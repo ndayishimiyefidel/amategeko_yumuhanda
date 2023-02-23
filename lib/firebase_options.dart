@@ -70,8 +70,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '922737655486',
     projectId: 'amategeko-75e59',
     storageBucket: 'amategeko-75e59.appspot.com',
-    iosClientId:
-        '922737655486-mo3ohnn7fjguttntm15bt3ll5034p505.apps.googleusercontent.com',
+    iosClientId: '922737655486-mo3ohnn7fjguttntm15bt3ll5034p505.apps.googleusercontent.com',
     iosBundleId: 'com.amategeko.amategeko',
   );
 }

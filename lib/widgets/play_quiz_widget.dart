@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class OptionTile extends StatefulWidget {
   final String option, description, correctAnswer, optionSelected;
+
   OptionTile(
       {required this.optionSelected,
       required this.option,
@@ -16,7 +17,7 @@ class _OptionTileState extends State<OptionTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
           Container(
@@ -34,7 +35,7 @@ class _OptionTileState extends State<OptionTile> {
             ),
             alignment: Alignment.center,
             child: Text(
-              "${widget.option}",
+              widget.option,
               style: TextStyle(
                   color: widget.optionSelected == widget.description
                       ? widget.optionSelected == widget.correctAnswer
@@ -43,14 +44,20 @@ class _OptionTileState extends State<OptionTile> {
                       : Colors.grey),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
-          Text(
-            widget.description,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
+          Expanded(
+            child: Text(
+              widget.description,
+              style: TextStyle(
+                fontSize: 16,
+                color: widget.optionSelected == widget.description
+                    ? widget.optionSelected == widget.correctAnswer
+                        ? Colors.green.withOpacity(0.7)
+                        : Colors.red
+                    : Colors.grey,
+              ),
             ),
           ),
         ],

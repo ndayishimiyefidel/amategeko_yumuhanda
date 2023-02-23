@@ -3,14 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/utils.dart';
 
 class AuthService {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   //create user
   Future createUser({email, password}) async {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
-
     } on FirebaseAuthException catch (e) {
       print(e.toString());
       Utils.ShowSnackBar(e.message);

@@ -1,6 +1,6 @@
 # amategeko
 
-A new Flutter project.
+A new Flutter project for show how .
 
 ## Getting Started
 
