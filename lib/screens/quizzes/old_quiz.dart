@@ -1,18 +1,17 @@
-import 'package:amategeko/components/text_field_container.dart';
-import 'package:amategeko/screens/questions/add_question.dart';
-import 'package:amategeko/services/auth.dart';
-import 'package:amategeko/services/database_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../utils/constants.dart';
-import '../../widgets/ProgressWidget.dart';
-import '../../widgets/fcmWidget.dart';
 import 'edit_quiz.dart';
 import 'open_quiz.dart';
+import '../../utils/constants.dart';
+import '../../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import '../../widgets/ProgressWidget.dart';
+import 'package:amategeko/services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:amategeko/services/database_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amategeko/screens/questions/add_question.dart';
+import 'package:amategeko/components/text_field_container.dart';
 
 class OldQuiz extends StatefulWidget {
   const OldQuiz({Key? key}) : super(key: key);
@@ -386,9 +385,9 @@ class _QuizTileState extends State<QuizTile> {
                                                   _isLoading = true;
                                                 });
                                                 checkValidCode(
-                                                  widget.currentUserId,
-                                                  code,
-                                                );
+                                                    widget.currentUserId,
+                                                    code,
+                                                    widget.quizId);
                                               }
                                             },
                                             child: const Text(
@@ -640,11 +639,13 @@ class _QuizTileState extends State<QuizTile> {
   }
 
 //check code
-  Future<void> checkValidCode(String currentUserId, String code) async {
+  Future<void> checkValidCode(
+      String currentUserId, String code, String quizId) async {
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
         .where("code", isEqualTo: code)
+        .where("isQuiz", isEqualTo: true)
         .get()
         .then((QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) {
@@ -703,7 +704,7 @@ class _QuizTileState extends State<QuizTile> {
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
-        // .where("quizId", isEqualTo: widget.quizId)
+        .where("isQuiz", isEqualTo: true)
         .get()
         .then((value) {
       if (value.size == 1) {
@@ -737,11 +738,13 @@ class _QuizTileState extends State<QuizTile> {
           "code": "",
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
           "isOpen": false,
+          "isQuiz": true,
         };
         FirebaseFirestore.instance
             .collection("Quiz-codes")
             .add(checkCode)
             .then((value) {
+          //send push notification
           sendPushMessage(userToken, body, notificationTitle);
           setState(() {
             _isLoading = false;

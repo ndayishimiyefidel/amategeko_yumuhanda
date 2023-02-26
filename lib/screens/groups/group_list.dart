@@ -393,113 +393,131 @@ class _FileTileState extends State<FileTile> {
           });
           _launchURL(widget.linkUrl);
         } else {
-          //show dialogue
-          final TextEditingController codeController = TextEditingController();
-          String code = "";
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Column(
-                    children: [
-                      const Text(
-                        "CODE VERIFICATION",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "If you don't have quiz code of ${widget.groupName}, pay ${widget.groupPrice} at phone number ${widget.adminPhone} ",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  content: Form(
-                    key: _formkey,
-                    child: TextFieldContainer(
-                      child: TextFormField(
-                        autofocus: false,
-                        maxLength: 6,
-                        controller: codeController,
-                        keyboardType: TextInputType.number,
-                        onSaved: (value) {
-                          codeController.text = value!;
-                        },
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          icon: Icon(
-                            Icons.code_off_outlined,
-                            color: kPrimaryColor,
-                          ),
-                          hintText: "Type Your code...",
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (val) {
-                          code = val;
-                        },
-                        autovalidateMode: AutovalidateMode.disabled,
-                        validator: (input) =>
-                            input!.isEmpty ? 'Enter Code Please' : null,
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor, elevation: 3),
-                      onPressed: () async {
-                        if (_formkey.currentState!.validate()) {
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          checkValidCode(
-                            widget.currentUserId,
-                            code,
-                            widget.groupId,
-                          );
-                        }
-                      },
-                      child: const Text(
-                        "Join Group",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryLightColor, elevation: 3),
-                      onPressed: () async {
-                        setState(() {
-                          _isLoading = true;
-                        });
-                        requestCode(widget.userToken, widget.currentUserId,
-                            widget.senderName, widget.groupName);
-                      },
-                      child: const Text(
-                        "Request Code",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.normal),
-                      ),
-                    ),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
+          ///check whether you already have code.
+          FirebaseFirestore.instance
+              .collection("Quiz-codes")
+              .where("userId", isEqualTo: widget.currentUserId)
+              .where("isOpen", isEqualTo: true)
+              .where("isQuiz", isEqualTo: false)
+              .get()
+              .then((value) {
+            if (value.size == 1) {
+              setState(() {
+                _isLoading = true;
               });
+              _launchURL(widget.linkUrl);
+            } else {
+              //show dialogue
+              final TextEditingController codeController =
+                  TextEditingController();
+              String code = "";
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Column(
+                        children: [
+                          const Text(
+                            "CODE VERIFICATION",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "If you don't have quiz code of ${widget.groupName}, pay ${widget.groupPrice} at phone number ${widget.adminPhone} ",
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Form(
+                        key: _formkey,
+                        child: TextFieldContainer(
+                          child: TextFormField(
+                            autofocus: false,
+                            maxLength: 6,
+                            controller: codeController,
+                            keyboardType: TextInputType.number,
+                            onSaved: (value) {
+                              codeController.text = value!;
+                            },
+                            textInputAction: TextInputAction.done,
+                            decoration: const InputDecoration(
+                              icon: Icon(
+                                Icons.code_off_outlined,
+                                color: kPrimaryColor,
+                              ),
+                              hintText: "Type Your code...",
+                              border: InputBorder.none,
+                            ),
+                            onChanged: (val) {
+                              code = val;
+                            },
+                            autovalidateMode: AutovalidateMode.disabled,
+                            validator: (input) =>
+                                input!.isEmpty ? 'Enter Code Please' : null,
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor, elevation: 3),
+                          onPressed: () async {
+                            if (_formkey.currentState!.validate()) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              checkValidCode(
+                                widget.currentUserId,
+                                code,
+                                widget.groupId,
+                              );
+                            }
+                          },
+                          child: const Text(
+                            "Join Group",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryLightColor,
+                              elevation: 3),
+                          onPressed: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            requestCode(widget.userToken, widget.currentUserId,
+                                widget.senderName, widget.groupName);
+                          },
+                          child: const Text(
+                            "Request Code",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Close"))
+                      ],
+                    );
+                  });
+            }
+          });
         }
       },
     );
@@ -552,31 +570,37 @@ class _FileTileState extends State<FileTile> {
   }
 
   //check code
+
   Future<void> checkValidCode(
       String currentUserId, String code, String quizId) async {
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
         .where("code", isEqualTo: code)
+        .where("isQuiz", isEqualTo: false)
         .get()
-        .then((value) {
-      setState(() {
-        _isLoading = false;
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        print(doc.reference.id);
+        FirebaseFirestore.instance
+            .collection("Quiz-codes")
+            .doc(doc.reference.id)
+            .update({"isOpen": true});
       });
-      if (value.size == 1) {
+      if (querySnapshot.size == 1) {
+        //join group whatsapp
         setState(() {
-          //join the whatsapp group
+          _isLoading = false;
           _launchURL(widget.linkUrl);
         });
       } else {
-        //double check your code,
         setState(() {
           showDialog(
               context: context,
               builder: (context) {
                 return AlertDialog(
                   content: const Text(
-                      "Invalid code for this whatsapp,Double check and try again"),
+                      "Invalid code for this group code ,Double check and try again"),
                   actions: [
                     TextButton(
                         onPressed: () {
@@ -595,15 +619,15 @@ class _FileTileState extends State<FileTile> {
   Future<void> requestCode(String userToken, String currentUserId,
       String senderName, String title) async {
     String body =
-        "Hello Sir,My Name is $senderName  and My phone number is ${widget.userPhone} \n I have completed to pay for quiz called $title .\n"
+        "Hello Sir,My Name is $senderName  and My phone number is ${widget.userPhone} \n I have completed to pay for joining  $title  group whatsapp.\n"
         "so can generate code for me. Thank you I'm waiting.";
-    String notificationTitle = "Requesting Quiz Code";
+    String notificationTitle = "Requesting Group Whatsapp Code";
 
     //make sure that request is not already sent
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
-        .where("quizId", isEqualTo: widget.groupId)
+        .where("isQuiz", isEqualTo: false)
         .get()
         .then((value) {
       if (value.size == 1) {
@@ -635,12 +659,15 @@ class _FileTileState extends State<FileTile> {
           "quizId": widget.groupId,
           "quizTitle": title,
           "code": "",
+          "isQuiz": false,
+          "isOpen": false,
           "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
         };
         FirebaseFirestore.instance
             .collection("Quiz-codes")
             .add(checkCode)
             .then((value) {
+          //send push notification
           sendPushMessage(userToken, body, notificationTitle);
           setState(() {
             _isLoading = false;
