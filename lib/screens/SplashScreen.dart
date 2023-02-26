@@ -1,14 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'HomeScreen.dart';
+import '../utils/constants.dart';
+import 'Welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
-
-import '../utils/constants.dart';
-import 'HomeScreen.dart';
-import 'Welcome/welcome_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
     return SplashScreenView(
       navigateRoute: isAlreadyLoggedIn
           ? HomeScreen(
-              currentuserid: currentuserid!,
+              currentuserid: currentuserid.toString(),
               userRole: userRole.toString(),
             )
           : WelcomeScreen(),

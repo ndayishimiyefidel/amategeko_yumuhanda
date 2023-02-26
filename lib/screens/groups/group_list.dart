@@ -1,20 +1,18 @@
 import 'dart:io';
-
-import 'package:amategeko/screens/groups/create_group.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../components/text_field_container.dart';
 import '../../services/auth.dart';
-import '../../services/database_service.dart';
 import '../../utils/constants.dart';
-import '../../widgets/MainDrawer.dart';
 import '../../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import '../../widgets/MainDrawer.dart';
 import '../homepages/nofications.dart';
+import '../../services/database_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../components/text_field_container.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:amategeko/screens/groups/create_group.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GroupList extends StatefulWidget {
   const GroupList({Key? key}) : super(key: key);
@@ -34,7 +32,7 @@ class _GroupListState extends State<GroupList> {
 
   //shared preferences
   late SharedPreferences preferences;
-  late String currentuserid;
+  late String? currentuserid;
   late String currentusername;
   String userRole = "";
   late String photo;
@@ -126,7 +124,7 @@ class _GroupListState extends State<GroupList> {
                               .data()["groupType"]
                               .toString(),
                           userRole: userRole,
-                          currentUserId: currentuserid,
+                          currentUserId: currentuserid.toString(),
                           groupPrice: snapshot.data.docs[index]
                               .data()["groupPrice"]
                               .toString(),
@@ -560,7 +558,6 @@ class _FileTileState extends State<FileTile> {
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
         .where("code", isEqualTo: code)
-        .where("quizId", isEqualTo: quizId)
         .get()
         .then((value) {
       setState(() {
@@ -579,7 +576,7 @@ class _FileTileState extends State<FileTile> {
               builder: (context) {
                 return AlertDialog(
                   content: const Text(
-                      "Invalid code for this quiz,Double check and try again"),
+                      "Invalid code for this whatsapp,Double check and try again"),
                   actions: [
                     TextButton(
                         onPressed: () {

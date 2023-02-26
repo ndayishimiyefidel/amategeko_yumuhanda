@@ -27,7 +27,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Traffic Rules">
+        android:label="CODE DE LA ROUTE">
 
         <activity
             android:name=".MainActivity"
