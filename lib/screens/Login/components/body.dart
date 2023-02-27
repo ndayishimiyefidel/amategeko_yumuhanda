@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import '../../forgotpassword/forgot_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/Login/components/background.dart';
-
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -150,6 +150,43 @@ class _SignInState extends State<SignIn> {
                     border: InputBorder.none,
                   ),
                 ),
+              ),
+              SizedBox(
+                height: size.height * 0.01,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 45),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    const Text(
+                      "Forgot Password ?  ",
+                      style: TextStyle(color: kPrimaryColor),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const ForgotScreen();
+                            },
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Reset",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: size.height * 0.01,
               ),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
