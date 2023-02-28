@@ -39,6 +39,7 @@ class _SignInState extends State<SignIn> {
     _passwordVisible = false;
     _messaging.getToken().then((value) {
       fcmToken = value;
+      print("My fcm token is: $fcmToken");
     });
   }
 
@@ -284,8 +285,12 @@ class _SignInState extends State<SignIn> {
             .doc(user!.uid)
             .get()
             .then((datasnapshot) async {
-          if (datasnapshot.data()!["fcmToken"] == fcmToken) {
-            String userRole = datasnapshot.data()!["role"];
+          String userRole = datasnapshot.data()!["role"];
+
+          ///make sure the user role is not admininstrator
+          /// no way to check which device is using
+
+          if (datasnapshot.data()!['role'] == "Admin") {
             await preferences.setString("uid", datasnapshot.data()!["uid"]);
             await preferences.setString("name", datasnapshot.data()!["name"]);
             await preferences.setString(
@@ -297,7 +302,6 @@ class _SignInState extends State<SignIn> {
             setState(() {
               isloading = false;
             });
-            // Navigator.of(context).pop(context);
             Route route = MaterialPageRoute(
                 builder: (c) => HomeScreen(
                       currentuserid: user!.uid,
@@ -305,14 +309,38 @@ class _SignInState extends State<SignIn> {
                     ));
             Navigator.push(context, route);
           } else {
-            setState(() {
-              isloading = false;
-            });
-            Fluttertoast.showToast(
-                msg:
-                    "Not registered on this device, please use device you have registered in before.",
-                textColor: Colors.red,
-                fontSize: 18);
+            ///tracking user role
+            if (datasnapshot.data()!["fcmToken"] == fcmToken) {
+              await preferences.setString("uid", datasnapshot.data()!["uid"]);
+              await preferences.setString("name", datasnapshot.data()!["name"]);
+              await preferences.setString(
+                  "photo", datasnapshot.data()!["photoUrl"]);
+              await preferences.setString(
+                  "email", datasnapshot.data()!["email"]);
+              await preferences.setString("role", datasnapshot.data()!["role"]);
+              await preferences.setString(
+                  "phone", datasnapshot.data()!["phone"]);
+
+              setState(() {
+                isloading = false;
+              });
+              // Navigator.of(context).pop(context);
+              Route route = MaterialPageRoute(
+                  builder: (c) => HomeScreen(
+                        currentuserid: user!.uid,
+                        userRole: userRole,
+                      ));
+              Navigator.push(context, route);
+            } else {
+              setState(() {
+                isloading = false;
+              });
+              Fluttertoast.showToast(
+                  msg:
+                      "Not registered on this device, please use device you have registered in before.",
+                  textColor: Colors.red,
+                  fontSize: 18);
+            }
           }
         });
       } else {

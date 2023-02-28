@@ -361,7 +361,7 @@ class _QuizTileState extends State<QuizTile> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  "If you don't have quiz code of ${widget.title}, pay ${widget.quizPrice} at phone number ${widget.adminPhone} ",
+                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                                                   textAlign: TextAlign.start,
                                                   style: const TextStyle(
                                                     fontSize: 16,
@@ -736,7 +736,7 @@ class _QuizTileState extends State<QuizTile> {
   Future<void> requestCode(String userToken, String currentUserId,
       String senderName, String title) async {
     String body =
-        "Hello Sir,My Name is $senderName  and My phone number is $widget.phone \n I have completed to pay for quiz called $title .\n"
+        "Hello Sir,My Name is $senderName  and My phone number is ${widget.phone} \n I have completed to pay for exam called $title .\n"
         "so can generate code for me. Thank you I'm waiting.";
     String notificationTitle = "Requesting Quiz Code";
 

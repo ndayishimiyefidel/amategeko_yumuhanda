@@ -27,7 +27,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="CODE DE LA ROUTE">
+        android:label="Code de la Route">
 
         <activity
             android:name=".MainActivity"

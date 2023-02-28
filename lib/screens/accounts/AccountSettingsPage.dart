@@ -1,18 +1,17 @@
-import 'dart:async';
 import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../resources/user_state_methods.dart';
+import 'dart:async';
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/MainDrawer.dart';
 import '../../widgets/ProgressWidget.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../resources/user_state_methods.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class UserSettings extends StatelessWidget {
   UserSettings({super.key});
@@ -182,7 +181,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       isLoading = false;
     });
-
     FirebaseFirestore.instance
         .collection("Users")
         .doc(id)
@@ -191,6 +189,14 @@ class SettingsScreenState extends State<SettingsScreen> {
       await preferences.setString("photo", photoUrl);
       await preferences.setString("name", name);
       await preferences.setString("phone", phone);
+      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+      User currentUser = firebaseAuth.currentUser as User;
+      currentUser.updatePassword(password).then((value) {
+        Fluttertoast.showToast(msg: "Password changed.");
+      }).catchError((err) {
+        // An error has occured.
+        print(err);
+      });
 
       setState(() {
         isLoading = false;

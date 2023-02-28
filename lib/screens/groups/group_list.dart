@@ -425,7 +425,7 @@ class _FileTileState extends State<FileTile> {
                             ),
                           ),
                           Text(
-                            "If you don't have quiz code of ${widget.groupName}, pay ${widget.groupPrice} at phone number ${widget.adminPhone} ",
+                            "Kugirango ubashe kwinjira muri ${widget.groupName}group whatsapp icyo usabwa nukwishyura ${widget.groupPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                               fontSize: 16,
