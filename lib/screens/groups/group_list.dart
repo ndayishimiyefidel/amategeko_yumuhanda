@@ -389,7 +389,7 @@ class _FileTileState extends State<FileTile> {
         if (widget.groupType == "Facebook") {
           //join group automatically
           setState(() {
-            _isLoading = true;
+            _isLoading = false;
           });
           _launchURL(widget.linkUrl);
         } else {
@@ -403,7 +403,7 @@ class _FileTileState extends State<FileTile> {
               .then((value) {
             if (value.size == 1) {
               setState(() {
-                _isLoading = true;
+                _isLoading = false;
               });
               _launchURL(widget.linkUrl);
             } else {
@@ -420,18 +420,21 @@ class _FileTileState extends State<FileTile> {
                           const Text(
                             "CODE VERIFICATION",
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          const SizedBox(
+                            height: 5,
+                          ),
                           Text(
-                            "Kugirango ubashe kwinjira muri ${widget.groupName}group whatsapp icyo usabwa nukwishyura ${widget.groupPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
+                            "Kugirango ubashe kwinjira muri ${widget.groupName}group whatsapp icyo usabwa nukwishyura ${widget.groupPrice.isEmpty ? 1000 : widget.groupPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
                               fontStyle: FontStyle.italic,
-                              color: Colors.red,
+                              color: kPrimaryColor,
                             ),
                           ),
                         ],
@@ -585,33 +588,34 @@ class _FileTileState extends State<FileTile> {
         FirebaseFirestore.instance
             .collection("Quiz-codes")
             .doc(doc.reference.id)
-            .update({"isOpen": true});
+            .update({"isOpen": true}).then((value) {
+          if (querySnapshot.size == 1) {
+            //join group whatsapp
+            setState(() {
+              _isLoading = false;
+              _launchURL(widget.linkUrl);
+            });
+          } else {
+            setState(() {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: const Text(
+                          "Invalid code for this group code ,Double check and try again"),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Close"))
+                      ],
+                    );
+                  });
+            });
+          }
+        });
       });
-      if (querySnapshot.size == 1) {
-        //join group whatsapp
-        setState(() {
-          _isLoading = false;
-          _launchURL(widget.linkUrl);
-        });
-      } else {
-        setState(() {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Invalid code for this group code ,Double check and try again"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
-        });
-      }
     });
   }
 

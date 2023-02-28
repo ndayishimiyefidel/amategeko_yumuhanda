@@ -104,6 +104,7 @@ class _NewQuizState extends State<NewQuiz> {
                         ///
 
                         return QuizTile(
+                          index: index,
                           quizId: snapshot.data!.docs[index].data()['quizId'],
                           imgurl:
                               snapshot.data!.docs[index].data()["quizImgUrl"],
@@ -122,7 +123,6 @@ class _NewQuizState extends State<NewQuiz> {
                           quizPrice:
                               snapshot.data.docs[index].data()["quizPrice"],
                           adminPhone: adminPhone.toString(),
-                          examno: examno + 1,
                         );
                       });
             }
@@ -133,6 +133,9 @@ class _NewQuizState extends State<NewQuiz> {
 
   @override
   void initState() {
+    ////
+    ///update
+
     _messaging.getToken().then((value) {
       print("My token is $value");
     });
@@ -177,7 +180,7 @@ class QuizTile extends StatefulWidget {
   final String currentUserId;
   final String quizPrice;
   final String email, photoUrl;
-  final int examno;
+  final int index;
 
   const QuizTile({
     Key? key,
@@ -196,7 +199,7 @@ class QuizTile extends StatefulWidget {
     required this.userRole,
     required this.quizPrice,
     required this.adminPhone,
-    required this.examno,
+    required this.index,
   }) : super(key: key);
 
   @override
@@ -244,7 +247,7 @@ class _QuizTileState extends State<QuizTile> {
                       SizedBox(
                         height: size.height * 0.03,
                       ),
-                      Text(widget.title,
+                      Text("${widget.index + 1}. ${widget.title}",
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -267,18 +270,18 @@ class _QuizTileState extends State<QuizTile> {
                         height: size.height * 0.01,
                       ),
 
-                      Text(
-                        "QUIZ PRICE:  ${widget.quizPrice}",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.02,
-                      ),
+                      // Text(
+                      //   "Exam PRICE:  ${widget.quizPrice}",
+                      //   textAlign: TextAlign.start,
+                      //   style: const TextStyle(
+                      //     fontSize: 16,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Colors.green,
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   height: size.height * 0.02,
+                      // ),
                       // Text(
                       //   "Exam : ${widget.examno}",
                       //   textAlign: TextAlign.start,
@@ -288,9 +291,9 @@ class _QuizTileState extends State<QuizTile> {
                       //     color: Colors.blue,
                       //   ),
                       // ),
-                      SizedBox(
-                        height: size.height * 0.03,
-                      ),
+                      // SizedBox(
+                      //   height: size.height * 0.03,
+                      // ),
                       //button
                       _isLoading
                           ? circularprogress()
@@ -356,19 +359,20 @@ class _QuizTileState extends State<QuizTile> {
                                                 const Text(
                                                   "CODE VERIFICATION",
                                                   style: TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: 22,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
+                                                SizedBox(height: 5),
                                                 Text(
-                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
+                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice.isEmpty ? 1500 : widget.quizPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                                                   textAlign: TextAlign.start,
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     fontStyle: FontStyle.italic,
-                                                    color: Colors.red,
+                                                    color: kPrimaryColor,
                                                   ),
                                                 ),
                                               ],
@@ -693,42 +697,43 @@ class _QuizTileState extends State<QuizTile> {
         FirebaseFirestore.instance
             .collection("Quiz-codes")
             .doc(doc.reference.id)
-            .update({"isOpen": true});
+            .update({"isOpen": true}).then((value) {
+          if (querySnapshot.size == 1) {
+            setState(() {
+              _isLoading = false;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return OpenQuiz(
+                      quizId: widget.quizId,
+                      title: widget.title,
+                    );
+                  },
+                ),
+              );
+            });
+          } else {
+            setState(() {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: const Text(
+                          "Invalid code for this quiz,Double check and try again"),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Close"))
+                      ],
+                    );
+                  });
+            });
+          }
+        });
       });
-      if (querySnapshot.size == 1) {
-        setState(() {
-          _isLoading = false;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return OpenQuiz(
-                  quizId: widget.quizId,
-                  title: widget.title,
-                );
-              },
-            ),
-          );
-        });
-      } else {
-        setState(() {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Invalid code for this quiz,Double check and try again"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
-        });
-      }
     });
   }
 

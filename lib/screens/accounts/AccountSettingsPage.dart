@@ -82,15 +82,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController nameTextEditingController;
   late TextEditingController emailTextEditingController;
   late TextEditingController phoneTextEditingController;
-  late TextEditingController passwordTextEditingController;
-  late bool _passwordVisible;
 
   String id = "";
   String name = "";
   String email = "";
   String photoUrl = "";
   String phone = "";
-  String password = "";
   File? imageFileAvatar;
   final picker = ImagePicker();
   bool isLoading = false;
@@ -105,7 +102,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _passwordVisible = false;
     readDataFromLocal();
   }
 
@@ -121,7 +117,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     nameTextEditingController = TextEditingController(text: name);
     emailTextEditingController = TextEditingController(text: email);
     phoneTextEditingController = TextEditingController(text: phone);
-    passwordTextEditingController = TextEditingController(text: password);
 
     isInitialLoading = false;
     setState(() {});
@@ -177,26 +172,17 @@ class SettingsScreenState extends State<SettingsScreen> {
     nameFocusNode.unfocus();
     emailFocusNode.unfocus();
     phoneFocusNode.unfocus();
-    passwordFocusNode.unfocus();
     setState(() {
       isLoading = false;
     });
+
     FirebaseFirestore.instance
         .collection("Users")
         .doc(id)
-        .update({"name": name, "phone": phone, "password": password}).then(
-            (data) async {
+        .update({"name": name, "phone": phone}).then((data) async {
       await preferences.setString("photo", photoUrl);
       await preferences.setString("name", name);
       await preferences.setString("phone", phone);
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      User currentUser = firebaseAuth.currentUser as User;
-      currentUser.updatePassword(password).then((value) {
-        Fluttertoast.showToast(msg: "Password changed.");
-      }).catchError((err) {
-        // An error has occured.
-        print(err);
-      });
 
       setState(() {
         isLoading = false;
@@ -432,66 +418,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ],
                                 )),
-                            //password
-                            Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 25.0, right: 25.0, top: 25.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: const <Widget>[
-                                        Text(
-                                          'Password',
-                                          style: TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )),
-                            Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 25.0, right: 25.0, top: 2.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Flexible(
-                                      child: TextField(
-                                        readOnly: false,
-                                        obscureText: !_passwordVisible,
-                                        decoration: InputDecoration(
-                                          hintText: "Enter new password",
-                                          suffixIcon: IconButton(
-                                            icon: Icon(
-                                              _passwordVisible
-                                                  ? Icons.visibility_off
-                                                  : Icons.visibility,
-                                              color: kPrimaryColor,
-                                            ),
-                                            onPressed: () {
-                                              setState(() {
-                                                _passwordVisible =
-                                                    !_passwordVisible;
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        enabled: !_status,
-                                        controller:
-                                            passwordTextEditingController,
-                                        focusNode: passwordFocusNode,
-                                        onChanged: (value) {
-                                          password = value;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                )),
+
                             //Email field
                             Padding(
                                 padding: const EdgeInsets.only(

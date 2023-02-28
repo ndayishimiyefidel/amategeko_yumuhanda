@@ -121,7 +121,7 @@ class _OldQuizState extends State<OldQuiz> {
                           quizPrice:
                               snapshot.data.docs[index].data()["quizPrice"],
                           adminPhone: adminPhone.toString(),
-                          quizNo: quizNo,
+                          index: index,
                         );
                       });
             }
@@ -176,7 +176,7 @@ class QuizTile extends StatefulWidget {
   final String currentUserId;
   final String quizPrice;
   final String email, photoUrl;
-  final int quizNo;
+  final int index;
 
   const QuizTile({
     Key? key,
@@ -195,7 +195,7 @@ class QuizTile extends StatefulWidget {
     required this.userRole,
     required this.quizPrice,
     required this.adminPhone,
-    required this.quizNo,
+    required this.index,
   }) : super(key: key);
 
   @override
@@ -244,7 +244,7 @@ class _QuizTileState extends State<QuizTile> {
                       SizedBox(
                         height: size.height * 0.03,
                       ),
-                      Text(widget.title,
+                      Text("${widget.index + 1}. ${widget.title}",
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -263,26 +263,26 @@ class _QuizTileState extends State<QuizTile> {
                           color: Colors.blueGrey,
                         ),
                       ),
-                      SizedBox(
-                        height: size.height * 0.01,
-                      ),
+                      // SizedBox(
+                      //   height: size.height * 0.01,
+                      // ),
 
-                      Text(
-                        "QUIZ COST: ${widget.quizType}",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.02,
-                      ),
+                      // Text(
+                      //   "QUIZ COST: ${widget.quizType}",
+                      //   textAlign: TextAlign.start,
+                      //   style: const TextStyle(
+                      //     fontSize: 16,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Colors.green,
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   height: size.height * 0.02,
+                      // ),
 
-                      SizedBox(
-                        height: size.height * 0.03,
-                      ),
+                      // SizedBox(
+                      //   height: size.height * 0.03,
+                      // ),
                       //button
                       _isLoading
                           ? circularprogress()
