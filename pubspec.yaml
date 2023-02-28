@@ -34,10 +34,10 @@ dependencies:
     sdk: flutter
   intl: ^0.17.0
   #  ionicons: ^0.2.1
-  localization: ^2.1.0
+  #  localization: ^2.1.0
   #  date_time_picker: ^2.1.0
-  package_info_plus: ^1.0.0
-  device_info_plus: ^4.0.0
+  #  package_info_plus: ^1.0.0
+  #  device_info_plus: ^4.0.0
   #  get: ^4.1.4
   #  dropdown_search: ^5.0.5
   #  fzregex: ^2.0.0

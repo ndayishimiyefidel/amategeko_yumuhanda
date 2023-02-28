@@ -27,7 +27,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Code de la Route">
+        android:label="Code de la Route (Amategeko y'umuhanda)">
 
         <activity
             android:name=".MainActivity"
