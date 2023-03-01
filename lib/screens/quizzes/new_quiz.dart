@@ -329,6 +329,7 @@ class _QuizTileState extends State<QuizTile> {
                                     .where("userId",
                                         isEqualTo: widget.currentUserId)
                                     .where("isOpen", isEqualTo: true)
+                                    .where("isQuiz", isEqualTo: true)
                                     .get()
                                     .then((value) {
                                   if (value.size == 1) {
@@ -365,7 +366,7 @@ class _QuizTileState extends State<QuizTile> {
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
-                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice.isEmpty ? 1500 : widget.quizPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
+                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice.isEmpty ? 1000 : widget.quizPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                                                   textAlign: TextAlign.start,
                                                   style: const TextStyle(
                                                     fontSize: 16,

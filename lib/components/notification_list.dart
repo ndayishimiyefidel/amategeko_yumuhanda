@@ -1,11 +1,10 @@
+import 'package:intl/intl.dart';
+import '../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import 'package:random_string/random_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../widgets/fcmWidget.dart';
 
 class UsersNotificationList extends StatefulWidget {
   final String name;
@@ -229,7 +228,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .doc(docId)
-        .update({"code": generatedCode}).then((value) {
+        .update({"code": generatedCode, "isOpen": true}).then((value) {
       _getToken();
       setState(() {
         _isLoading = false;
