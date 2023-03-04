@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
+import 'background.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/signup_screen.dart';
-import 'background.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
   const Body({super.key});
@@ -74,10 +73,11 @@ class _BodyState extends State<Body> {
                   style:
                       ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
                   onPressed: () {
-                    loginNavigator();
+                    setState(() {});
+                    signupNavigator();
                   },
                   child: const Text(
-                    "LOGIN",
+                    "SIGN UP",
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -96,19 +96,19 @@ class _BodyState extends State<Body> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: kPrimaryLightColor),
                   onPressed: () {
-                    setState(() {});
-                    signupNavigator();
+                    loginNavigator();
                   },
                   child: const Text(
-                    "SIGN UP",
+                    "LOGIN",
                     style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal),
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

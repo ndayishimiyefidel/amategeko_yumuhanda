@@ -366,7 +366,7 @@ class _QuizTileState extends State<QuizTile> {
                                                 ),
                                                 SizedBox(height: 5),
                                                 Text(
-                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice.isEmpty ? 1000 : widget.quizPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
+                                                  "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice.isEmpty ? 1000 : widget.quizPrice}frw kuri ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                                                   textAlign: TextAlign.start,
                                                   style: const TextStyle(
                                                     fontSize: 16,
@@ -399,7 +399,7 @@ class _QuizTileState extends State<QuizTile> {
                                                       color: kPrimaryColor,
                                                     ),
                                                     hintText:
-                                                        "Type Your code...",
+                                                        "Shyiramo code...",
                                                     border: InputBorder.none,
                                                   ),
                                                   onChanged: (val) {
@@ -409,7 +409,7 @@ class _QuizTileState extends State<QuizTile> {
                                                       AutovalidateMode.disabled,
                                                   validator: (input) =>
                                                       input!.isEmpty
-                                                          ? 'Enter Code Please'
+                                                          ? 'Gukomeza bisaba Kode'
                                                           : null,
                                                 ),
                                               ),
@@ -434,7 +434,7 @@ class _QuizTileState extends State<QuizTile> {
                                                   }
                                                 },
                                                 child: const Text(
-                                                  "Continue",
+                                                  "Komeza",
                                                   style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 12,
@@ -458,7 +458,7 @@ class _QuizTileState extends State<QuizTile> {
                                                       widget.title);
                                                 },
                                                 child: const Text(
-                                                  "Request Code",
+                                                  "Saba Kode",
                                                   style: TextStyle(
                                                       color: Colors.black,
                                                       fontSize: 12,

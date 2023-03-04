@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../components/chat_for_users_list.dart';
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
+import '../../components/chat_for_users_list.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -82,6 +81,7 @@ class _UserListState extends State<UserList> {
               stream: FirebaseFirestore.instance
                   .collection("Users")
                   .where("role", isNotEqualTo: "Admin")
+                  .orderBy("createdAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

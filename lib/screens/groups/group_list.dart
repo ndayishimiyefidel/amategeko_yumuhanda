@@ -428,7 +428,7 @@ class _FileTileState extends State<FileTile> {
                             height: 5,
                           ),
                           Text(
-                            "Kugirango ubashe kwinjira muri ${widget.groupName}group whatsapp icyo usabwa nukwishyura ${widget.groupPrice.isEmpty ? 1000 : widget.groupPrice}frw kuri ${widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
+                            "Kugirango ubashe kwinjira muri ${widget.groupName}group whatsapp icyo usabwa nukwishyura ${widget.groupPrice.isEmpty ? 1000 : widget.groupPrice}frw kuri  ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                               fontSize: 16,
@@ -456,15 +456,16 @@ class _FileTileState extends State<FileTile> {
                                 Icons.code_off_outlined,
                                 color: kPrimaryColor,
                               ),
-                              hintText: "Type Your code...",
+                              hintText: "Shyiramo code...",
                               border: InputBorder.none,
                             ),
                             onChanged: (val) {
                               code = val;
                             },
                             autovalidateMode: AutovalidateMode.disabled,
-                            validator: (input) =>
-                                input!.isEmpty ? 'Enter Code Please' : null,
+                            validator: (input) => input!.isEmpty
+                                ? 'Kwinjira muri group bisaba kode'
+                                : null,
                           ),
                         ),
                       ),
@@ -485,7 +486,7 @@ class _FileTileState extends State<FileTile> {
                             }
                           },
                           child: const Text(
-                            "Join Group",
+                            "Injira group",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
@@ -504,7 +505,7 @@ class _FileTileState extends State<FileTile> {
                                 widget.senderName, widget.groupName);
                           },
                           child: const Text(
-                            "Request Code",
+                            "Saba Kode",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 12,

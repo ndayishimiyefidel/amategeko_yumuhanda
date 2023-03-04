@@ -1,12 +1,11 @@
-import 'package:amategeko/screens/quizzes/new_quiz.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'old_quiz.dart';
+import 'create_quiz.dart';
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/MainDrawer.dart';
 import '../homepages/nofications.dart';
-import 'create_quiz.dart';
-import 'old_quiz.dart';
+import 'package:amategeko/screens/quizzes/new_quiz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Quizzes extends StatefulWidget {
   @override
@@ -89,8 +88,8 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
                         unselectedLabelColor: Colors.black26,
                         indicatorColor: Colors.black,
                         tabs: [
-                          Tab(text: 'Quiz'),
                           Tab(text: 'Exam'),
+                          Tab(text: 'Quiz'),
                         ],
                       ),
                     ),
@@ -103,10 +102,8 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
                     ),
                     child: const TabBarView(
                       children: <Widget>[
-                        // TodayAttendance(),
-                        // OverallAttendance(),
-                        OldQuiz(),
                         NewQuiz(),
+                        OldQuiz(),
                       ],
                     ),
                   ),
