@@ -1,17 +1,18 @@
-import 'package:flutter_svg/svg.dart';
+import 'package:amategeko/components/text_field_container.dart';
+import 'package:amategeko/screens/HomeScreen.dart';
+import 'package:amategeko/screens/Login/components/background.dart';
+import 'package:amategeko/screens/Signup/signup_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../forgotpassword/forgot_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:amategeko/screens/HomeScreen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:amategeko/screens/Signup/signup_screen.dart';
-import 'package:amategeko/components/text_field_container.dart';
-import 'package:amategeko/screens/Login/components/background.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -66,13 +67,54 @@ class _SignInState extends State<SignIn> {
             children: <Widget>[
               SizedBox(height: size.height * 0.03),
               const Text(
-                "LOGIN PAGE",
+                "KWINJIRA MURI APULIKASIYO",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: size.height * 0.03),
               SvgPicture.asset(
                 "assets/icons/login.svg",
                 height: size.height * 0.35,
+              ),
+              SizedBox(height: size.height * 0.03),
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "ICYITONDERWA:",
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.02),
+                    const Text(
+                      "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wabariza kuri izi inforumasiyo zikurikira:",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.02),
+                    const Text(
+                      "Telephone:0788659575/0728877442",
+                      style: TextStyle(
+                        color: kPrimaryColor,
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.01),
+                    const Text(
+                      "Imeri:maitrealexis001@gmail.com",
+                      style: TextStyle(
+                        color: kPrimaryColor,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: size.height * 0.03),
               TextFieldContainer(
@@ -104,7 +146,7 @@ class _SignInState extends State<SignIn> {
                       Icons.email,
                       color: kPrimaryColor,
                     ),
-                    hintText: "Your Email",
+                    hintText: "imeri yawe",
                     border: InputBorder.none,
                   ),
                 ),
@@ -130,7 +172,7 @@ class _SignInState extends State<SignIn> {
                   },
                   cursorColor: kPrimaryColor,
                   decoration: InputDecoration(
-                    hintText: "Your Phone...",
+                    hintText: "Andika telefoni yawe...",
                     icon: const Icon(
                       Icons.lock_outlined,
                       color: kPrimaryColor,
@@ -161,7 +203,7 @@ class _SignInState extends State<SignIn> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     const Text(
-                      "Forgot Password ?  ",
+                      "Wibagiwe numero ya terefone? ",
                       style: TextStyle(color: kPrimaryColor),
                     ),
                     GestureDetector(
@@ -176,7 +218,7 @@ class _SignInState extends State<SignIn> {
                         );
                       },
                       child: const Text(
-                        "Reset",
+                        "Gusubiramo",
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
@@ -202,10 +244,10 @@ class _SignInState extends State<SignIn> {
                       loginUser();
                     },
                     child: const Text(
-                      "LOGIN",
+                      "Injira",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -221,7 +263,7 @@ class _SignInState extends State<SignIn> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    "Don’t have an Account ? ",
+                    "Ntugire Konti ?   ",
                     style: TextStyle(color: kPrimaryColor),
                   ),
                   GestureDetector(
@@ -236,7 +278,7 @@ class _SignInState extends State<SignIn> {
                       );
                     },
                     child: const Text(
-                      "Sign Up",
+                      "Iyandikishe",
                       style: TextStyle(
                         color: kPrimaryColor,
                         fontWeight: FontWeight.bold,

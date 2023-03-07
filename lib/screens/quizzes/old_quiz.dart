@@ -436,7 +436,7 @@ class _QuizTileState extends State<QuizTile> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Text(
-                                  "Start Quiz",
+                                  "Tangira Imyitozo",
                                   style: TextStyle(
                                       color: Colors.white,
                                       letterSpacing: 2,

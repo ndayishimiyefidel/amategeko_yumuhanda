@@ -1,10 +1,11 @@
-import 'background.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../utils/constants.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/signup_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'background.dart';
 
 class Body extends StatefulWidget {
   const Body({super.key});
@@ -53,14 +54,43 @@ class _BodyState extends State<Body> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              "WELCOME TO TRAFFIC RULE APP",
-              style: TextStyle(fontWeight: FontWeight.bold),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, right: 15),
+              child: Text(
+                "MURAKAZA NEZA KURI APULIKASIYO Y'AMATEGEKO Y'UMUHANDA",
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
             ),
             SizedBox(height: size.height * 0.05),
             SvgPicture.asset(
               "assets/icons/chat.svg",
               height: size.height * 0.45,
+            ),
+            SizedBox(height: size.height * 0.01),
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    "ICYITONDERWA:",
+                    style: TextStyle(
+                      fontSize: 22,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Niba uri mushya kuri iyi apulikasiyo kanda "
+                    "kuri buto ibanza yitwa iyandikishe,Naho niba usanzwe ufite konti kanda ahanditse injira",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
             ),
             SizedBox(height: size.height * 0.05),
             Container(
@@ -77,10 +107,10 @@ class _BodyState extends State<Body> {
                     signupNavigator();
                   },
                   child: const Text(
-                    "SIGN UP",
+                    "Iyandikishe",
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -99,7 +129,7 @@ class _BodyState extends State<Body> {
                     loginNavigator();
                   },
                   child: const Text(
-                    "LOGIN",
+                    "Injira",
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,

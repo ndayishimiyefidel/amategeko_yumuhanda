@@ -1,16 +1,17 @@
-import '../../HomeScreen.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:flutter/material.dart';
-import '../../../utils/constants.dart';
-import '../../Login/login_screen.dart';
-import '../../../widgets/ProgressWidget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import '../../Signup/components/background.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../components/text_field_container.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../components/text_field_container.dart';
+import '../../../utils/constants.dart';
+import '../../../widgets/ProgressWidget.dart';
+import '../../HomeScreen.dart';
+import '../../Login/login_screen.dart';
+import '../../Signup/components/background.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -164,9 +165,9 @@ class _SignUpState extends State<SignUp> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(height: size.height * 0.03),
+                SizedBox(height: size.height * 0.05),
                 const Text(
-                  "SIGNUP PAGE",
+                  "IYANDIKISHE Nk'UMUNTU MUSHYA USHAKA KWIGA",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: size.height * 0.03),
@@ -174,6 +175,48 @@ class _SignUpState extends State<SignUp> {
                   "assets/icons/signup.svg",
                   height: size.height * 0.35,
                 ),
+                SizedBox(height: size.height * 0.03),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "ICYITONDERWA:",
+                        style: TextStyle(
+                          fontSize: 22,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: size.height * 0.02),
+                      const Text(
+                        "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wabariza kuri izi inforumasiyo zikurikira:",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: size.height * 0.02),
+                      const Text(
+                        "Telephone:0788659575/0728877442",
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                        ),
+                      ),
+                      SizedBox(height: size.height * 0.01),
+                      const Text(
+                        "Imeri:maitrealexis001@gmail.com",
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: size.height * 0.03),
                 TextFieldContainer(
                   child: TextFormField(
                     controller: nameEditingController,
@@ -206,7 +249,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.person,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Your Name",
+                      hintText: "Andika amazina yawe..",
                       border: InputBorder.none,
                     ),
                   ),
@@ -241,7 +284,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.email,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Your Email",
+                      hintText: "Andika imeli yawe...",
                       border: InputBorder.none,
                     ),
                   ),
@@ -276,7 +319,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.phone_outlined,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Enter Phone Number",
+                      hintText: "Andika Telefoni yawe...",
                       border: InputBorder.none,
                     ),
                   ),
@@ -317,7 +360,7 @@ class _SignUpState extends State<SignUp> {
                     },
                     cursorColor: kPrimaryColor,
                     decoration: InputDecoration(
-                      hintText: "Re-enter phone number",
+                      hintText: "Ongera wandike telefoni..",
                       icon: const Icon(
                         Icons.lock,
                         color: kPrimaryColor,
@@ -352,11 +395,11 @@ class _SignUpState extends State<SignUp> {
                         _registerUser();
                       },
                       child: const Text(
-                        "SIGN UP",
+                        "Iyandikishe",
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -370,7 +413,7 @@ class _SignUpState extends State<SignUp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const Text(
-                      "Already have an Account ? ",
+                      "Usanzwe ufite konti ? ",
                       style: TextStyle(color: kPrimaryColor),
                     ),
                     GestureDetector(
@@ -385,7 +428,7 @@ class _SignUpState extends State<SignUp> {
                         );
                       },
                       child: const Text(
-                        "Sign In",
+                        "Injira",
                         style: TextStyle(
                           color: kPrimaryColor,
                           fontWeight: FontWeight.bold,

@@ -1,12 +1,12 @@
-import 'package:amategeko/screens/SplashScreen.dart';
-import 'package:amategeko/utils/constants.dart';
-import 'package:amategeko/utils/utils.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
+import 'package:amategeko/utils/utils.dart';
+import 'package:amategeko/utils/constants.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:amategeko/screens/SplashScreen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       title: 'CODE DE LA ROUTE',
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,

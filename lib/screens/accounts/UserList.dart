@@ -1,8 +1,9 @@
-import '../../utils/constants.dart';
-import 'package:flutter/material.dart';
-import '../../components/chat_for_users_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../components/chat_for_users_list.dart';
+import '../../utils/constants.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -20,11 +21,16 @@ class _UserListState extends State<UserList> {
   late String currentusername;
   late String currentuserphoto;
   late SharedPreferences preferences;
+  late int number = 0;
 
   @override
   initState() {
     super.initState();
     getCurrUserId();
+    FirebaseFirestore.instance.collection("Users").get().then((value) {
+      number = value.docs.length;
+      print(number);
+    });
   }
 
   getCurrUserId() async {
@@ -42,7 +48,7 @@ class _UserListState extends State<UserList> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: const Text(
-          'Users',
+          'Users List',
           style: TextStyle(letterSpacing: 1.25, fontSize: 24),
         ),
         leading: IconButton(
@@ -77,11 +83,23 @@ class _UserListState extends State<UserList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
+              child: Text(
+                "Total number of users is : $number",
+                style: const TextStyle(
+                  fontSize: 22,
+                  color: kPrimaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Users")
                   .where("role", isNotEqualTo: "Admin")
-                  .orderBy("createdAt", descending: true)
+                  // .orderBy("role", descending: true)
+                  // .orderBy("createAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

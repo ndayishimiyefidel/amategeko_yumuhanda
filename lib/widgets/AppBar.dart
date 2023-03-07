@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-
-import '../resources/user_state_methods.dart';
 import '../utils/constants.dart';
+import 'package:flutter/material.dart';
+import '../resources/user_state_methods.dart';
+
 
 class CommonAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
@@ -20,6 +20,7 @@ class CommonAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      
       title: Text(
         title,
         style: const TextStyle(

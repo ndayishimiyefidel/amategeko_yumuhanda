@@ -1,10 +1,11 @@
-import '../../utils/constants.dart';
-import 'package:flutter/material.dart';
-import '../../widgets/MainDrawer.dart';
-import '../../components/notification_list.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../components/notification_list.dart';
+import '../../utils/constants.dart';
+import '../../widgets/MainDrawer.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -109,7 +110,6 @@ class _NotificationsState extends State<Notifications> {
                       .collection("Quiz-codes")
                       .where("userId",
                           isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                      .orderBy("createdAt", descending: true)
                       .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

@@ -407,10 +407,10 @@ class _QuizTileState extends State<QuizTile> {
                                                   },
                                                   autovalidateMode:
                                                       AutovalidateMode.disabled,
-                                                  validator: (input) =>
-                                                      input!.isEmpty
-                                                          ? 'Gukomeza bisaba Kode'
-                                                          : null,
+                                                  validator: (input) => input!
+                                                          .isEmpty
+                                                      ? 'Gukomeza bisaba Kode'
+                                                      : null,
                                                 ),
                                               ),
                                             ),
@@ -482,7 +482,7 @@ class _QuizTileState extends State<QuizTile> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Text(
-                                  "Start Exam",
+                                  "Tangira Exam",
                                   style: TextStyle(
                                       color: Colors.white,
                                       letterSpacing: 2,
