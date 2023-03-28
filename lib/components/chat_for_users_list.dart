@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/auth.dart';
 import '../widgets/StatusIndicator.dart';
 
 class ChatUsersList extends StatefulWidget {
@@ -101,41 +101,49 @@ class _ChatUsersListState extends State<ChatUsersList> {
                   Expanded(
                     child: Container(
                       color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(widget.name),
-                          const SizedBox(
-                            height: 6,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(widget.name),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                Text(widget.phone),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                Text(
+                                  widget.email,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                                Text(
+                                  "password: ${widget.password}",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                              ],
+                            ),
                           ),
-                          Text(widget.phone),
-                          const SizedBox(
-                            height: 6,
+                          IconButton(
+                            color: Colors.red,
+                            onPressed: () async {
+                              await AuthService()
+                                  .deleteUser(widget.email, widget.password);
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              size: 30,
+                              color: Colors.red,
+                            ),
                           ),
-                          Text(
-                            widget.email,
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade500,
-                                fontStyle: FontStyle.italic),
-                          ),
-                          Text(
-                            "password: ${widget.password}",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade500,
-                                fontStyle: FontStyle.italic),
-                          ),
-                          // IconButton(
-                          //   color: Colors.red,
-                          //   onPressed: () {
-                          //     deleteUser(widget.userId);
-                          //   },
-                          //   icon: const Icon(
-                          //     Icons.delete,
-                          //     size: 30,
-                          //   ),
-                          // )
                         ],
                       ),
                     ),
@@ -148,12 +156,4 @@ class _ChatUsersListState extends State<ChatUsersList> {
       ),
     );
   }
-
-  FirebaseAuth auth = FirebaseAuth.instance;
-
-// Future<void> deleteUser(String docId) async {
-//   await FirebaseFirestore.instance.collection("users").doc(docId).delete().then((value) =>{
-//
-//   });
-// }
 }

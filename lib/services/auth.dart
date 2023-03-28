@@ -1,5 +1,7 @@
-import '../utils/utils.dart';
+import 'package:amategeko/services/user_delete.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../utils/utils.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -105,6 +107,24 @@ class AuthService {
   Future signOut() async {
     try {
       return await _auth.signOut();
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future deleteUser(String email, String password) async {
+    try {
+      User user = await _auth.currentUser!;
+      AuthCredential credentials =
+          EmailAuthProvider.credential(email: email, password: password);
+      print(user);
+      UserCredential result =
+          await user.reauthenticateWithCredential(credentials);
+      await DatabaseServices(uid: result.user!.uid)
+          .deleteuser(); // called from database class
+      await result.user!.delete();
+      return true;
     } catch (e) {
       print(e.toString());
       return null;
