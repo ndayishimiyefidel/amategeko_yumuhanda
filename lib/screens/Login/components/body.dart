@@ -263,8 +263,11 @@ class _SignInState extends State<SignIn> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    "Ntugire Konti ?   ",
-                    style: TextStyle(color: kPrimaryColor),
+                    "Ntugira Konti ?   ",
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 16,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -282,11 +285,15 @@ class _SignInState extends State<SignIn> {
                       style: TextStyle(
                         color: kPrimaryColor,
                         fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                   )
                 ],
-              )
+              ),
+              SizedBox(
+                height: size.height * 0.04,
+              ),
             ],
           ),
         ),

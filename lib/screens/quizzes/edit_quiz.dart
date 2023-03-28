@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/nofications.dart';
+import '../homepages/notificationtab.dart';
 import '../questions/add_question.dart';
 
 class EditQuiz extends StatefulWidget {
@@ -272,7 +272,7 @@ class _EditQuizState extends State<EditQuiz> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },

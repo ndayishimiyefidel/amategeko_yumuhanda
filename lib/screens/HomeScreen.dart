@@ -1,4 +1,3 @@
-import 'package:amategeko/screens/homepages/nofications.dart';
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +11,7 @@ import '../resources/user_state_methods.dart';
 import '../utils/constants.dart';
 import 'accounts/AccountSettingsPage.dart';
 import 'homepages/dashboard.dart';
+import 'homepages/notificationtab.dart';
 
 class HomeScreen extends StatefulWidget {
   final String currentuserid;
@@ -117,7 +117,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   final List<Widget> _widgetOptions = <Widget>[
     const Home(), //index 0
     Quizzes(), //index 1
-    const Notifications(), //index 2// index 3
+    Notifications(), //index 2// index 3
     const AmategekoYose(), //index 4
     UserSettings(), //index 5
   ];

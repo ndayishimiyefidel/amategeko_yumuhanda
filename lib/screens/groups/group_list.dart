@@ -1,18 +1,21 @@
 import 'dart:io';
-import '../../services/auth.dart';
-import '../../utils/constants.dart';
-import '../../widgets/fcmWidget.dart';
-import 'package:flutter/material.dart';
-import '../../widgets/MainDrawer.dart';
-import '../homepages/nofications.dart';
-import '../../services/database_service.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../components/text_field_container.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:amategeko/screens/groups/create_group.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../components/text_field_container.dart';
+import '../../services/auth.dart';
+import '../../services/database_service.dart';
+import '../../utils/constants.dart';
+import '../../widgets/MainDrawer.dart';
+import '../../widgets/fcmWidget.dart';
+import '../homepages/noficationtab1.dart';
+import '../homepages/notificationtab.dart';
 
 class GroupList extends StatefulWidget {
   const GroupList({Key? key}) : super(key: key);
@@ -180,7 +183,7 @@ class _GroupListState extends State<GroupList> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },
@@ -624,8 +627,8 @@ class _FileTileState extends State<FileTile> {
   Future<void> requestCode(String userToken, String currentUserId,
       String senderName, String title) async {
     String body =
-        "Hello Sir,My Name is $senderName  and My phone number is ${widget.userPhone} \n I have completed to pay for joining  $title  group whatsapp.\n"
-        "so can generate code for me. Thank you I'm waiting.";
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName  naho nimero ya telefoni ni ${widget.userPhone} .\n  Namaze kwishyura amafaranga ${widget.groupPrice.isEmpty ? 1500 : widget.groupPrice} frw kuri nimero ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} yo kwinjira muri group whatsapp.\n"
+        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Group Whatsapp Code";
 
     //make sure that request is not already sent

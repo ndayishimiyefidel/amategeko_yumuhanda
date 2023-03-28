@@ -1,7 +1,8 @@
+import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/nofications.dart';
+import '../homepages/notificationtab.dart';
 
 class Results extends StatefulWidget {
   final int correct, incorrect, total;
@@ -64,7 +65,7 @@ class _ResultsState extends State<Results> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },
@@ -112,7 +113,8 @@ class _ResultsState extends State<Results> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Quizzes()));
                 },
                 child: const Text("Go Home"),
               )

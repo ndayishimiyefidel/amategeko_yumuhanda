@@ -1,17 +1,18 @@
+import 'package:amategeko/components/text_field_container.dart';
+import 'package:amategeko/screens/questions/add_question.dart';
+import 'package:amategeko/services/auth.dart';
+import 'package:amategeko/services/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../utils/constants.dart';
+import '../../widgets/ProgressWidget.dart';
+import '../../widgets/fcmWidget.dart';
 import 'edit_quiz.dart';
 import 'open_quiz.dart';
-import '../../utils/constants.dart';
-import '../../widgets/fcmWidget.dart';
-import 'package:flutter/material.dart';
-import '../../widgets/ProgressWidget.dart';
-import 'package:amategeko/services/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:amategeko/services/database_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:amategeko/screens/questions/add_question.dart';
-import 'package:amategeko/components/text_field_container.dart';
 
 class NewQuiz extends StatefulWidget {
   const NewQuiz({Key? key}) : super(key: key);
@@ -742,8 +743,8 @@ class _QuizTileState extends State<QuizTile> {
   Future<void> requestCode(String userToken, String currentUserId,
       String senderName, String title) async {
     String body =
-        "Hello Sir,My Name is $senderName  and My phone number is ${widget.phone} \n I have completed to pay for exam called $title .\n"
-        "so can generate code for me. Thank you I'm waiting.";
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName  naho nimero ya telefoni ni ${widget.phone} .\n  Namaze kwishyura amafaranga ${widget.quizPrice.isEmpty ? 1000 : widget.quizPrice} frw kuri nimero ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} yo gukora ibizamini.\n"
+        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
     //make sure that request is not already sent

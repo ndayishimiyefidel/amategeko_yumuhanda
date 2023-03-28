@@ -1,10 +1,11 @@
-import 'package:intl/intl.dart';
-import '../widgets/fcmWidget.dart';
-import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/fcmWidget.dart';
 
 class UsersNotificationList extends StatefulWidget {
   final String name;
@@ -135,7 +136,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                             height: 6,
                           ),
                           Text(
-                            userRole == "Admin" ? widget.email : dateTimeFormat,
+                            userRole == "User" ? dateTimeFormat : "",
                             style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey.shade500,
@@ -143,7 +144,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                           ),
                           Text(
                             userRole == "Admin"
-                                ? "Quiz Title : ${widget.quizTitle}"
+                                ? "Requested Date : $dateTimeFormat"
                                 : "",
                             style: TextStyle(
                                 fontSize: 14,
@@ -267,8 +268,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
           print("user device fcm Token is  $userToken");
           //send push notification to user
           String body =
-              "Dear ${widget.name}, Your code for exams is $generatedCode"
-              "please keep it secret,don't share with someone else.Thank you for choosing us,Enjoy!";
+              "Mwiriwe neza ${widget.name}, ubu ngubu wemerewe gukora ibizamini byose ntankomyi kuko wamaze kwishyura.\n Murakoze mukomeze kwiga neza";
           String notificationTitle = "Quiz App Generating Code";
           sendPushMessage(userToken, body, notificationTitle);
         }

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:amategeko/components/text_field_container.dart';
-import 'package:amategeko/screens/quizzes/old_quiz.dart';
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/services/database_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/nofications.dart';
+import '../homepages/notificationtab.dart';
 import '../questions/add_question.dart';
 
 class CreateQuiz extends StatefulWidget {
@@ -264,7 +263,7 @@ class _CreateQuizState extends State<CreateQuiz> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },

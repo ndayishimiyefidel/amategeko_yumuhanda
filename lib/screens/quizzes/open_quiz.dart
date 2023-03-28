@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/nofications.dart';
+import '../../widgets/count_down.dart';
+import '../homepages/noficationtab1.dart';
 import '../questions/edit_question.dart';
 
 class OpenQuiz extends StatefulWidget {
@@ -34,10 +35,12 @@ String correctOp = "";
 String questionImgUrl = "";
 bool ans = false;
 
-class _OpenQuizState extends State<OpenQuiz> {
+class _OpenQuizState extends State<OpenQuiz>
+    with SingleTickerProviderStateMixin {
   DatabaseService databaseService = DatabaseService();
-
   QuerySnapshot? questionSnapshot;
+  late AnimationController _controller;
+  final limitTime = 1200;
 
   QuestionModel getQuestionModelFromDatasnapshot(
       DocumentSnapshot questionSnapshot) {
@@ -62,6 +65,14 @@ class _OpenQuizState extends State<OpenQuiz> {
   }
 
   @override
+  void dispose() {
+    if (_controller.isAnimating || _controller.isCompleted) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   void initState() {
     print("${widget.quizId}");
     databaseService.getQuizQuestion(widget.quizId).then((value) {
@@ -72,6 +83,22 @@ class _OpenQuizState extends State<OpenQuiz> {
       total = questionSnapshot!.docs.length;
       setState(() {});
     });
+    _controller = AnimationController(
+        vsync: this, duration: Duration(seconds: limitTime));
+    _controller.addListener(() {
+      if (_controller.isCompleted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return Results(
+                  correct: _correct, incorrect: _incorrect, total: total);
+            },
+          ),
+        );
+      }
+    });
+    _controller.forward();
     super.initState();
   }
 
@@ -99,7 +126,7 @@ class _OpenQuizState extends State<OpenQuiz> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => const NotificationTab1(),
                 ),
               );
             },
@@ -118,23 +145,43 @@ class _OpenQuizState extends State<OpenQuiz> {
                 child: Text(
                   "TITLE:${widget.title}",
                   style: const TextStyle(
-                    fontSize: 22,
-                    color: Colors.black87,
-                    letterSpacing: 2,
+                    fontSize: 25,
+                    color: kPrimaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+              const SizedBox(
+                height: 10,
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: Text(
-                  "TQ:${questionSnapshot == null ? 0 : questionSnapshot!.docs.length}",
+                  "TQ:${questionSnapshot == null ? 0 : questionSnapshot!.docs.length} question(s)",
                   style: const TextStyle(
-                    fontSize: 22,
-                    color: Colors.black87,
-                    letterSpacing: 2,
+                    fontSize: 25,
+                    color: kPrimaryColor,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Icon(
+                      Icons.punch_clock,
+                      size: 40,
+                      color: kPrimaryColor,
+                    ),
+                    Countdown(
+                        animation: StepTween(begin: limitTime, end: 0)
+                            .animate(_controller)),
+                  ],
                 ),
               ),
               questionSnapshot == null
@@ -316,7 +363,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                       builder: (context) {
                         return AlertDialog(
                           content: Text(
-                            "Correct Answer: ${widget.questionModel.correctOption}",
+                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
                             style: const TextStyle(
                                 color: Colors.green, fontSize: 18),
                           ),
@@ -367,7 +414,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                       builder: (context) {
                         return AlertDialog(
                           content: Text(
-                            "Correct Answer: ${widget.questionModel.correctOption}",
+                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
                             style: const TextStyle(
                                 color: Colors.green, fontSize: 18),
                           ),
@@ -416,7 +463,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                       builder: (context) {
                         return AlertDialog(
                           content: Text(
-                            "Correct Answer: ${widget.questionModel.correctOption}",
+                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
                             style: const TextStyle(
                                 color: Colors.green, fontSize: 18),
                           ),
@@ -463,7 +510,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                       builder: (context) {
                         return AlertDialog(
                           content: Text(
-                            "Correct Answer: ${widget.questionModel.correctOption}",
+                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
                             style: const TextStyle(
                                 color: Colors.green, fontSize: 18),
                           ),

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,6 +14,7 @@ class ChatUsersList extends StatefulWidget {
   final String userId;
   final String email;
   final String phone;
+  final String password;
 
   const ChatUsersList(
       {super.key,
@@ -22,7 +24,8 @@ class ChatUsersList extends StatefulWidget {
       required this.isMessageRead,
       required this.email,
       required this.userId,
-      required this.phone});
+      required this.phone,
+      required this.password});
 
   @override
   _ChatUsersListState createState() => _ChatUsersListState();
@@ -115,7 +118,24 @@ class _ChatUsersListState extends State<ChatUsersList> {
                                 fontSize: 14,
                                 color: Colors.grey.shade500,
                                 fontStyle: FontStyle.italic),
-                          )
+                          ),
+                          Text(
+                            "password: ${widget.password}",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade500,
+                                fontStyle: FontStyle.italic),
+                          ),
+                          // IconButton(
+                          //   color: Colors.red,
+                          //   onPressed: () {
+                          //     deleteUser(widget.userId);
+                          //   },
+                          //   icon: const Icon(
+                          //     Icons.delete,
+                          //     size: 30,
+                          //   ),
+                          // )
                         ],
                       ),
                     ),
@@ -128,4 +148,12 @@ class _ChatUsersListState extends State<ChatUsersList> {
       ),
     );
   }
+
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+// Future<void> deleteUser(String docId) async {
+//   await FirebaseFirestore.instance.collection("users").doc(docId).delete().then((value) =>{
+//
+//   });
+// }
 }

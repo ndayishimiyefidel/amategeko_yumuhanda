@@ -1,18 +1,17 @@
-import 'package:amategeko/screens/accounts/AccountSettingsPage.dart';
 import 'package:amategeko/screens/accounts/UserList.dart';
 import 'package:amategeko/screens/groups/group_list.dart';
-import 'package:amategeko/screens/quizzes/old_quiz.dart';
-import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../resources/user_state_methods.dart';
 import '../../utils/constants.dart';
 import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
 import '../../widgets/MainDrawer.dart';
-import 'nofications.dart';
+import '../quizzes/exams.dart';
+import '../quizzes/quiz.dart';
+import 'noficationtab1.dart';
+import 'notificationtab.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -116,7 +115,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => const Notifications(),
+                      builder: (BuildContext context) =>
+                          const NotificationTab1(),
                     ),
                   );
                 },
@@ -156,13 +156,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (BuildContext context) => Quizzes(),
+                                  builder: (BuildContext context) => Exams(),
                                 ),
                               );
                             },
                             child: const DashboardCard(
-                              name: "Quizzes",
-                              imgpath: "quizzez.png",
+                              name: "New Exam",
+                              imgpath: "exam.png",
                             ),
                           ),
                         ),
@@ -174,14 +174,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      UserSettings(),
+                                  builder: (BuildContext context) => OnlyQuiz(),
                                 ),
                               );
                             },
                             child: const DashboardCard(
-                              name: "Profile",
-                              imgpath: "profile.png",
+                              name: "Quizzes",
+                              imgpath: "quizzez.png",
                             ),
                           ),
                         ),
@@ -260,7 +259,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                 context,
                                 MaterialPageRoute(
                                   builder: (BuildContext context) =>
-                                      const Notifications(),
+                                      Notifications(),
                                 ),
                               );
                             },
@@ -271,18 +270,19 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         userRole != "Admin"
-                            ? Transform(
-                                transform: Matrix4.translationValues(
-                                    delayedAnimation.value * width, 0, 0),
-                                child: Bouncing(
-                                  onPress: () =>
-                                      UserStateMethods().logoutuser(context),
-                                  child: const DashboardCard(
-                                    name: "Exit",
-                                    imgpath: "exit.png",
-                                  ),
-                                ),
-                              )
+                            ? Container()
+                            // Transform(
+                            //     transform: Matrix4.translationValues(
+                            //         delayedAnimation.value * width, 0, 0),
+                            //     child: Bouncing(
+                            //       onPress: () =>
+                            //           UserStateMethods().logoutuser(context),
+                            //       child: const DashboardCard(
+                            //         name: "Exit",
+                            //         imgpath: "exit.png",
+                            //       ),
+                            //     ),
+                            //   )
                             : Transform(
                                 transform: Matrix4.translationValues(
                                     delayedAnimation.value * width, 0, 0),

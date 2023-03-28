@@ -1,6 +1,8 @@
 import 'package:amategeko/resources/user_state_methods.dart';
 import 'package:amategeko/screens/accounts/AccountSettingsPage.dart';
 import 'package:amategeko/utils/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -13,6 +15,8 @@ class MainDrawer extends StatefulWidget {
 }
 
 class _MainDrawerState extends State<MainDrawer> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -103,18 +107,22 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
           ),
           ListTile(
-            onTap: () => UserStateMethods().logoutuser(context),
-            leading: Image.asset(
-              "assets/exit.png",
-              height: 30,
+            onTap: () => deleteUser(auth.currentUser!.uid),
+            leading: IconButton(
+              onPressed: () => deleteUser(auth.currentUser!.uid),
+              icon: const Icon(
+                Icons.delete,
+                size: 40,
+                color: Colors.blueGrey,
+              ),
             ),
             contentPadding: const EdgeInsets.only(
-              left: 70,
+              left: 60,
               top: 5,
               bottom: 5,
             ),
             title: const Text(
-              "Log out",
+              "Delete Account",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -123,5 +131,17 @@ class _MainDrawerState extends State<MainDrawer> {
         ],
       ),
     );
+  }
+
+  Future<void> deleteUser(String docId) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(docId)
+        .delete()
+        .then((value) => auth.currentUser!.delete())
+        .then((value) => {
+              UserStateMethods().logoutuser(context),
+              print("User deleted"),
+            });
   }
 }

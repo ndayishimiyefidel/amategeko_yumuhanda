@@ -1,4 +1,3 @@
-import 'package:amategeko/screens/quizzes/new_quiz.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,12 +7,13 @@ import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
 import 'old_quiz.dart';
 
-class Quizzes extends StatefulWidget {
+class OnlyQuiz extends StatefulWidget {
   @override
-  _QuizzesState createState() => _QuizzesState();
+  _OnlyQuizState createState() => _OnlyQuizState();
 }
 
-class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
+class _OnlyQuizState extends State<OnlyQuiz>
+    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -25,7 +25,7 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
       ),
       appBar: AppBar(
         title: const Text(
-          "Exam & Quiz",
+          "Quiz",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -69,51 +69,7 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
         backgroundColor: kPrimaryColor,
         elevation: 0.0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          //crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            DefaultTabController(
-              length: 2, // length of tabs
-              initialIndex: 0,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                    ),
-                    child: Container(
-                      child: const TabBar(
-                        labelColor: Colors.black,
-                        unselectedLabelColor: Colors.black26,
-                        indicatorColor: Colors.black,
-                        tabs: [
-                          Tab(text: 'Exam'),
-                          Tab(text: 'Quiz'),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height *
-                        0.68, //height of TabBarView
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                    ),
-                    child: const TabBarView(
-                      children: <Widget>[
-                        NewQuiz(),
-                        OldQuiz(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: const OldQuiz(),
       //floating button
 
       floatingActionButton: userRole == "Admin"

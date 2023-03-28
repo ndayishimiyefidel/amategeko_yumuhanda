@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:random_string/random_string.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/nofications.dart';
+import '../homepages/notificationtab.dart';
 
 class CreateGroup extends StatefulWidget {
   const CreateGroup({
@@ -228,7 +228,7 @@ class _CreateGroupState extends State<CreateGroup> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },

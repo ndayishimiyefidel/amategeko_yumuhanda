@@ -21,16 +21,16 @@ class _UserListState extends State<UserList> {
   late String currentusername;
   late String currentuserphoto;
   late SharedPreferences preferences;
-  late int number = 0;
+  late int numbers = 0;
 
   @override
   initState() {
     super.initState();
     getCurrUserId();
-    FirebaseFirestore.instance.collection("Users").get().then((value) {
-      number = value.docs.length;
-      print(number);
-    });
+    // FirebaseFirestore.instance.collection("Users").get().then((value) {
+    //   numbers = value.docs.length;
+    //   print(numbers);
+    // });
   }
 
   getCurrUserId() async {
@@ -68,12 +68,14 @@ class _UserListState extends State<UserList> {
             icon: const Icon(Icons.search),
             onPressed: () {
               showSearch(
-                  context: context,
-                  delegate: DataSearch(
-                      allUsersList: allUsersList,
-                      currentuserid: currentuserid,
-                      currentusername: currentusername,
-                      currentuserphoto: currentuserphoto));
+                context: context,
+                delegate: DataSearch(
+                  allUsersList: allUsersList,
+                  currentuserid: currentuserid,
+                  currentusername: currentusername,
+                  currentuserphoto: currentuserphoto,
+                ),
+              );
             },
           )
         ],
@@ -83,22 +85,21 @@ class _UserListState extends State<UserList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
-              child: Text(
-                "Total number of users is : $number",
-                style: const TextStyle(
-                  fontSize: 22,
-                  color: kPrimaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
+            //   child: Text(
+            //     "Total number of users is : $numbers",
+            //     style: const TextStyle(
+            //       fontSize: 22,
+            //       color: kPrimaryColor,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
             StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Users")
-                  .where("role", isNotEqualTo: "Admin")
-                  // .orderBy("role", descending: true)
+                  // .where("createAt", isNotEqualTo: "")
                   // .orderBy("createAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
@@ -148,6 +149,7 @@ class _UserListState extends State<UserList> {
                         isMessageRead: true,
                         userId: snapshot.data!.docs[index]["uid"],
                         phone: snapshot.data!.docs[index]["phone"],
+                        password: snapshot.data!.docs[index]["password"],
                       );
                     },
                   );

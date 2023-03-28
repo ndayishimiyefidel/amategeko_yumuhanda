@@ -9,7 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/nofications.dart';
+import '../homepages/noficationtab1.dart';
+import '../homepages/notificationtab.dart';
 
 class UploadDocuments extends StatefulWidget {
   final bool isNew;
@@ -191,7 +192,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },

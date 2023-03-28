@@ -69,8 +69,28 @@ class _SignUpState extends State<SignUp> {
             .createUserWithEmailAndPassword(
                 email: emailAddress.toString().trim(),
                 password: password.toString().trim())
-            .then((auth) {
+            .then((auth) async {
           firebaseUser = auth.user;
+          // final credential = PhoneAuthProvider.credential(
+          //     verificationId: verificationId, smsCode: smsCode);
+          // await firebaseUser!.updatePhoneNumber(credential);
+          //
+          // FirebaseAuth.instance.verifyPhoneNumber(
+          //   phoneNumber: phoneNumber,
+          //   verificationCompleted: (PhoneAuthCredential credential) async {
+          //     // Sign in with the phone number credential
+          //     await FirebaseAuth.instance.signInWithCredential(credential);
+          //   },
+          //   verificationFailed: (FirebaseAuthException e) {
+          //     // Handle verification failed exception
+          //   },
+          //   codeSent: (String verificationId, int? resendToken) {
+          //     // Save verification ID and resend token
+          //   },
+          //   codeAutoRetrievalTimeout: (String verificationId) {
+          //     // Handle timeout
+          //   },
+          // );
         }).catchError((err) {
           setState(() {
             isloading = false;

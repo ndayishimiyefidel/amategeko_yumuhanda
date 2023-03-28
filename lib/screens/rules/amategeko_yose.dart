@@ -10,7 +10,7 @@ import '../../services/auth.dart';
 import '../../services/database_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
-import '../homepages/nofications.dart';
+import '../homepages/notificationtab.dart';
 
 class AmategekoYose extends StatefulWidget {
   const AmategekoYose({Key? key}) : super(key: key);
@@ -152,7 +152,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
+                  builder: (BuildContext context) => Notifications(),
                 ),
               );
             },
