@@ -1,4 +1,4 @@
-import 'package:amategeko/services/user_delete.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../utils/utils.dart';
@@ -113,21 +113,23 @@ class AuthService {
     }
   }
 
-  Future deleteUser(String email, String password) async {
-    try {
-      User user = await _auth.currentUser!;
-      AuthCredential credentials =
-          EmailAuthProvider.credential(email: email, password: password);
-      print(user);
-      UserCredential result =
-          await user.reauthenticateWithCredential(credentials);
-      await DatabaseServices(uid: result.user!.uid)
-          .deleteuser(); // called from database class
-      await result.user!.delete();
-      return true;
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
+  // Future deleteUser(String email, String password) async {
+  //   try {
+  //     User user = await _auth.currentUser!;
+  //     AuthCredential credentials =
+  //         EmailAuthProvider.credential(email: email, password: password);
+  //     print(user);
+  //     UserCredential result =
+  //         await user.reauthenticateWithCredential(credentials);
+  //     await DatabaseServices(uid: result.user!.uid)
+  //         .deleteuser(); // called from database class
+  //     await result.user!.delete();
+  //     return true;
+  //   } catch (e) {
+  //     print(e.toString());
+  //     return null;
+  //   }
+  Future deleteUser(String uid) async {
+    FirebaseFirestore.instance.collection("Users").doc(uid).delete();
   }
 }

@@ -35,6 +35,7 @@ class _UserListState extends State<UserList> {
 
   getCurrUserId() async {
     preferences = await SharedPreferences.getInstance();
+
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
@@ -85,41 +86,13 @@ class _UserListState extends State<UserList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
-            //   child: Text(
-            //     "Total number of users is : $numbers",
-            //     style: const TextStyle(
-            //       fontSize: 22,
-            //       color: kPrimaryColor,
-            //       fontWeight: FontWeight.bold,
-            //     ),
-            //   ),
-            // ),
             StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Users")
-                  // .where("createAt", isNotEqualTo: "")
-                  // .orderBy("createAt", descending: true)
+                  .orderBy("createdAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).copyWith().size.height -
-                        MediaQuery.of(context).copyWith().size.height / 5,
-                    width: MediaQuery.of(context).copyWith().size.width,
-                    child: const Center(
-                      child: Text(
-                        "There is no user registered yet!",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
                   return SizedBox(
                     height: MediaQuery.of(context).copyWith().size.height -
                         MediaQuery.of(context).copyWith().size.height / 5,
@@ -133,7 +106,7 @@ class _UserListState extends State<UserList> {
                   );
                 } else {
                   snapshot.data!.docs
-                      .removeWhere((i) => i["uid"] == currentuserid);
+                      .removeWhere((i) => i["uid" ?? ''] == currentuserid);
                   allUsersList = snapshot.data!.docs;
                   return ListView.builder(
                     padding: const EdgeInsets.only(top: 16),
@@ -146,7 +119,6 @@ class _UserListState extends State<UserList> {
                         image: snapshot.data!.docs[index]["photoUrl"],
                         time: snapshot.data!.docs[index]["createdAt"],
                         email: snapshot.data!.docs[index]["email"],
-                        isMessageRead: true,
                         userId: snapshot.data!.docs[index]["uid"],
                         phone: snapshot.data!.docs[index]["phone"],
                         password: snapshot.data!.docs[index]["password"],

@@ -77,6 +77,8 @@ dependencies:
   image_picker: ^0.8.6
   firebase_storage: ^11.0.6
   syncfusion_flutter_pdfviewer: ^20.4.51
+  device_info_plus: ^3.2.3
+  uuid: ^3.0.7
 #  flutter_plugin_android_lifecycle: ^2.0.7
 #  syncfusion_flutter_pdfviewer: ^20.4.49
 #  advance_pdf_viewer_fork: ^2.0.0

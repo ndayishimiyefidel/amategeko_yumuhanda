@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:amategeko/screens/Login/components/background.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +36,26 @@ class _SignInState extends State<SignIn> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late bool _passwordVisible;
   bool isloading = false;
+
+  String? deviceId;
+
+  Future<String?> _getId() async {
+    var deviceInfo = DeviceInfoPlugin();
+    if (Platform.isIOS) {
+      // import 'dart:io'
+      var iosDeviceInfo = await deviceInfo.iosInfo;
+      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
+    } else if (Platform.isAndroid) {
+      var androidDeviceInfo = await deviceInfo.androidInfo;
+      return androidDeviceInfo.androidId; // unique ID on Android
+    }
+  }
+
+  retieveDeviceId() async {
+    //get device id
+    deviceId = await _getId();
+    // print("deveice id is:$deviceId");
+  }
 
   @override
   void initState() {
@@ -338,7 +361,6 @@ class _SignInState extends State<SignIn> {
 
           ///make sure the user role is not admininstrator
           /// no way to check which device is using
-
           if (datasnapshot.data()!['role'] == "Admin") {
             await preferences.setString("uid", datasnapshot.data()!["uid"]);
             await preferences.setString("name", datasnapshot.data()!["name"]);
@@ -359,7 +381,7 @@ class _SignInState extends State<SignIn> {
             Navigator.push(context, route);
           } else {
             ///tracking user role
-            if (datasnapshot.data()!["fcmToken"] == fcmToken) {
+            if (datasnapshot.data()!["deviceId"] == deviceId) {
               await preferences.setString("uid", datasnapshot.data()!["uid"]);
               await preferences.setString("name", datasnapshot.data()!["name"]);
               await preferences.setString(

@@ -1,17 +1,18 @@
-import 'dart:io';
 import 'dart:async';
-import '../../utils/constants.dart';
-import 'package:flutter/material.dart';
-import '../../widgets/MainDrawer.dart';
-import '../../widgets/ProgressWidget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import '../../resources/user_state_methods.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
+import '../../resources/user_state_methods.dart';
+import '../../utils/constants.dart';
+import '../../widgets/MainDrawer.dart';
+import '../../widgets/ProgressWidget.dart';
 
 class UserSettings extends StatelessWidget {
   UserSettings({super.key});
@@ -361,6 +362,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   children: <Widget>[
                                     Flexible(
                                       child: TextField(
+                                        readOnly: true,
                                         decoration: const InputDecoration(
                                           hintText: "Enter Your Name",
                                         ),
@@ -405,7 +407,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   children: <Widget>[
                                     Flexible(
                                       child: TextField(
-                                        readOnly: false,
+                                        readOnly: true,
                                         decoration: const InputDecoration(
                                             hintText: "Enter Phone number"),
                                         enabled: !_status,

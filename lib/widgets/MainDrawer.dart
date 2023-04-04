@@ -112,8 +112,8 @@ class _MainDrawerState extends State<MainDrawer> {
               onPressed: () => deleteUser(auth.currentUser!.uid),
               icon: const Icon(
                 Icons.delete,
-                size: 40,
-                color: Colors.blueGrey,
+                size: 30,
+                color: Colors.redAccent,
               ),
             ),
             contentPadding: const EdgeInsets.only(
@@ -134,14 +134,15 @@ class _MainDrawerState extends State<MainDrawer> {
   }
 
   Future<void> deleteUser(String docId) async {
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(docId)
-        .delete()
-        .then((value) => auth.currentUser!.delete())
-        .then((value) => {
-              UserStateMethods().logoutuser(context),
-              print("User deleted"),
-            });
+    await auth.currentUser!.delete().then((value) => {
+          FirebaseFirestore.instance
+              .collection("Users")
+              .doc(docId)
+              .delete()
+              .then((value) => {
+                    UserStateMethods().logoutuser(context),
+                    print("User deleted"),
+                  })
+        });
   }
 }

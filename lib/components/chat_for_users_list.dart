@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/auth.dart';
@@ -10,7 +11,6 @@ class ChatUsersList extends StatefulWidget {
   // final String secondaryText;
   final String image;
   final String time;
-  final bool isMessageRead;
   final String userId;
   final String email;
   final String phone;
@@ -21,7 +21,6 @@ class ChatUsersList extends StatefulWidget {
       required this.name,
       required this.image,
       required this.time,
-      required this.isMessageRead,
       required this.email,
       required this.userId,
       required this.phone,
@@ -39,6 +38,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
   late String userRole;
   late String phoneNumber;
   late SharedPreferences preferences;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -58,6 +58,9 @@ class _ChatUsersListState extends State<ChatUsersList> {
 
   @override
   Widget build(BuildContext context) {
+    int timestamp = int.parse(widget.time);
+    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    var dateTimeFormat = DateFormat('dd/MM/yyyy, hh:mm a').format(date);
     return InkWell(
       onTap: () {
         // Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -129,14 +132,20 @@ class _ChatUsersListState extends State<ChatUsersList> {
                                       color: Colors.grey.shade500,
                                       fontStyle: FontStyle.italic),
                                 ),
+                                Text(
+                                  "Joined date: $dateTimeFormat",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ),
                               ],
                             ),
                           ),
                           IconButton(
                             color: Colors.red,
                             onPressed: () async {
-                              await AuthService()
-                                  .deleteUser(widget.email, widget.password);
+                              AuthService().deleteUser(widget.userId);
                             },
                             icon: const Icon(
                               Icons.delete,

@@ -14,7 +14,6 @@ import '../../services/database_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 import '../../widgets/fcmWidget.dart';
-import '../homepages/noficationtab1.dart';
 import '../homepages/notificationtab.dart';
 
 class GroupList extends StatefulWidget {
@@ -308,7 +307,7 @@ class _FileTileState extends State<FileTile> {
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
-                                    textAlign: TextAlign.center),
+                                    textAlign: TextAlign.start),
                                 SizedBox(
                                   height: size.height * 0.01,
                                 ),
@@ -376,13 +375,12 @@ class _FileTileState extends State<FileTile> {
 
   Widget _joinGroupIcon() {
     return GestureDetector(
-      child: const CircleAvatar(
-        backgroundColor: Colors.green,
-        radius: 14.0,
-        child: Icon(
-          Icons.link_outlined,
-          color: Colors.white,
-          size: 20.0,
+      child: const Text(
+        "Join",
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.blueAccent,
         ),
       ),
       onTap: () {

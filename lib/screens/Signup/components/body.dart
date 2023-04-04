@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -37,19 +40,42 @@ class _SignUpState extends State<SignUp> {
   bool isloading = false;
   late bool _passwordVisible;
   final userRole = "User";
+  String? deviceId;
+
+  Future<String?> _getId() async {
+    var deviceInfo = DeviceInfoPlugin();
+    if (Platform.isIOS) {
+      // import 'dart:io'
+      var iosDeviceInfo = await deviceInfo.iosInfo;
+      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
+    } else if (Platform.isAndroid) {
+      var androidDeviceInfo = await deviceInfo.androidInfo;
+      return androidDeviceInfo.androidId; // unique ID on Android
+    }
+  }
+
+  retieveDeviceId() async {
+    //get device id
+    deviceId = await _getId();
+    // print("deveice id is:$deviceId");
+  }
 
   @override
   void initState() {
     super.initState();
     _passwordVisible = false;
-
     _messaging.getToken().then((value) {
       fcmToken = value;
     });
+    //get device id
+    retieveDeviceId();
   }
 
   void _registerUser() async {
     print("your fcm token is $fcmToken");
+    //get device id
+    deviceId = await _getId();
+    print("deveice id is:$deviceId");
     if (_formkey.currentState!.validate()) {
       setState(() {
         isloading = true;
@@ -120,7 +146,8 @@ class _SignUpState extends State<SignUp> {
               "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
               "state": 1,
               "role": userRole,
-              "fcmToken": fcmToken
+              "fcmToken": fcmToken,
+              "deviceId": deviceId
             });
             final currentuser = firebaseUser;
             await preferences.setString("uid", currentuser!.uid);
@@ -269,7 +296,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.person,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika amazina yawe..",
+                      hintText: "Andika amazina yombi",
                       border: InputBorder.none,
                     ),
                   ),
@@ -304,7 +331,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.email,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika imeli yawe...",
+                      hintText: "Andika imeli yawe",
                       border: InputBorder.none,
                     ),
                   ),
@@ -339,7 +366,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.phone_outlined,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika Telefoni yawe...",
+                      hintText: "Andika Telefoni yawe",
                       border: InputBorder.none,
                     ),
                   ),
@@ -380,7 +407,7 @@ class _SignUpState extends State<SignUp> {
                     },
                     cursorColor: kPrimaryColor,
                     decoration: InputDecoration(
-                      hintText: "Ongera wandike telefoni..",
+                      hintText: "Andika telephone nanone",
                       icon: const Icon(
                         Icons.lock,
                         color: kPrimaryColor,
