@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
+import 'package:share_plus/share_plus.dart';
 import '../screens/homepages/dashboard.dart';
 import '../screens/quizzes/old_quiz.dart';
 
@@ -107,6 +107,38 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
           ),
           ListTile(
+            onTap: () =>
+            {
+              Share.share(
+                  'Iyi application igizwe nibibazo nibisubizo babaza muri examin ya provisoire iga examin zose zirimo kuko bazakubaza imwe muri zo https://play.google.com/store/apps/details?id=com.amategeko.amategeko',
+                  subject: 'Share App!')
+            },
+            leading: IconButton(
+              onPressed: () =>
+              {
+                Share.share(
+                    'Iyi application igizwe nibibazo nibisubizo babaza muri examin ya provisoire iga examin zose zirimo kuko bazakubaza imwe muri zo https://play.google.com/store/apps/details?id=com.amategeko.amategeko',
+                    subject: 'Share App!')
+              },
+              icon: const Icon(
+                Icons.share,
+                size: 30,
+                color: Colors.green,
+              ),
+            ),
+            contentPadding: const EdgeInsets.only(
+              left: 60,
+              top: 5,
+              bottom: 5,
+            ),
+            title: const Text(
+              "Share App",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ListTile(
             onTap: () => deleteUser(auth.currentUser!.uid),
             leading: IconButton(
               onPressed: () => deleteUser(auth.currentUser!.uid),
@@ -134,15 +166,17 @@ class _MainDrawerState extends State<MainDrawer> {
   }
 
   Future<void> deleteUser(String docId) async {
-    await auth.currentUser!.delete().then((value) => {
-          FirebaseFirestore.instance
-              .collection("Users")
-              .doc(docId)
-              .delete()
-              .then((value) => {
-                    UserStateMethods().logoutuser(context),
-                    print("User deleted"),
-                  })
-        });
+    await auth.currentUser!.delete().then((value) =>
+    {
+      FirebaseFirestore.instance
+          .collection("Users")
+          .doc(docId)
+          .delete()
+          .then((value) =>
+      {
+        UserStateMethods().logoutuser(context),
+        print("User deleted"),
+      })
+    });
   }
 }

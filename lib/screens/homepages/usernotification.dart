@@ -116,6 +116,7 @@ class _UserNotificationState extends State<UserNotification> {
                         quizId: snapshot.data!.docs[index]["quizId"],
                         quizTitle: snapshot.data!.docs[index]["quizTitle"],
                         code: snapshot.data!.docs[index]["code"],
+                        isQuiz: snapshot.data!.docs[index]["isQuiz"],
                         docId:
                             snapshot.data!.docs[index].reference.id.toString(),
                       );

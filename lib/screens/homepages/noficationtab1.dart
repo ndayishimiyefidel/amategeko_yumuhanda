@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../components/notification_list.dart';
+import '../../components/notification_list_modified.dart';
 import '../../utils/constants.dart';
 
 class NotificationTab1 extends StatefulWidget {
@@ -55,7 +55,7 @@ class _NotificationTab1State extends State<NotificationTab1> {
             StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Quiz-codes")
-                  .where("code", isNotEqualTo: "")
+                  .orderBy("createdAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -64,22 +64,49 @@ class _NotificationTab1State extends State<NotificationTab1> {
                         MediaQuery.of(context).copyWith().size.height / 5,
                     width: MediaQuery.of(context).copyWith().size.width,
                     child: Center(
-                      child: userRole == "Admin"
-                          ? const Text(
-                              "No available notification right now",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.red,
-                              ),
-                            )
-                          : const Text(
-                              "There is no notifications for you",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.red,
-                              ),
-                            ),
-                    ),
+                        child: userRole == "Admin"
+                            ? SizedBox(
+                                height: MediaQuery.of(context)
+                                        .copyWith()
+                                        .size
+                                        .height -
+                                    MediaQuery.of(context)
+                                            .copyWith()
+                                            .size
+                                            .height /
+                                        5,
+                                width: MediaQuery.of(context)
+                                    .copyWith()
+                                    .size
+                                    .width,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation(
+                                    kPrimaryColor,
+                                  )),
+                                ),
+                              )
+                            : SizedBox(
+                                height: MediaQuery.of(context)
+                                        .copyWith()
+                                        .size
+                                        .height -
+                                    MediaQuery.of(context)
+                                            .copyWith()
+                                            .size
+                                            .height /
+                                        5,
+                                width: MediaQuery.of(context)
+                                    .copyWith()
+                                    .size
+                                    .width,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation(
+                                    kPrimaryColor,
+                                  )),
+                                ),
+                              )),
                   );
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
@@ -104,7 +131,7 @@ class _NotificationTab1State extends State<NotificationTab1> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
-                      return UsersNotificationList(
+                      return ModifiedUsersNotificationList(
                         name: snapshot.data!.docs[index]["name"],
                         image: snapshot.data!.docs[index]["photoUrl"],
                         time: snapshot.data!.docs[index]["createdAt"],
@@ -116,6 +143,7 @@ class _NotificationTab1State extends State<NotificationTab1> {
                         code: snapshot.data!.docs[index]["code"],
                         docId:
                             snapshot.data!.docs[index].reference.id.toString(),
+                        isQuiz: snapshot.data!.docs[index]["isQuiz"],
                       );
                     },
                   );

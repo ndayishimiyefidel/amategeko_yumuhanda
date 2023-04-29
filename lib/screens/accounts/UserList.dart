@@ -192,17 +192,13 @@ class DataSearch extends SearchDelegate {
     if (query.isNotEmpty) {
       suggestionList = [];
       userList.forEach((element) {
-        if (element["name"].toLowerCase().startsWith(query.toLowerCase())) {
+        if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
+            element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
+            element["email"].toLowerCase().startsWith(query.toLowerCase())) {
           suggestionList.add(element);
         }
       });
     }
-
-    // suggestionList = query.isEmpty
-    //     ? suggestionList
-    //     : suggestionList
-    //         .where((element) => element.startsWith(query.toLowerCase()))
-    //         .toList();
 
     return ListView.builder(
         itemBuilder: (context, index) => ListTile(
@@ -220,23 +216,45 @@ class DataSearch extends SearchDelegate {
                 // }));
               },
               leading: const Icon(Icons.person),
-              title: RichText(
-                text: TextSpan(
-                    text: suggestionList[index]["name"]
-                        .toLowerCase()
-                        .substring(0, query.length),
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16),
-                    children: [
-                      TextSpan(
-                          text: suggestionList[index]["name"]
-                              .toLowerCase()
-                              .substring(query.length),
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 16))
-                    ]),
+              title: Column(
+                children: [
+                  RichText(
+                    text: TextSpan(
+                        text: suggestionList[index]["name"]
+                            .toLowerCase()
+                            .substring(0, query.length),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                        children: [
+                          TextSpan(
+                              text: suggestionList[index]["name"]
+                                  .toLowerCase()
+                                  .substring(query.length),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 16))
+                        ]),
+                  ),
+                  RichText(
+                    text: TextSpan(
+                        text: suggestionList[index]["phone"]
+                            .toLowerCase()
+                            .substring(0, query.length),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                        children: [
+                          TextSpan(
+                              text: suggestionList[index]["phone"]
+                                  .toLowerCase()
+                                  .substring(query.length),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 16))
+                        ]),
+                  ),
+                ],
               ),
             ),
         itemCount: suggestionList.length);

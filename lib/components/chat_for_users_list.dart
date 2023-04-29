@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../services/auth.dart';
 import '../widgets/StatusIndicator.dart';
 
@@ -111,12 +111,26 @@ class _ChatUsersListState extends State<ChatUsersList> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(widget.name),
-                                const SizedBox(
-                                  height: 6,
-                                ),
-                                Text(widget.phone),
-                                const SizedBox(
-                                  height: 6,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(widget.phone),
+                                    IconButton(
+                                      onPressed: () async {
+                                        //indirect phone call
+                                        // launchUrl('tel://${widget.phone}' as Uri);
+                                        //direct phone call
+                                        await FlutterPhoneDirectCaller
+                                            .callNumber(widget.phone);
+                                      },
+                                      icon: const Icon(
+                                        Icons.call,
+                                        size: 30,
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 Text(
                                   widget.email,

@@ -64,6 +64,12 @@ class _OpenQuizState extends State<OpenQuiz>
     return questionModel;
   }
 
+  bool btnPressed = false;
+  PageController? _controller1;
+  String btnText = "Next";
+  String btnTextPrevious = "Previous";
+  bool answered = false;
+
   @override
   void dispose() {
     if (_controller.isAnimating || _controller.isCompleted) {
@@ -75,6 +81,7 @@ class _OpenQuizState extends State<OpenQuiz>
   @override
   void initState() {
     print("${widget.quizId}");
+    _controller1 = PageController(initialPage: 0);
     databaseService.getQuizQuestion(widget.quizId).then((value) {
       questionSnapshot = value;
       _notAttempted = 0;
@@ -100,6 +107,18 @@ class _OpenQuizState extends State<OpenQuiz>
     });
     _controller.forward();
     super.initState();
+  }
+
+  bool isFABExtended = false;
+
+  // Create function for button action change:
+
+  void _switchButton() {
+    setState(
+      () {
+        isFABExtended = !isFABExtended;
+      },
+    );
   }
 
   @override
@@ -134,16 +153,16 @@ class _OpenQuizState extends State<OpenQuiz>
         ],
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 20),
+                padding: const EdgeInsets.only(left: 0, top: 10),
                 child: Text(
                   "TITLE:${widget.title}",
+                  textAlign: TextAlign.start,
                   style: const TextStyle(
                     fontSize: 25,
                     color: kPrimaryColor,
@@ -155,9 +174,10 @@ class _OpenQuizState extends State<OpenQuiz>
                 height: 10,
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 20),
+                padding: const EdgeInsets.only(left: 35),
                 child: Text(
                   "TQ:${questionSnapshot == null ? 0 : questionSnapshot!.docs.length} question(s)",
+                  textAlign: TextAlign.start,
                   style: const TextStyle(
                     fontSize: 25,
                     color: kPrimaryColor,
@@ -168,76 +188,144 @@ class _OpenQuizState extends State<OpenQuiz>
               const SizedBox(
                 height: 10,
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    const Icon(
-                      Icons.punch_clock,
-                      size: 40,
-                      color: kPrimaryColor,
-                    ),
-                    Countdown(
-                        animation: StepTween(begin: limitTime, end: 0)
-                            .animate(_controller)),
-                  ],
-                ),
-              ),
-              questionSnapshot == null
-                  ? Container(
-                      child: Center(
-                        child:
-                            Text("No Question for this Quiz ${widget.title}"),
-                      ),
-                    )
-                  : FutureBuilder<QuerySnapshot>(builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return const CircularProgressIndicator();
-                        default:
-                          if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else {
-                            // snapshot.data!.docs
-                            //     .map((DocumentSnapshot document) {
-                            //   Map<String, dynamic> data =
-                            //       document.data()! as Map<String, dynamic>;
-                            //   print(data);
-                            //
-                            //   print(document.id);
-                            // });
-                            return ListView.builder(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 25),
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                physics: const ClampingScrollPhysics(),
-                                itemCount: questionSnapshot!.docs.length,
-                                itemBuilder: (context, index) {
-                                  return QuizPlayTile(
-                                    questionModel:
-                                        getQuestionModelFromDatasnapshot(
-                                            questionSnapshot!.docs[index]),
-                                    index: index,
-                                    quizId: widget.quizId,
-                                    quizTitle: widget.title,
-                                  );
-                                });
-                          }
-                      }
-                    }),
             ],
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Icon(
+                  Icons.punch_clock,
+                  size: 40,
+                  color: kPrimaryColor,
+                ),
+                Countdown(
+                    animation: StepTween(begin: limitTime, end: 0)
+                        .animate(_controller)),
+              ],
+            ),
+          ),
+          FutureBuilder<QuerySnapshot>(builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return const CircularProgressIndicator();
+              default:
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return PageView.builder(
+                      controller: _controller1!,
+                      onPageChanged: (page) {
+                        if (page == questionSnapshot!.docs.length - 1) {
+                          setState(() {
+                            btnText = "Soza Exam";
+                          });
+                        }
+                        setState(() {
+                          answered = false;
+                        });
+                      },
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: questionSnapshot!.docs.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 80),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                QuizPlayTile(
+                                  questionModel:
+                                      getQuestionModelFromDatasnapshot(
+                                          questionSnapshot!.docs[index]),
+                                  index: index,
+                                  quizId: widget.quizId,
+                                  quizTitle: widget.title,
+                                ),
+                                const SizedBox(
+                                  height: 30.0,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    RawMaterialButton(
+                                      onPressed: () {
+                                        if (_controller1!.page?.toInt() ==
+                                            questionSnapshot!.docs.length - 1) {
+                                        } else {
+                                          _controller1!.previousPage(
+                                              duration: const Duration(
+                                                  milliseconds: 250),
+                                              curve: Curves.easeInExpo);
+
+                                          setState(() {
+                                            btnPressed = false;
+                                          });
+                                        }
+                                      },
+                                      shape: const StadiumBorder(),
+                                      fillColor: Colors.blue,
+                                      padding: const EdgeInsets.all(18.0),
+                                      elevation: 0.0,
+                                      child: Text(
+                                        btnTextPrevious,
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                      ),
+                                    ),
+                                    RawMaterialButton(
+                                      onPressed: () {
+                                        if (_controller1!.page?.toInt() ==
+                                            questionSnapshot!.docs.length - 1) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => Results(
+                                                    correct: _correct,
+                                                    incorrect: _incorrect,
+                                                    total: total),
+                                              ));
+                                        } else {
+                                          _controller1!.nextPage(
+                                              duration: const Duration(
+                                                  milliseconds: 250),
+                                              curve: Curves.easeInExpo);
+
+                                          setState(() {
+                                            btnPressed = false;
+                                          });
+                                        }
+                                      },
+                                      shape: const StadiumBorder(),
+                                      fillColor: Colors.blue,
+                                      padding: const EdgeInsets.all(14.0),
+                                      elevation: 0.0,
+                                      child: Text(
+                                        btnText,
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      });
+                }
+            }
+          }),
+        ],
       ),
+
       //floating action button
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimaryColor,
-        child: const Icon(
-          Icons.check_outlined,
-          size: 35,
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: kPrimaryLightColor,
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -247,7 +335,17 @@ class _OpenQuizState extends State<OpenQuiz>
             ),
           );
         },
+        label: const Text(
+          "Soza Exam",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
@@ -276,7 +374,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
-      padding: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.only(top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

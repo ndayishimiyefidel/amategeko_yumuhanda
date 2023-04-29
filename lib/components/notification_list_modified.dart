@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/fcmWidget.dart';
 
-class UsersNotificationList extends StatefulWidget {
+class ModifiedUsersNotificationList extends StatefulWidget {
   final String name;
 
   // final String secondaryText;
@@ -21,7 +21,7 @@ class UsersNotificationList extends StatefulWidget {
   final String code, docId;
   final bool isQuiz;
 
-  const UsersNotificationList({
+  const ModifiedUsersNotificationList({
     super.key,
     required this.name,
     required this.image,
@@ -37,10 +37,12 @@ class UsersNotificationList extends StatefulWidget {
   });
 
   @override
-  _UsersNotificationListState createState() => _UsersNotificationListState();
+  _ModifiedUsersNotificationListState createState() =>
+      _ModifiedUsersNotificationListState();
 }
 
-class _UsersNotificationListState extends State<UsersNotificationList> {
+class _ModifiedUsersNotificationListState
+    extends State<ModifiedUsersNotificationList> {
   late String currentuserid;
   late String currentusername;
   late String currentuserphoto;
@@ -89,136 +91,144 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         // }));
       },
       child: Container(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 5, bottom: 10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Row(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 0),
+        child: widget.code == ""
+            ? Container(
+                child: null,
+              )
+            : Row(
                 children: <Widget>[
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(widget.image),
-                        maxRadius: 30,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: size.width * 0.03,
-                  ),
                   Expanded(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            userRole == "Admin"
-                                ? widget.name
-                                : "Title: ${widget.quizTitle}",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                    child: Row(
+                      children: <Widget>[
+                        Stack(
+                          children: [
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(widget.image),
+                              maxRadius: 30,
                             ),
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                userRole == "Admin"
-                                    ? widget.phone
-                                    : "Quiz-code: ${widget.code}",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              userRole == "Admin"
-                                  ? Expanded(
-                                      child: IconButton(
-                                        onPressed: () async {
-                                          //indirect phone call
-                                          // launchUrl('tel://${widget.phone}' as Uri);
-                                          //direct phone call
-                                          await FlutterPhoneDirectCaller
-                                              .callNumber(widget.phone);
-                                        },
-                                        icon: const Icon(
-                                          Icons.call,
-                                          size: 30,
-                                          color: Colors.blueAccent,
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      child: null,
-                                    ),
-                            ],
-                          ),
-                          Text(
-                            userRole == "User" ? dateTimeFormat : "",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade500,
-                                fontStyle: FontStyle.italic),
-                          ),
-                          Text(
-                            userRole == "Admin"
-                                ? "Requested Date : $dateTimeFormat"
-                                : "",
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade500,
-                                fontStyle: FontStyle.italic),
-                          ),
-                          Text(
-                            userRole == "Admin"
-                                ? widget.isQuiz == true
-                                    ? "Quiz code: ${widget.code}"
-                                    : "Group code: ${widget.code}"
-                                : "",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.green,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: size.width * 0.03,
-                  ),
-                  userRole == "Admin"
-                      ? Expanded(
+                          ],
+                        ),
+                        SizedBox(
+                          width: size.width * 0.03,
+                        ),
+                        Expanded(
                           child: Container(
                             color: Colors.transparent,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                _getGenerateIcon(),
-                                SizedBox(
-                                  height: size.height * 0.03,
+                                Text(
+                                  userRole == "Admin"
+                                      ? widget.name
+                                      : "Title: ${widget.quizTitle}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                _isLoading
-                                    ? const CircularProgressIndicator()
-                                    : Container(
-                                        child: null,
+                                Row(
+                                  children: [
+                                    Text(
+                                      userRole == "Admin"
+                                          ? widget.phone
+                                          : "Quiz-code: ${widget.code}",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                        fontStyle: FontStyle.italic,
                                       ),
-                                _getDeleteIcon(),
+                                    ),
+                                    userRole == "Admin"
+                                        ? Expanded(
+                                            child: IconButton(
+                                              onPressed: () async {
+                                                //indirect phone call
+                                                // launchUrl('tel://${widget.phone}' as Uri);
+                                                //direct phone call
+                                                await FlutterPhoneDirectCaller
+                                                    .callNumber(widget.phone);
+                                              },
+                                              icon: const Icon(
+                                                Icons.call,
+                                                size: 30,
+                                                color: Colors.blueAccent,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            child: null,
+                                          ),
+                                  ],
+                                ),
+                                Text(
+                                  userRole == "User" ? dateTimeFormat : "",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                                Text(
+                                  userRole == "Admin"
+                                      ? "Requested Date : $dateTimeFormat"
+                                      : "",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ),
+                                Text(
+                                  userRole == "Admin"
+                                      ? widget.isQuiz == true
+                                          ? "Quiz code: ${widget.code}"
+                                          : "Group code: ${widget.code}"
+                                      : "",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.green,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                )
                               ],
                             ),
                           ),
-                        )
-                      : Container(
-                          child: null,
                         ),
+                        SizedBox(
+                          width: size.width * 0.03,
+                        ),
+                        userRole == "Admin"
+                            ? Expanded(
+                                child: Container(
+                                  color: Colors.transparent,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 30.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        _getGenerateIcon(),
+                                        SizedBox(
+                                          height: size.height * 0.03,
+                                        ),
+                                        _isLoading
+                                            ? const CircularProgressIndicator()
+                                            : Container(
+                                                child: null,
+                                              ),
+                                        _getDeleteIcon(),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                child: null,
+                              ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

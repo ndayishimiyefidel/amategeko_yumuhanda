@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
@@ -114,7 +115,7 @@ class _NewQuizState extends State<NewQuiz> {
                           quizType:
                               snapshot.data.docs[index].data()["quizType"],
                           totalQuestion: totalQuestion,
-                          userRole: userRole!,
+                          userRole: userRole.toString(),
                           userToken: userToken,
                           senderName: currentusername,
                           currentUserId: currentuserid,
@@ -244,6 +245,11 @@ class _QuizTileState extends State<QuizTile> {
                         height: size.height * 0.2,
                         width: size.width * 0.9,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print(error);
+                          return const Text(
+                              "Failed to load image due network connection");
+                        },
                       ),
                       SizedBox(
                         height: size.height * 0.03,
@@ -365,7 +371,7 @@ class _QuizTileState extends State<QuizTile> {
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
-                                                SizedBox(height: 5),
+                                                const SizedBox(height: 5),
                                                 Text(
                                                   "Kugirango ubashe kwinjira muri exam icyo usabwa nukwishyura ${widget.quizPrice.isEmpty ? 1000 : widget.quizPrice}frw kuri ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} cyangwa kuri momo pay 329494 tugusobanurira amategeko y'umuhanda ndetse n'imitego ituma harabatsindwa kuberako batayimenye.",
                                                   textAlign: TextAlign.start,
@@ -754,7 +760,7 @@ class _QuizTileState extends State<QuizTile> {
         .where("isQuiz", isEqualTo: true)
         .get()
         .then((value) {
-      if (value.size == 1) {
+      if (value.size != 0) {
         setState(() {
           _isLoading = false;
           showDialog(
@@ -795,13 +801,38 @@ class _QuizTileState extends State<QuizTile> {
           sendPushMessage(userToken, body, notificationTitle);
           setState(() {
             _isLoading = false;
+            Size size = MediaQuery.of(context).size;
             showDialog(
                 context: context,
                 builder: (context) {
                   return AlertDialog(
                     content: const Text(
-                        "Your request sent successfully, we will let you once your information is processed."),
+                        "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
                     actions: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        width: size.width * 0.7,
+                        height: size.height * 0.07,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor),
+                            onPressed: () async {
+                              //direct phone call
+                              await FlutterPhoneDirectCaller.callNumber(
+                                  "*182*8*1*329494*1500#");
+                            },
+                            child: const Text(
+                              "Ishyura 1500 Rwf.",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
                       TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();

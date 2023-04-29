@@ -58,18 +58,18 @@ class _NotificationsState extends State<Notifications>
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              showSearch(
-                context: context,
-                delegate: DataSearch(
-                  allUsersList: allUsersList,
-                  currentuserid: currentuserid.toString(),
-                  currentusername: currentusername.toString(),
-                  currentuserphoto: currentuserphoto.toString(),
-                  phoneNumber: phoneNumber.toString(),
-                  code: code.toString(),
-                  quizTitle: quizTitle.toString(),
-                ),
-              );
+              // showSearch(
+              //   context: context,
+              //   delegate: DataSearch(
+              //     allUsersList: allUsersList,
+              //     currentuserid: currentuserid.toString(),
+              //     currentusername: currentusername.toString(),
+              //     currentuserphoto: currentuserphoto.toString(),
+              //     phoneNumber: phoneNumber.toString(),
+              //     code: code.toString(),
+              //     quizTitle: quizTitle.toString(),
+              //   ),
+              // );
             },
           )
         ],
@@ -219,13 +219,6 @@ class DataSearch extends SearchDelegate {
         }
       });
     }
-
-    // suggestionList = query.isEmpty
-    //     ? suggestionList
-    //     : suggestionList
-    //         .where((element) => element.startsWith(query.toLowerCase()))
-    //         .toList();
-
     return ListView.builder(
         itemBuilder: (context, index) => ListTile(
               onTap: () {},

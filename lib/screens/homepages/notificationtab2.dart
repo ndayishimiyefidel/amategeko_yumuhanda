@@ -57,6 +57,8 @@ class _NotificationTab2State extends State<NotificationTab2> {
               stream: FirebaseFirestore.instance
                   .collection("Quiz-codes")
                   .where("code", isEqualTo: "")
+                  .where("createdAt", isNotEqualTo: "")
+                  .orderBy("createdAt", descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -66,18 +68,42 @@ class _NotificationTab2State extends State<NotificationTab2> {
                     width: MediaQuery.of(context).copyWith().size.width,
                     child: Center(
                       child: userRole == "Admin"
-                          ? const Text(
-                              "No available notification right now",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.red,
+                          ? SizedBox(
+                              height: MediaQuery.of(context)
+                                      .copyWith()
+                                      .size
+                                      .height -
+                                  MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height /
+                                      5,
+                              width:
+                                  MediaQuery.of(context).copyWith().size.width,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(
+                                  kPrimaryColor,
+                                )),
                               ),
                             )
-                          : const Text(
-                              "There is no notifications for you",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.red,
+                          : SizedBox(
+                              height: MediaQuery.of(context)
+                                      .copyWith()
+                                      .size
+                                      .height -
+                                  MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height /
+                                      5,
+                              width:
+                                  MediaQuery.of(context).copyWith().size.width,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(
+                                  kPrimaryColor,
+                                )),
                               ),
                             ),
                     ),
@@ -117,6 +143,7 @@ class _NotificationTab2State extends State<NotificationTab2> {
                         code: snapshot.data!.docs[index]["code"],
                         docId:
                             snapshot.data!.docs[index].reference.id.toString(),
+                        isQuiz: snapshot.data!.docs[index]["isQuiz"],
                       );
                     },
                   );
