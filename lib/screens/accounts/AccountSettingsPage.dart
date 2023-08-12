@@ -83,10 +83,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   late TextEditingController nameTextEditingController;
   late TextEditingController emailTextEditingController;
   late TextEditingController phoneTextEditingController;
+  late TextEditingController passwordTextEditingController;
 
   String id = "";
   String name = "";
   String email = "";
+  String password = "";
   String photoUrl = "";
   String phone = "";
   File? imageFileAvatar;
@@ -118,6 +120,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     nameTextEditingController = TextEditingController(text: name);
     emailTextEditingController = TextEditingController(text: email);
     phoneTextEditingController = TextEditingController(text: phone);
+    passwordTextEditingController = TextEditingController();
 
     isInitialLoading = false;
     setState(() {});
@@ -173,23 +176,32 @@ class SettingsScreenState extends State<SettingsScreen> {
     nameFocusNode.unfocus();
     emailFocusNode.unfocus();
     phoneFocusNode.unfocus();
+    passwordFocusNode.unfocus();
     setState(() {
       isLoading = false;
     });
 
-    FirebaseFirestore.instance
-        .collection("Users")
-        .doc(id)
-        .update({"name": name, "phone": phone}).then((data) async {
-      await preferences.setString("photo", photoUrl);
-      await preferences.setString("name", name);
-      await preferences.setString("phone", phone);
+    if (password != "") {
+      FirebaseFirestore.instance
+          .collection("Users")
+          .doc(id)
+          .update({"name": name, "phone": phone, "password": password}).then(
+              (data) async {
+        await preferences.setString("photo", photoUrl);
+        await preferences.setString("name", name);
+        await preferences.setString("phone", phone);
 
+        setState(() {
+          isLoading = false;
+        });
+        Fluttertoast.showToast(msg: "Updated Successfully.");
+      });
+    } else {
       setState(() {
         isLoading = false;
       });
-      Fluttertoast.showToast(msg: "Updated Successfully.");
-    });
+      Fluttertoast.showToast(msg: "key is required please");
+    }
   }
 
   @override
@@ -202,6 +214,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                 child: Column(
                   children: <Widget>[
+                    //Profile Image - Avatar
                     //Profile Image - Avatar
                     Container(
                       width: double.infinity,
@@ -266,12 +279,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   ),
                             GestureDetector(
                               onTap: getImage,
-                              child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 150.0, right: 120.0),
+                              child: const Padding(
+                                  padding:
+                                      EdgeInsets.only(top: 150.0, right: 120.0),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const <Widget>[
+                                    children: <Widget>[
                                       CircleAvatar(
                                         backgroundColor: Colors.red,
                                         radius: 25.0,
@@ -311,11 +324,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
-                                    Column(
+                                    const Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
-                                      children: const <Widget>[
+                                      children: <Widget>[
                                         Text(
                                           'Personal Information',
                                           style: TextStyle(
@@ -333,8 +346,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                     )
                                   ],
                                 )),
-                            Padding(
-                                padding: const EdgeInsets.only(
+                            const Padding(
+                                padding: EdgeInsets.only(
                                     left: 25.0, right: 25.0, top: 25.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -343,7 +356,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
-                                      children: const <Widget>[
+                                      children: <Widget>[
                                         Text(
                                           'Name',
                                           style: TextStyle(
@@ -378,8 +391,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   ],
                                 )),
                             //Telephone
-                            Padding(
-                                padding: const EdgeInsets.only(
+                            const Padding(
+                                padding: EdgeInsets.only(
                                     left: 25.0, right: 25.0, top: 25.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -388,7 +401,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
-                                      children: const <Widget>[
+                                      children: <Widget>[
                                         Text(
                                           'Telephone',
                                           style: TextStyle(
@@ -422,8 +435,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 )),
 
                             //Email field
-                            Padding(
-                                padding: const EdgeInsets.only(
+                            const Padding(
+                                padding: EdgeInsets.only(
                                     left: 25.0, right: 25.0, top: 25.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -432,7 +445,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
-                                      children: const <Widget>[
+                                      children: <Widget>[
                                         Text(
                                           'Email ID',
                                           style: TextStyle(
@@ -461,6 +474,53 @@ class SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ],
                                 )),
+
+                            const Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 25.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        Text(
+                                          'App Key',
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )),
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 2.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Flexible(
+                                      child: TextField(
+                                        readOnly: false,
+                                        decoration: const InputDecoration(
+                                          hintText: "New Phone Number",
+                                        ),
+                                        controller:
+                                            passwordTextEditingController,
+                                        enabled: !_status,
+                                        autofocus: !_status,
+                                        onChanged: (value) {
+                                          password = value;
+                                        },
+                                        focusNode: passwordFocusNode,
+                                      ),
+                                    ),
+                                  ],
+                                )),
+
                             !_status ? _getActionButtons() : Container(),
                           ],
                         ),

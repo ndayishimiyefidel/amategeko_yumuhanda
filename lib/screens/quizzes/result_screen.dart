@@ -2,6 +2,7 @@ import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
+import '../../widgets/banner_widget.dart';
 import '../homepages/notificationtab.dart';
 
 class Results extends StatefulWidget {
@@ -19,7 +20,8 @@ class _ResultsState extends State<Results> {
   String status = "";
 
   _checkFailed() {
-    if (widget.correct < 10) {
+    double pass = (widget.correct + widget.incorrect) / 2 + 2;
+    if (widget.correct < 12) {
       print("failed");
       status = "Failed";
     } else {
@@ -79,6 +81,7 @@ class _ResultsState extends State<Results> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              AdBannerWidget(),
               Text(
                 "You have $status ",
                 style: const TextStyle(

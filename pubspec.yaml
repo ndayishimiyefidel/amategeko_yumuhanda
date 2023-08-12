@@ -1,90 +1,53 @@
 name: amategeko
 description: A new Flutter project.
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+9
+version: 1.0.0+25
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
-
-# Dependencies specify other packages that your package needs in order to work.
-# To automatically upgrade your package dependencies to the latest versions
-# consider running `flutter pub upgrade --major-versions`. Alternatively,
-# dependencies can be manually updated by changing the version numbers below to
-# the latest version available on pub.dev. To see which dependencies have newer
-# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  intl: ^0.17.0
-  #  ionicons: ^0.2.1
-  #  localization: ^2.1.0
-  #  date_time_picker: ^2.1.0
-  #  package_info_plus: ^1.0.0
-  #  device_info_plus: ^4.0.0
-  #  get: ^4.1.4
-  #  dropdown_search: ^5.0.5
-  #  fzregex: ^2.0.0
-  splash_screen_view: ^3.0.0
-  flutter_svg:
-  #  flare_flutter: ^3.0.2
+  splash_screen_view: any
+  flutter_svg: ^1.0.0
+  #  device_info: ^2.0.0
+  flutter_linkify: ^6.0.0
+  uni_links: ^0.5.1
   flutter_local_notifications: ^12.0.4
-  #  randomizer: ^0.0.2
-  #  flrx_validator: ^0.6.0
-  #  flutter_easyloading: ^3.0.5
-  #  photo_view: ^0.14.0
-  #  giphy_picker: ^3.0.1
-  #  agora_rtc_engine: ^6.1.0
   curved_navigation_bar: ^1.0.3
-  #  focused_menu: ^1.0.1
   fluttertoast: ^8.1.2
-  #  flutter_admin_scaffold: ^1.1.2
   http: ^0.13.0
-  #  bubble: ^1.2.1
-  #  popup_menu: ^1.0.5
   firebase_messaging: ^14.2.1
-  #  cupertino_icons: ^1.0.2
-  #  smooth_page_indicator: ^1.0.0+2
-  #  google_fonts: ^4.0.1
-  #  fluentui_icons: ^1.0.0
-  #  font_awesome_flutter: ^10.2.1
   cached_network_image: ^3.2.2
   cloud_firestore: ^4.4.4
   url_launcher: ^6.1.9
   share_plus: any
-  form_builder_file_picker: ^2.3.0
+  connectivity_plus: ^4.0.2
   firebase_core: ^2.7.1
-  #  permission_handler: ^10.0.0
   firebase_auth: ^4.0.2
-  #  provider: ^6.0.4
+  file_picker: ^5.0.0
   shared_preferences: ^2.0.15
+  image_network: ^2.5.2
   random_string: ^2.0.1
   image_picker: ^0.8.6
+  collection: ^1.15.0
   firebase_storage: ^11.0.6
   syncfusion_flutter_pdfviewer: ^20.4.51
-  device_info_plus: ^4.0.0
+  device_info_plus: ^9.0.1
+  dbus: ^0.7.8
+  upgrader: ^8.0.0
   uuid: ^3.0.7
   flutter_phone_direct_caller: ^2.1.1
-#  flutter_phone_direct_caller: ^2.0.0
-#  flutter_plugin_android_lifecycle: ^2.0.7
-#  syncfusion_flutter_pdfviewer: ^20.4.49
-#  advance_pdf_viewer_fork: ^2.0.0
+  just_audio: ^0.9.11
+  visibility_detector: ^0.4.0+2
+  screenshot_callback: ^3.0.1
+  flutter_windowmanager: ^0.2.0
+  crypto: ^3.0.3
+  google_mobile_ads:
+  flutterwave_standard: ^1.0.7
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -96,33 +59,15 @@ flutter_icons:
   android: true
   ios: true
   image_path: "assets/icons/logo.png"
-  # adaptive_icon_background: "#ffffff"
-  # adaptive_icon_foreground: "assets/icons/ic_background.png"
-  flutter_lints: ^2.0.0
 
 flutter:
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
     - assets/images/
     - assets/icons/
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
+    - assets/files/
   fonts:
     - family: Lato
       fonts:
@@ -130,12 +75,3 @@ flutter:
     - family: Courgette
       fonts:
         - asset: assets/fonts/Courgette-Regular.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages

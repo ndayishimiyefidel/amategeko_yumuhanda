@@ -1,23 +1,29 @@
-import 'dart:io';
+import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../components/text_field_container.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
+import '../../../widgets/banner_widget.dart';
 import '../../HomeScreen.dart';
+import '../../Login/components/check_deviceid.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/components/background.dart';
 
 class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+  final String? referralCode;
+
+  const SignUp({Key? key, this.referralCode}) : super(key: key);
 
   @override
   _SignUpState createState() => _SignUpState();
@@ -29,6 +35,8 @@ class _SignUpState extends State<SignUp> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? fcmToken;
+  bool isRegistered = false;
+
   TextEditingController nameEditingController = TextEditingController();
   TextEditingController emailEditingController = TextEditingController();
   TextEditingController passwordEditingController = TextEditingController();
@@ -41,165 +49,225 @@ class _SignUpState extends State<SignUp> {
   late bool _passwordVisible;
   final userRole = "User";
   String? deviceId;
+  String? deviceEmail;
 
-  Future<String?> _getId() async {
-    var deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
-      // import 'dart:io'
-      var iosDeviceInfo = await deviceInfo.iosInfo;
-      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
-    } else if (Platform.isAndroid) {
-      var androidDeviceInfo = await deviceInfo.androidInfo;
-      return androidDeviceInfo.androidId; // unique ID on Android
-    }
+  List<dynamic> accounts = [];
+  InterstitialAd? _interstitialAd;
+  Timer? interstitialTimer;
+
+  void loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          print('InterstitialAd failed to load: $error');
+        },
+      ),
+    );
   }
 
-  retieveDeviceId() async {
-    //get device id
-    deviceId = await _getId();
-    // print("deveice id is:$deviceId");
+  void showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    } else {
+      print('InterstitialAd is not loaded yet.');
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    loadInterstitialAd();
+    // Start the timer to show the interstitial ad every 4 minutes
+    interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+      showInterstitialAd();
+    });
+
+    print("Referral code");
+    print(widget.referralCode);
     _passwordVisible = false;
     _messaging.getToken().then((value) {
       fcmToken = value;
     });
     //get device id
-    retieveDeviceId();
+    retrieveDeviceId().then((_) {
+      // The device ID retrieval is completed, so now call checkLoginState()
+      if (isRegistered == true) {
+        // If already registered, navigate to the login page
+        setState(() {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        });
+      }
+    });
+
+    // Check if user is registered
+  }
+
+  String? currentuserid;
+
+  getCurrUserId() async {
+    preferences = await SharedPreferences.getInstance();
+    setState(() {
+      currentuserid = preferences.getString("uid")!;
+      print(currentuserid);
+    });
+  }
+
+  Future<void> retrieveDeviceId() async {
+    deviceId = await DeviceIdManager.getDeviceId();
+    print("Device ID: $deviceId");
+  }
+
+  String sanitizeName(String name) {
+    // Remove spaces and convert to lowercase
+    return name.replaceAll(' ', '').toLowerCase();
+  }
+
+  String generateRandomEmail(String name) {
+    // Sanitize the name
+    String sanitized = sanitizeName(name);
+    // Generate a random number for email uniqueness
+    int randomNum = Random().nextInt(9999);
+
+    // Create a random email using sanitized name and random number
+    return '$sanitized$randomNum@gmail.com';
   }
 
   void _registerUser() async {
-    print("your fcm token is $fcmToken");
-    //get device id
-    deviceId = await _getId();
-    print("deveice id is:$deviceId");
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        isloading = true;
-      });
-      preferences = await SharedPreferences.getInstance();
-      var firebaseUser = FirebaseAuth.instance.currentUser;
-
-      //BEFORE CREATING A NEW ACCOUNT MAKE SURE THE DEVICE IS ALREADY REGISTERED YET.
-
-      final QuerySnapshot checkToken = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("fcmToken", isEqualTo: fcmToken)
-          .get();
-      final List<DocumentSnapshot> document = checkToken.docs;
-      if (document.isEmpty) {
-        await _auth
-            .createUserWithEmailAndPassword(
-                email: emailAddress.toString().trim(),
-                password: password.toString().trim())
-            .then((auth) async {
-          firebaseUser = auth.user;
-          // final credential = PhoneAuthProvider.credential(
-          //     verificationId: verificationId, smsCode: smsCode);
-          // await firebaseUser!.updatePhoneNumber(credential);
-          //
-          // FirebaseAuth.instance.verifyPhoneNumber(
-          //   phoneNumber: phoneNumber,
-          //   verificationCompleted: (PhoneAuthCredential credential) async {
-          //     // Sign in with the phone number credential
-          //     await FirebaseAuth.instance.signInWithCredential(credential);
-          //   },
-          //   verificationFailed: (FirebaseAuthException e) {
-          //     // Handle verification failed exception
-          //   },
-          //   codeSent: (String verificationId, int? resendToken) {
-          //     // Save verification ID and resend token
-          //   },
-          //   codeAutoRetrievalTimeout: (String verificationId) {
-          //     // Handle timeout
-          //   },
-          // );
-        }).catchError((err) {
-          setState(() {
-            isloading = false;
-          });
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(err.message)));
+    if (deviceId == "") {
+      Fluttertoast.showToast(msg: "Error no device Id");
+    } else {
+      if (_formkey.currentState!.validate()) {
+        setState(() {
+          isloading = true;
         });
+        preferences = await SharedPreferences.getInstance();
+        var firebaseUser = FirebaseAuth.instance.currentUser;
+        //
+        showInterstitialAd();
+        //BEFORE CREATING A NEW ACCOUNT MAKE SURE THE DEVICE IS ALREADY REGISTERED YET.
 
-        if (firebaseUser != null) {
-          final QuerySnapshot result = await FirebaseFirestore.instance
-              .collection("Users")
-              .where("uid", isEqualTo: firebaseUser!.uid)
-              .get();
+        final QuerySnapshot checkToken = await FirebaseFirestore.instance
+            .collection("Users")
+            .where("deviceId", isEqualTo: deviceId)
+            .where("password", isEqualTo: password.toString().trim())
+            .get();
+        final List<DocumentSnapshot> document = checkToken.docs;
+        // Generate a random email based on the user's name
+        String randomEmail =
+            generateRandomEmail(nameEditingController.text.toString().trim());
+        print(randomEmail);
 
-          final List<DocumentSnapshot> documents = result.docs;
-          if (documents.isEmpty) {
-            FirebaseFirestore.instance
-                .collection("Users")
-                .doc(firebaseUser!.uid)
-                .set({
-              "uid": firebaseUser!.uid,
-              "email": firebaseUser!.email,
-              "name": name.toString().trim(),
-              "phone": phoneNumber.trim(),
-              "password": password.trim(),
-              "photoUrl": defaultPhotoUrl,
-              "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-              "state": 1,
-              "role": userRole,
-              "fcmToken": fcmToken,
-              "deviceId": deviceId
-            });
-            final currentuser = firebaseUser;
-            await preferences.setString("uid", currentuser!.uid);
-            await preferences.setString("name", name.toString().trim());
-            await preferences.setString("photo", defaultPhotoUrl);
-            await preferences.setString("phone", phoneNumber.trim());
-            await preferences.setString("role", userRole.toString().trim());
-            await preferences.setString("email", currentuser.email.toString());
-          } else {
-            //get user detail for current user
-            await preferences.setString("uid", documents[0]["uid"]);
-            await preferences.setString("name", documents[0]["name"]);
-            await preferences.setString("photo", documents[0]["photoUrl"]);
-            await preferences.setString("phone", documents[0]["phone"]);
-            await preferences.setString("role", documents[0]["role"]);
-            await preferences.setString("email", documents[0]["email"]);
+        if (document.isEmpty) {
+          await _auth
+              .createUserWithEmailAndPassword(
+                  email: randomEmail, password: password.toString().trim())
+              .then((auth) async {
+            firebaseUser = auth.user;
+          }).catchError((err) {
             setState(() {
               isloading = false;
             });
-            Fluttertoast.showToast(
-                msg:
-                    "Account with this credentials is already created or this device is already in use");
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(err.message)));
+          });
+
+          if (firebaseUser != null) {
+            final QuerySnapshot result = await FirebaseFirestore.instance
+                .collection("Users")
+                .where("uid", isEqualTo: firebaseUser!.uid)
+                .get();
+
+            final List<DocumentSnapshot> documents = result.docs;
+            if (documents.isEmpty) {
+              FirebaseFirestore.instance
+                  .collection("Users")
+                  .doc(firebaseUser!.uid)
+                  .set({
+                "uid": firebaseUser!.uid,
+                "email": firebaseUser!.email,
+                "name": name.toString().trim(),
+                "phone": phoneNumber.trim(),
+                "password": password.trim(),
+                "photoUrl": defaultPhotoUrl,
+                "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
+                "state": 1,
+                "role": userRole,
+                "fcmToken": fcmToken,
+                "deviceId": deviceId,
+                "referralCode": widget.referralCode //1.emmy
+              });
+              setState(() {
+                isRegistered = true;
+              });
+              final currentuser = firebaseUser;
+              await preferences.setString("uid", currentuser!.uid);
+              await preferences.setString("name", name.toString().trim());
+              await preferences.setString("photo", defaultPhotoUrl);
+              await preferences.setString("phone", phoneNumber.trim());
+              await preferences.setString("role", userRole.toString().trim());
+              await preferences.setString(
+                  "email", currentuser.email.toString());
+            } else {
+              //get user detail for current user
+              await preferences.setString("uid", documents[0]["uid"]);
+              await preferences.setString("name", documents[0]["name"]);
+              await preferences.setString("photo", documents[0]["photoUrl"]);
+              await preferences.setString("phone", documents[0]["phone"]);
+              await preferences.setString("role", documents[0]["role"]);
+              await preferences.setString("email", documents[0]["email"]);
+              setState(() {
+                isloading = false;
+              });
+              Fluttertoast.showToast(
+                  msg: "Account with this credentials is already created");
+            }
+
+            setState(() {
+              isloading = false;
+            });
+            Route route = MaterialPageRoute(
+                builder: (c) => HomeScreen(
+                      currentuserid: firebaseUser!.uid,
+                      userRole: userRole,
+                    ));
+            // ignore: use_build_context_synchronously
+            Navigator.push(context, route);
+          } else {
+            setState(() {
+              isloading = false;
+            });
+            Fluttertoast.showToast(msg: "Sign up Failed");
           }
+        } else {
+          ///device already exists
 
           setState(() {
             isloading = false;
           });
-          Route route = MaterialPageRoute(
-              builder: (c) => HomeScreen(
-                    currentuserid: firebaseUser!.uid,
-                    userRole: userRole,
-                  ));
-          // ignore: use_build_context_synchronously
-          Navigator.push(context, route);
-        } else {
-          setState(() {
-            isloading = false;
-          });
-          Fluttertoast.showToast(msg: "Sign up Failed");
+          Fluttertoast.showToast(
+              textColor: Colors.red,
+              fontSize: 18,
+              msg:
+                  "Device Already registered in the app, please contact the administrator");
         }
-      } else {
-        ///device already exists
-        setState(() {
-          isloading = false;
-        });
-        Fluttertoast.showToast(
-            textColor: Colors.red,
-            fontSize: 18,
-            msg:
-                "Your device is already registered,Contact administraor for help");
       }
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd!.dispose();
+    interstitialTimer?.cancel();
   }
 
   @override
@@ -212,7 +280,7 @@ class _SignUpState extends State<SignUp> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SizedBox(height: size.height * 0.05),
+                SizedBox(height: size.height * 0.1),
                 const Text(
                   "IYANDIKISHE Nk'UMUNTU MUSHYA USHAKA KWIGA",
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -238,26 +306,45 @@ class _SignUpState extends State<SignUp> {
                       ),
                       SizedBox(height: size.height * 0.02),
                       const Text(
-                        "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wabariza kuri izi inforumasiyo zikurikira:",
+                        "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wahamagara kuri izi nimero zikurikira:",
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 16,
                         ),
                       ),
                       SizedBox(height: size.height * 0.02),
-                      const Text(
-                        "Telephone:0788659575/0728877442",
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(height: size.height * 0.01),
-                      const Text(
-                        "Imeri:maitrealexis001@gmail.com",
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 18,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 62),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () async {
+                                await FlutterPhoneDirectCaller.callNumber(
+                                    "0788659575");
+                              },
+                              child: const Text(
+                                "0788659575",
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                await FlutterPhoneDirectCaller.callNumber(
+                                    "0728877442");
+                              },
+                              child: const Text(
+                                "0728877442",
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -296,46 +383,46 @@ class _SignUpState extends State<SignUp> {
                         Icons.person,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika amazina yombi",
+                      hintText: "Andika amazina yawe",
                       border: InputBorder.none,
                     ),
                   ),
                 ),
-                TextFieldContainer(
-                  child: TextFormField(
-                    controller: emailEditingController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    onChanged: (val) {
-                      emailAddress = val;
-                      print(emailAddress);
-                    },
-                    validator: (emailValue) {
-                      if (emailValue!.isEmpty) {
-                        return 'This field is mandatory';
-                      }
-                      String p =
-                          "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
-                      RegExp regExp = new RegExp(p);
-
-                      if (regExp.hasMatch(emailValue)) {
-                        // So, the email is valid
-                        return null;
-                      }
-
-                      return 'This is not a valid email';
-                    },
-                    cursorColor: kPrimaryColor,
-                    decoration: const InputDecoration(
-                      icon: Icon(
-                        Icons.email,
-                        color: kPrimaryColor,
-                      ),
-                      hintText: "Andika imeli yawe",
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
+                // TextFieldContainer(
+                //   child: TextFormField(
+                //     controller: emailEditingController,
+                //     keyboardType: TextInputType.emailAddress,
+                //     textInputAction: TextInputAction.next,
+                //     onChanged: (val) {
+                //       emailAddress = val;
+                //       print(emailAddress);
+                //     },
+                //     validator: (emailValue) {
+                //       if (emailValue!.isEmpty) {
+                //         return 'This field is mandatory';
+                //       }
+                //       String p =
+                //           "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
+                //       RegExp regExp = new RegExp(p);
+                //
+                //       if (regExp.hasMatch(emailValue)) {
+                //         // So, the email is valid
+                //         return null;
+                //       }
+                //
+                //       return 'This is not a valid email';
+                //     },
+                //     cursorColor: kPrimaryColor,
+                //     decoration: const InputDecoration(
+                //       icon: Icon(
+                //         Icons.email,
+                //         color: kPrimaryColor,
+                //       ),
+                //       hintText: "Andika imeli yawe",
+                //       border: InputBorder.none,
+                //     ),
+                //   ),
+                // ),
                 TextFieldContainer(
                   child: TextFormField(
                     controller: phoneNumberEditingController,
@@ -374,7 +461,6 @@ class _SignUpState extends State<SignUp> {
                 TextFieldContainer(
                   child: TextFormField(
                     controller: passwordEditingController,
-                    obscureText: !_passwordVisible,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     onChanged: (val) {
@@ -406,43 +492,48 @@ class _SignUpState extends State<SignUp> {
                       return 'This is not a valid phone number';
                     },
                     cursorColor: kPrimaryColor,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Andika telephone nanone",
-                      icon: const Icon(
-                        Icons.lock,
+                      icon: Icon(
+                        Icons.phone,
                         color: kPrimaryColor,
                       ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passwordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: kPrimaryColor,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _passwordVisible = !_passwordVisible;
-                          });
-                        },
-                      ),
+                      // suffixIcon: IconButton(
+                      //   icon: Icon(
+                      //     _passwordVisible
+                      //         ? Icons.visibility_off
+                      //         : Icons.visibility,
+                      //     color: kPrimaryColor,
+                      //   ),
+                      //   onPressed: () {
+                      //     setState(() {
+                      //       _passwordVisible = !_passwordVisible;
+                      //     });
+                      //   },
+                      // ),
                       border: InputBorder.none,
                     ),
                   ),
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
-                  width: size.width * 0.7,
-                  height: size.height * 0.07,
+                  width: size.width * 0.3,
+                  height: size.height * 0.06,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           backgroundColor: kPrimaryColor),
                       onPressed: () {
-                        _registerUser();
+                        if (phoneNumber == password) {
+                          _registerUser();
+                        } else {
+                          Fluttertoast.showToast(
+                              msg: "Phone number must be the same!");
+                        }
                       },
                       child: const Text(
-                        "Iyandikishe",
+                        "Emeza",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 22,
@@ -456,35 +547,38 @@ class _SignUpState extends State<SignUp> {
                     : Container(
                         child: null,
                       ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "Usanzwe ufite konti ? ",
-                      style: TextStyle(color: kPrimaryColor),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return LoginScreen();
-                            },
+                currentuserid == null
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Text(
+                            "Usanzwe ufite konti ? ",
+                            style: TextStyle(color: kPrimaryColor),
                           ),
-                        );
-                      },
-                      child: const Text(
-                        "Injira",
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.1),
-                  ],
-                ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return LoginScreen();
+                                  },
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Injira",
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.1),
+                        ],
+                      )
+                    : const SizedBox(),
+                AdBannerWidget(),
               ]),
         ),
       ),

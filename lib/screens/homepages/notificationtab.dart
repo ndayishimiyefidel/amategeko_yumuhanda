@@ -1,5 +1,7 @@
 import 'package:amategeko/screens/homepages/usernotification.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
@@ -43,7 +45,7 @@ class _NotificationsState extends State<Notifications>
             color: Colors.white,
           ),
         ),
-        title: userRole == "Admin"
+        title: userRole == "Admin" || userRole == "Caller"
             ? const Text(
                 'Notifications',
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
@@ -58,23 +60,23 @@ class _NotificationsState extends State<Notifications>
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // showSearch(
-              //   context: context,
-              //   delegate: DataSearch(
-              //     allUsersList: allUsersList,
-              //     currentuserid: currentuserid.toString(),
-              //     currentusername: currentusername.toString(),
-              //     currentuserphoto: currentuserphoto.toString(),
-              //     phoneNumber: phoneNumber.toString(),
-              //     code: code.toString(),
-              //     quizTitle: quizTitle.toString(),
-              //   ),
-              // );
+              showSearch(
+                context: context,
+                delegate: DataSearch(
+                  allUsersList: allUsersList,
+                  currentuserid: currentuserid.toString(),
+                  currentusername: currentusername.toString(),
+                  currentuserphoto: currentuserphoto.toString(),
+                  phoneNumber: phoneNumber.toString(),
+                  code: code.toString(),
+                  quizTitle: quizTitle.toString(),
+                ),
+              );
             },
           )
         ],
       ),
-      body: userRole == "Admin"
+      body: userRole == "Admin" || userRole == "Caller"
           ? SingleChildScrollView(
               child: Column(
                 //crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -95,8 +97,8 @@ class _NotificationsState extends State<Notifications>
                               unselectedLabelColor: Colors.black26,
                               indicatorColor: Colors.black,
                               tabs: [
-                                Tab(text: 'Abafite kode'),
                                 Tab(text: 'Abadafite kode'),
+                                Tab(text: 'Abafite kode'),
                               ],
                             ),
                           ),
@@ -109,14 +111,63 @@ class _NotificationsState extends State<Notifications>
                           ),
                           child: const TabBarView(
                             children: <Widget>[
-                              NotificationTab1(),
                               NotificationTab2(),
+                              NotificationTab1(),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("Quiz-codes")
+                            .orderBy("createdAt", descending: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return SizedBox(
+                              height: MediaQuery.of(context)
+                                      .copyWith()
+                                      .size
+                                      .height -
+                                  MediaQuery.of(context)
+                                          .copyWith()
+                                          .size
+                                          .height /
+                                      5,
+                              width:
+                                  MediaQuery.of(context).copyWith().size.width,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation(
+                                  kPrimaryColor,
+                                )),
+                              ),
+                            );
+                          } else {
+                            snapshot.data!.docs.removeWhere(
+                                (i) => i["userId" ?? ''] == currentuserid);
+                            allUsersList = snapshot.data!.docs;
+                            return ListView.builder(
+                              padding: const EdgeInsets.only(top: 16, left: 20),
+                              itemCount: snapshot.data!.docs.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  child: null,
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             )
@@ -214,32 +265,116 @@ class DataSearch extends SearchDelegate {
     if (query.isNotEmpty) {
       suggestionList = [];
       userList.forEach((element) {
-        if (element["name"].toLowerCase().startsWith(query.toLowerCase())) {
+        if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
+            element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
+            element["email"].toLowerCase().startsWith(query.toLowerCase()) ||
+            element["code"].toLowerCase().startsWith(query.toLowerCase())) {
           suggestionList.add(element);
         }
       });
     }
     return ListView.builder(
+        shrinkWrap: true,
         itemBuilder: (context, index) => ListTile(
               onTap: () {},
               leading: const Icon(Icons.person),
-              title: RichText(
-                text: TextSpan(
-                    text: suggestionList[index]["name"]
-                        .toLowerCase()
-                        .substring(0, query.length),
-                    style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                        text: suggestionList[index]["name"]
+                            .toLowerCase()
+                            .substring(0, query.length),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                        children: [
+                          TextSpan(
+                              text: suggestionList[index]["name"]
+                                  .toLowerCase()
+                                  .substring(query.length),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 16))
+                        ]),
+                  ),
+                  RichText(
+                    text: TextSpan(
+                        text: suggestionList[index]["email"]
+                            .toLowerCase()
+                            .substring(0, query.length),
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16),
+                        children: [
+                          TextSpan(
+                              text: suggestionList[index]["email"]
+                                  .toLowerCase()
+                                  .substring(query.length),
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 16))
+                        ]),
+                  ),
+                  // RichText(
+                  //   text: TextSpan(
+                  //       text: suggestionList[index]["code"]
+                  //           .toLowerCase()
+                  //           .substring(query.length),
+                  //       style: const TextStyle(
+                  //           color: Colors.black,
+                  //           fontWeight: FontWeight.w500,
+                  //           fontSize: 16),
+                  //       children: [
+                  //         TextSpan(
+                  //             text: suggestionList[index]["code"]
+                  //                 .toLowerCase()
+                  //                 .substring(query.length),
+                  //             style: const TextStyle(
+                  //                 color: Colors.grey, fontSize: 16))
+                  //       ]),
+                  // ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      TextSpan(
-                          text: suggestionList[index]["name"]
-                              .toLowerCase()
-                              .substring(query.length),
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 16))
-                    ]),
+                      RichText(
+                        text: TextSpan(
+                            text: suggestionList[index]["phone"]
+                                .toLowerCase()
+                                .substring(0, query.length),
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16),
+                            children: [
+                              TextSpan(
+                                  text: suggestionList[index]["phone"]
+                                      .toLowerCase()
+                                      .substring(query.length),
+                                  style: const TextStyle(
+                                      color: Colors.grey, fontSize: 16))
+                            ]),
+                      ),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          await FlutterPhoneDirectCaller.callNumber(
+                              suggestionList[index]["phone"]
+                                  .toLowerCase()
+                                  .substring(query.length));
+                        },
+                        icon: const Icon(
+                          Icons.call,
+                          size: 30,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
         itemCount: suggestionList.length);

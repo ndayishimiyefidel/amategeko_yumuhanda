@@ -1,24 +1,26 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:amategeko/screens/Login/components/background.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
-import '../../forgotpassword/forgot_screen.dart';
+import '../../../widgets/banner_widget.dart';
+import 'check_deviceid.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({super.key});
+  const SignIn({Key? key}) : super(key: key);
 
   @override
   _SignInState createState() => _SignInState();
@@ -27,44 +29,84 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   late SharedPreferences preferences;
 
-  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? fcmToken;
   TextEditingController emailEditingController = TextEditingController();
   TextEditingController passwordEditingController = TextEditingController();
-  String emailAddress = "", password = "";
+  String emailAddress = "";
+  String password = "";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late bool _passwordVisible;
-  bool isloading = false;
-
+  bool isLoading = false;
   String? deviceId;
+  bool checkedValue = false;
+  bool isLoggedIn = false; // Track login state
+  InterstitialAd? _interstitialAd;
+  Timer? interstitialTimer;
 
-  Future<String?> _getId() async {
-    var deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
-      // import 'dart:io'
-      var iosDeviceInfo = await deviceInfo.iosInfo;
-      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
-    } else if (Platform.isAndroid) {
-      var androidDeviceInfo = await deviceInfo.androidInfo;
-      return androidDeviceInfo.androidId; // unique ID on Android
-    }
+  void loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          print('InterstitialAd failed to load: $error');
+        },
+      ),
+    );
   }
 
-  retieveDeviceId() async {
-    //get device id
-    deviceId = await _getId();
-    // print("deveice id is:$deviceId");
+  void showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      //_interstitialAd = null;
+    } else {
+      print('InterstitialAd is not loaded yet.');
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    loadInterstitialAd();
+
+    // Start the timer to show the interstitial ad every 4 minutes
+    interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+      showInterstitialAd();
+    });
+
     _passwordVisible = false;
     _messaging.getToken().then((value) {
       fcmToken = value;
       print("My fcm token is: $fcmToken");
     });
+
+    // Await the retrieveDeviceId() function here
+    retrieveDeviceId().then((_) {
+      // The device ID retrieval is completed, so now call checkLoginState()
+      checkLoginState();
+    });
+    getCurrUserId();
+  }
+
+  String? currentuserid;
+
+  getCurrUserId() async {
+    preferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      currentuserid = preferences.getString("uid");
+      print(currentuserid);
+    });
+  }
+
+  Future<void> retrieveDeviceId() async {
+    deviceId = await DeviceIdManager.getDeviceId();
+    print("Device ID: $deviceId");
   }
 
   Future<void> signupNavigator() async {
@@ -78,17 +120,30 @@ class _SignInState extends State<SignIn> {
     );
   }
 
+  void checkLoginState() async {
+    preferences = await SharedPreferences.getInstance();
+    isLoggedIn = preferences.getBool('isLoggedIn') ?? false;
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _interstitialAd!.dispose();
+    interstitialTimer?.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Background(
       child: SingleChildScrollView(
         child: Form(
-          key: _formkey,
+          key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: size.height * 0.03),
+              SizedBox(height: size.height * 0.1),
               const Text(
                 "KWINJIRA MURI APULIKASIYO",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -98,7 +153,6 @@ class _SignInState extends State<SignIn> {
                 "assets/icons/login.svg",
                 height: size.height * 0.35,
               ),
-              SizedBox(height: size.height * 0.03),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30),
                 child: Column(
@@ -114,71 +168,56 @@ class _SignInState extends State<SignIn> {
                     ),
                     SizedBox(height: size.height * 0.02),
                     const Text(
-                      "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wabariza kuri izi inforumasiyo zikurikira:",
+                      "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wahamagara kuri izi nimero zikurikira:",
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
                       ),
                     ),
                     SizedBox(height: size.height * 0.02),
-                    const Text(
-                      "Telephone:0788659575/0728877442",
-                      style: TextStyle(
-                        color: kPrimaryColor,
-                        fontSize: 18,
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.01),
-                    const Text(
-                      "Imeri:maitrealexis001@gmail.com",
-                      style: TextStyle(
-                        color: kPrimaryColor,
-                        fontSize: 18,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 62),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              await FlutterPhoneDirectCaller.callNumber(
+                                  "0788659575");
+                            },
+                            child: const Text(
+                              "0788659575",
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () async {
+                              await FlutterPhoneDirectCaller.callNumber(
+                                  "0728877442");
+                            },
+                            child: const Text(
+                              "0728877442",
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: size.height * 0.03),
-              TextFieldContainer(
-                child: TextFormField(
-                  controller: emailEditingController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  onChanged: (val) {
-                    emailAddress = val;
-                  },
-                  validator: (emailValue) {
-                    if (emailValue!.isEmpty) {
-                      return 'This field is mandatory';
-                    }
-                    String p =
-                        "[a-zA-Z0-9+._%-+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
-                    RegExp regExp = RegExp(p);
-
-                    if (regExp.hasMatch(emailValue)) {
-                      // So, the email is valid
-                      return null;
-                    }
-
-                    return 'This is not a valid email';
-                  },
-                  cursorColor: kPrimaryColor,
-                  decoration: const InputDecoration(
-                    icon: Icon(
-                      Icons.email,
-                      color: kPrimaryColor,
-                    ),
-                    hintText: "imeri yawe",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
               TextFieldContainer(
                 child: TextFormField(
                   controller: passwordEditingController,
-                  obscureText: !_passwordVisible,
                   keyboardType: TextInputType.number,
+                  autocorrect: true,
+                  autofocus: true,
                   textInputAction: TextInputAction.done,
                   onChanged: (val) {
                     password = val;
@@ -188,76 +227,84 @@ class _SignInState extends State<SignIn> {
                       return 'This field is mandatory';
                     }
                     if (pwValue.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return 'phone must be at least 6 characters';
                     }
 
                     return null;
                   },
                   cursorColor: kPrimaryColor,
-                  decoration: InputDecoration(
-                    hintText: "Andika telefoni yawe...",
-                    icon: const Icon(
-                      Icons.lock_outlined,
+                  decoration: const InputDecoration(
+                    hintText: "Andika telefoni yawe",
+                    icon: Icon(
+                      Icons.call,
                       color: kPrimaryColor,
                     ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _passwordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: kPrimaryColor,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _passwordVisible = !_passwordVisible;
-                        });
-                      },
-                    ),
+                    // suffixIcon: IconButton(
+                    //   icon: Icon(
+                    //     _passwordVisible
+                    //         ? Icons.visibility_off
+                    //         : Icons.visibility,
+                    //     color: kPrimaryColor,
+                    //   ),
+                    //   onPressed: () {
+                    //     setState(() {
+                    //       _passwordVisible = !_passwordVisible;
+                    //     });
+                    //   },
+                    // ),
                     border: InputBorder.none,
                   ),
                 ),
               ),
-              SizedBox(
-                height: size.height * 0.01,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 45),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    const Text(
-                      "Wibagiwe numero ya terefone? ",
-                      style: TextStyle(color: kPrimaryColor),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const ForgotScreen();
-                            },
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Gusubiramo",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: size.height * 0.01,
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 20),
+              //   child: CheckboxListTile(
+              //     title: Text("Remember Me"),
+              //     value: checkedValue,
+              //     onChanged: (newValue) {
+              //       setState(() {
+              //         checkedValue = newValue!;
+              //       });
+              //     },
+              //     controlAffinity:
+              //         ListTileControlAffinity.leading, //  <-- leading Checkbox
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.only(right: 45, bottom: 20),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.end,
+              //     children: <Widget>[
+              //       const Text(
+              //         "Wibagiwe numero ya terefone? ",
+              //         style: TextStyle(color: kPrimaryColor),
+              //       ),
+              //       GestureDetector(
+              //         onTap: () {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) {
+              //                 return const ForgotScreen();
+              //               },
+              //             ),
+              //           );
+              //         },
+              //         child: const Text(
+              //           "Gusubiramo",
+              //           style: TextStyle(
+              //             color: Colors.red,
+              //             fontWeight: FontWeight.bold,
+              //           ),
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              // ),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
-                width: size.width * 0.7,
-                height: size.height * 0.07,
+                width: size.width * 0.3,
+                height: size.height * 0.06,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
                   child: ElevatedButton(
@@ -267,7 +314,7 @@ class _SignInState extends State<SignIn> {
                       loginUser();
                     },
                     child: const Text(
-                      "Injira",
+                      "Emeza",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 22,
@@ -277,43 +324,46 @@ class _SignInState extends State<SignIn> {
                 ),
               ),
               SizedBox(height: size.height * 0.03),
-              isloading
+              isLoading
                   ? oldcircularprogress()
                   : Container(
                       child: null,
                     ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    "Ntugira Konti ?   ",
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return SignUpScreen();
-                          },
+              currentuserid != null
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "Ntugira Konti ?   ",
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
                         ),
-                      );
-                    },
-                    child: const Text(
-                      "Iyandikishe",
-                      style: TextStyle(
-                        color: kPrimaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return SignUpScreen();
+                                },
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Iyandikishe",
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  : const SizedBox(),
+              AdBannerWidget(),
               SizedBox(
                 height: size.height * 0.06,
               ),
@@ -325,104 +375,117 @@ class _SignInState extends State<SignIn> {
   }
 
   void loginUser() async {
-    if (_formkey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        isloading = true;
+        isLoading = true;
       });
       preferences = await SharedPreferences.getInstance();
-
       var user = FirebaseAuth.instance.currentUser;
 
-      await _auth
-          .signInWithEmailAndPassword(
-              email: emailAddress.toString().trim(), password: password.trim())
-          .then((auth) {
-        user = auth.user;
-      }).catchError((err) {
-        setState(() {
-          isloading = false;
-        });
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(err.message)));
-      });
+      showInterstitialAd();
 
-      if (user != null) {
-        FirebaseFirestore.instance
-            .collection("Users")
-            .doc(user!.uid)
-            .update({"state": 1});
+      // await _auth
+      //     .signInWithEmailAndPassword(
+      //         email: emailAddress.toString().trim(), password: password.trim())
+      //     .then((auth) {
+      //   user = auth.user;
+      // }).catchError((err) {
+      //   setState(() {
+      //     isLoading = false;
+      //   });
+      //   ScaffoldMessenger.of(context)
+      //       .showSnackBar(SnackBar(content: Text(err.message)));
+      // });
 
-        FirebaseFirestore.instance
-            .collection("Users")
-            .doc(user!.uid)
-            .get()
-            .then((datasnapshot) async {
-          String userRole = datasnapshot.data()!["role"];
+      // if (user != null) {
+      //   FirebaseFirestore.instance
+      //       .collection("Users")
+      //       .doc(user!.uid)
+      //       .update({"state": 1});
 
-          ///make sure the user role is not admininstrator
-          /// no way to check which device is using
-          if (datasnapshot.data()!['role'] == "Admin") {
-            await preferences.setString("uid", datasnapshot.data()!["uid"]);
-            await preferences.setString("name", datasnapshot.data()!["name"]);
-            await preferences.setString(
-                "photo", datasnapshot.data()!["photoUrl"]);
-            await preferences.setString("email", datasnapshot.data()!["email"]);
-            await preferences.setString("role", datasnapshot.data()!["role"]);
-            await preferences.setString("phone", datasnapshot.data()!["phone"]);
+      FirebaseFirestore.instance
+          .collection("Users")
+          .where("password", isEqualTo: password)
+          .get()
+          .then((QuerySnapshot querySnapshot) async {
+        if (querySnapshot.size > 0) {
+          var firstDoc = querySnapshot.docs.first;
+          if (firstDoc != null && firstDoc.data() != null) {
+            Map<String, dynamic> data = firstDoc.data() as Map<String, dynamic>;
 
-            setState(() {
-              isloading = false;
-            });
-            Route route = MaterialPageRoute(
-                builder: (c) => HomeScreen(
-                      currentuserid: user!.uid,
-                      userRole: userRole,
-                    ));
-            Navigator.push(context, route);
-          } else {
-            ///tracking user role
-            if (datasnapshot.data()!["deviceId"] == deviceId) {
-              await preferences.setString("uid", datasnapshot.data()!["uid"]);
-              await preferences.setString("name", datasnapshot.data()!["name"]);
-              await preferences.setString(
-                  "photo", datasnapshot.data()!["photoUrl"]);
-              await preferences.setString(
-                  "email", datasnapshot.data()!["email"]);
-              await preferences.setString("role", datasnapshot.data()!["role"]);
-              await preferences.setString(
-                  "phone", datasnapshot.data()!["phone"]);
+            String userRole = data['role'];
+
+            if (data.containsKey('role') &&
+                (data['role'] == "Admin" ||
+                    data['role'] == "Ambassador" ||
+                    data['role'] == "Caller")) {
+              await preferences.setString("uid", data["uid"]);
+              await preferences.setString("name", data["name"]);
+              await preferences.setString("photo", data["photoUrl"]);
+              await preferences.setString("email", data["email"]);
+              await preferences.setString("role", data["role"]);
+              await preferences.setString("phone", data["phone"]);
 
               setState(() {
-                isloading = false;
+                isLoading = false;
+                isLoggedIn = true; // Update login state
               });
-              // Navigator.of(context).pop(context);
+              preferences.setBool('isLoggedIn', isLoggedIn);
               Route route = MaterialPageRoute(
-                  builder: (c) => HomeScreen(
-                        currentuserid: user!.uid,
-                        userRole: userRole,
-                      ));
+                builder: (c) => HomeScreen(
+                  currentuserid: data["uid"],
+                  userRole: userRole,
+                ),
+              );
               Navigator.push(context, route);
             } else {
-              setState(() {
-                isloading = false;
-              });
-              Fluttertoast.showToast(
+              if (data.containsKey("deviceId") &&
+                  data["deviceId"] == deviceId) {
+                await preferences.setString("uid", data["uid"]);
+                await preferences.setString("name", data["name"]);
+                await preferences.setString("photo", data["photoUrl"]);
+                await preferences.setString("email", data["email"]);
+                await preferences.setString("role", data["role"]);
+                await preferences.setString("phone", data["phone"]);
+                print("db device id");
+                print(data["deviceId"]);
+
+                setState(() {
+                  isLoading = false;
+                  isLoggedIn = true; // Update login state
+                });
+                preferences.setBool('isLoggedIn', isLoggedIn);
+                Route route = MaterialPageRoute(
+                  builder: (c) => HomeScreen(
+                    currentuserid: data["uid"],
+                    userRole: userRole,
+                  ),
+                );
+                Navigator.push(context, route);
+              } else {
+                setState(() {
+                  isLoading = false;
+                });
+                Fluttertoast.showToast(
                   msg:
-                      "Not registered on this device, please use device you have registered in before.",
+                      "Not registered on this device, please use the device you have registered before.",
                   textColor: Colors.red,
-                  fontSize: 18);
+                  fontSize: 18,
+                );
+              }
             }
           }
-        });
-      } else {
-        setState(() {
-          isloading = false;
-        });
-        Fluttertoast.showToast(
-            msg: "Login Failed,No such user matching with your credentials",
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          Fluttertoast.showToast(
+            msg: "Login Failed, No such user matching with your credentials",
             textColor: Colors.red,
-            fontSize: 18);
-      }
+            fontSize: 18,
+          );
+        }
+      });
     }
   }
 }

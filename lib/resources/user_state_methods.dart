@@ -30,7 +30,7 @@ class UserStateMethods {
         userRole: preferences.getString("role").toString(),
         userState: UserState.Offline);
     await FirebaseAuth.instance.signOut();
-    await preferences.clear();
+    // await preferences.clear();
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => LoginScreen()),

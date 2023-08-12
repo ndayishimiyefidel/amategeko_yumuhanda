@@ -311,15 +311,15 @@ class _FileTileState extends State<FileTile> {
                                 SizedBox(
                                   height: size.height * 0.01,
                                 ),
-                                Text(
-                                  "Group Category: ${widget.groupType}",
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.blueGrey,
-                                  ),
-                                ),
+                                // Text(
+                                //   "Group Category: ${widget.groupType}",
+                                //   textAlign: TextAlign.start,
+                                //   style: const TextStyle(
+                                //     fontSize: 16,
+                                //     fontWeight: FontWeight.normal,
+                                //     color: Colors.blueGrey,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -715,9 +715,9 @@ class _FileTileState extends State<FileTile> {
       }
       setState(() {
         _isLoading = false;
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(content: Text("whatsapp not installed")));
       });
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: new Text("whatsapp not installed")));
     }
   }
 }

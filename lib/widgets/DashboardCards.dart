@@ -28,24 +28,26 @@ class DashboardCard extends StatelessWidget {
         ],
       ),
       child: Container(
-        child: Column(
-          children: [
-            Image.asset(
-              "assets/${imgpath}",
-              width: 60,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                "${name}",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Image.asset(
+                "assets/${imgpath}",
+                width: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "${name}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

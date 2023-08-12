@@ -1,23 +1,25 @@
-import 'HomeScreen.dart';
-import '../utils/constants.dart';
-import 'Welcome/welcome_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:splash_screen_view/SplashScreenView.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:splash_screen_view/SplashScreenView.dart';
+
+import '../utils/constants.dart';
+import 'HomeScreen.dart';
+import 'Welcome/welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({super.key, required this.onAdShown});
+
+  final VoidCallback onAdShown;
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late SharedPreferences preferences;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? fcmToken;
@@ -27,9 +29,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
+    widget.onAdShown();
     precachePicture(
         ExactAssetPicture(
             SvgPicture.svgStringDecoderBuilder, 'assets/icons/signup.svg'),
@@ -42,40 +43,57 @@ class _SplashScreenState extends State<SplashScreen>
         ExactAssetPicture(
             SvgPicture.svgStringDecoderBuilder, 'assets/icons/login.svg'),
         null);
-    navigateuser();
+    WidgetsBinding.instance.addObserver(this);
+
+    navigateUser();
   }
 
-  void navigateuser() async {
+  void navigateUser() async {
     preferences = await SharedPreferences.getInstance();
     currentuserid = preferences.getString("uid");
     userRole = preferences.getString("role");
 
     fcmToken = await _messaging.getToken();
+    print(currentuserid);
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    if (currentuserid != null) {
       FirebaseFirestore.instance
           .collection("Users")
           .doc(preferences.getString("uid"))
           .update({"fcmToken": fcmToken});
-
       setState(() {
         isAlreadyLoggedIn = true;
       });
-
-      Route route = MaterialPageRoute(
-          builder: (c) => HomeScreen(
-                currentuserid: preferences.getString("uid").toString(),
-                userRole: userRole.toString(),
-              ));
-      Navigator.pushReplacement(context, route);
     } else {
       setState(() {
         isAlreadyLoggedIn = false;
       });
-      Route route = MaterialPageRoute(builder: (c) => WelcomeScreen());
-      Navigator.pushReplacement(context, route);
     }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // When the app is minimized or closed, navigate to the HomeScreen
+      if (isAlreadyLoggedIn) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              currentuserid: preferences.getString("uid").toString(),
+              userRole: userRole.toString(),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -83,10 +101,10 @@ class _SplashScreenState extends State<SplashScreen>
     return SplashScreenView(
       navigateRoute: isAlreadyLoggedIn
           ? HomeScreen(
-              currentuserid: currentuserid.toString(),
+              currentuserid: preferences.getString("uid").toString(),
               userRole: userRole.toString(),
             )
-          : WelcomeScreen(),
+          : const WelcomeScreen(),
       duration: 5500,
       imageSrc: "assets/images/icon_new.png",
       text: "Amategeko y'Umuhanda",

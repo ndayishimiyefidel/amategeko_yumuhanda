@@ -1,17 +1,21 @@
+import 'dart:async';
+
+import 'package:amategeko/components/text_field_container.dart';
+import 'package:amategeko/screens/questions/add_question.dart';
+import 'package:amategeko/services/auth.dart';
+import 'package:amategeko/services/database_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../utils/constants.dart';
+import '../../widgets/ProgressWidget.dart';
+import '../../widgets/fcmWidget.dart';
 import 'edit_quiz.dart';
 import 'open_quiz.dart';
-import '../../utils/constants.dart';
-import '../../widgets/fcmWidget.dart';
-import 'package:flutter/material.dart';
-import '../../widgets/ProgressWidget.dart';
-import 'package:amategeko/services/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:amategeko/services/database_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:amategeko/screens/questions/add_question.dart';
-import 'package:amategeko/components/text_field_container.dart';
 
 class OldQuiz extends StatefulWidget {
   const OldQuiz({Key? key}) : super(key: key);
@@ -22,6 +26,10 @@ class OldQuiz extends StatefulWidget {
 
 class _OldQuizState extends State<OldQuiz> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late BannerAd _bannerAd;
+  bool isBannerLoaded = false;
+  bool isBannerVisible = false;
+  Timer? bannerTimer;
   Stream<dynamic>? quizStream;
   bool isLoading = false;
   DatabaseService databaseService = DatabaseService();
@@ -71,67 +79,95 @@ class _OldQuizState extends State<OldQuiz> {
   }
 
   Widget quizList() {
-    return StreamBuilder(
-      stream: quizStream,
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const CircularProgressIndicator();
-          case ConnectionState.none:
-            return const Text('Error,No internet');
-          default:
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return snapshot.data == null
-                  ? const Center(
-                      child: Text(
-                        "There is no available quiz at this time ",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          letterSpacing: 2,
-                          color: Colors.red,
+    return Expanded(
+      child: StreamBuilder(
+        stream: quizStream,
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return const Center(child: CircularProgressIndicator());
+            case ConnectionState.none:
+              return const Text('Error,No internet');
+            default:
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return snapshot.data == null
+                    ? const Center(
+                        child: Text(
+                          "There is no available quiz at this time ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            letterSpacing: 2,
+                            color: Colors.red,
+                          ),
                         ),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: snapshot.data.docs.length,
-                      itemBuilder: (context, index) {
-                        ///calculate number of question in specific quiz
-                        ///in this time i will use collection group
-                        ///
-                        int quizNo = snapshot.data.docs.length;
-                        return QuizTile(
-                          quizId: snapshot.data!.docs[index].data()['quizId'],
-                          imgurl:
-                              snapshot.data!.docs[index].data()["quizImgUrl"],
-                          title: snapshot.data.docs[index].data()["quizTitle"],
-                          desc: snapshot.data.docs[index].data()["quizDesc"],
-                          quizType:
-                              snapshot.data.docs[index].data()["quizType"],
-                          totalQuestion: totalQuestion,
-                          userRole: userRole!,
-                          userToken: userToken,
-                          senderName: currentusername,
-                          currentUserId: currentuserid,
-                          phone: phone,
-                          email: email,
-                          photoUrl: photo,
-                          quizPrice:
-                              snapshot.data.docs[index].data()["quizPrice"],
-                          adminPhone: adminPhone.toString(),
-                          index: index,
-                        );
-                      });
-            }
-        }
-      },
+                      )
+                    : ListView.builder(
+                        itemCount: snapshot.data.docs.length,
+                        itemBuilder: (context, index) {
+                          ///calculate number of question in specific quiz
+                          ///in this time i will use collection group
+                          ///
+                          int quizNo = snapshot.data.docs.length;
+                          return QuizTile(
+                            quizId: snapshot.data!.docs[index].data()['quizId'],
+                            imgurl:
+                                snapshot.data!.docs[index].data()["quizImgUrl"],
+                            title:
+                                snapshot.data.docs[index].data()["quizTitle"],
+                            desc: snapshot.data.docs[index].data()["quizDesc"],
+                            quizType:
+                                snapshot.data.docs[index].data()["quizType"],
+                            totalQuestion: totalQuestion,
+                            userRole: userRole!,
+                            userToken: userToken,
+                            senderName: currentusername,
+                            currentUserId: currentuserid,
+                            phone: phone,
+                            email: email,
+                            photoUrl: photo,
+                            quizPrice:
+                                snapshot.data.docs[index].data()["quizPrice"],
+                            adminPhone: adminPhone.toString(),
+                            index: index,
+                          );
+                        });
+              }
+          }
+        },
+      ),
     );
   }
 
   @override
   void initState() {
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (Ad ad) {
+          setState(() {
+            isBannerLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          ad.dispose();
+        },
+        // Add other banner ad listener callbacks as needed.
+      ),
+    );
+
+    _bannerAd.load();
+    // Initialize the banner timer
+    bannerTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      setState(() {
+        isBannerVisible = true;
+      });
+    });
+
     _messaging.getToken().then((value) {
       print("My token is $value");
     });
@@ -146,8 +182,16 @@ class _OldQuizState extends State<OldQuiz> {
     loadFCM(); //load fcm
     listenFCM(); //list fcm
     getToken(); //get admin token
-    FirebaseMessaging.instance.subscribeToTopic("Traffic-Notification");
+    FirebaseMessaging.instance;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // Dispose the banner timer when the widget is disposed
+    _bannerAd.dispose();
+    bannerTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -155,7 +199,12 @@ class _OldQuizState extends State<OldQuiz> {
     return Scaffold(
       //appbar
       key: _scaffoldKey,
-      body: quizList(),
+      body: Column(
+        children: [
+          quizList(),
+          if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
+        ],
+      ),
     );
   }
 }
@@ -307,6 +356,7 @@ class _QuizTileState extends State<QuizTile> {
                                       return OpenQuiz(
                                         quizId: widget.quizId,
                                         title: widget.title,
+                                        quizNumber: widget.index + 1,
                                       );
                                     },
                                   ),
@@ -474,6 +524,7 @@ class _QuizTileState extends State<QuizTile> {
                                             return OpenQuiz(
                                               quizId: widget.quizId,
                                               title: widget.title,
+                                              quizNumber: widget.index + 1,
                                             );
                                           },
                                         ),
@@ -665,6 +716,7 @@ class _QuizTileState extends State<QuizTile> {
                 return OpenQuiz(
                   quizId: widget.quizId,
                   title: widget.title,
+                  quizNumber: widget.index + 1,
                 );
               },
             ),

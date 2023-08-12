@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "amategeko-75e59",
+    "staging": "amategeko-75e59"
+  },
+  "targets": {},
+  "etags": {
+    "amategeko-75e59": {
+      "extensionInstances": {}
+    }
+  }
+}

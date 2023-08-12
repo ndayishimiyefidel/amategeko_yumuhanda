@@ -1,9 +1,9 @@
-import '../utils/constants.dart';
 import 'package:flutter/material.dart';
+
 import '../resources/user_state_methods.dart';
+import '../utils/constants.dart';
 
-
-class CommonAppBar extends StatelessWidget with PreferredSizeWidget {
+class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final menuenabled;
   final bool notificationenabled;
@@ -20,7 +20,6 @@ class CommonAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      
       title: Text(
         title,
         style: const TextStyle(

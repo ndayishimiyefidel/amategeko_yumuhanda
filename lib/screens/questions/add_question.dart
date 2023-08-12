@@ -9,6 +9,7 @@ import 'package:random_string/random_string.dart';
 
 import '../../services/database_service.dart';
 import '../../utils/constants.dart';
+import '../../widgets/banner_widget.dart';
 import '../quizzes/create_quiz.dart';
 
 class AddQuestion extends StatefulWidget {
@@ -28,12 +29,17 @@ class _AddQuestionState extends State<AddQuestion> {
   String option3 = "", option4 = "";
   String questionUrl = "";
 
+  // String correctOption = "";
+
   //adding controller
   final TextEditingController questionController = TextEditingController();
   final TextEditingController option1Controller = TextEditingController();
   final TextEditingController option2Controller = TextEditingController();
   final TextEditingController option3Controller = TextEditingController();
   final TextEditingController option4Controller = TextEditingController();
+
+  // final TextEditingController correctOptionController = TextEditingController();
+
   bool _isLoading = false;
 
   final picker = ImagePicker();
@@ -88,6 +94,7 @@ class _AddQuestionState extends State<AddQuestion> {
         "option2": option2,
         "option3": option3,
         "option4": option4,
+        "correctOption": "Not Specified",
         "quizPhotoUrl": questionUrl,
       };
 
@@ -153,6 +160,7 @@ class _AddQuestionState extends State<AddQuestion> {
                             option2Controller.clear();
                             option3Controller.clear();
                             option4Controller.clear();
+                            // correctOptionController.clear();
                             Route route = MaterialPageRoute(
                                 builder: (c) => const CreateQuiz());
                             Navigator.of(context).push(route);
@@ -173,6 +181,26 @@ class _AddQuestionState extends State<AddQuestion> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    // final correctOptionField = TextFieldContainer(
+    //   child: TextFormField(
+    //     autofocus: false,
+    //     controller: correctOptionController,
+    //     keyboardType: TextInputType.text,
+    //     onSaved: (value) {
+    //       correctOptionController.text = value!;
+    //     },
+    //     textInputAction: TextInputAction.next,
+    //     decoration: const InputDecoration(
+    //       hintText: "Type correct option...",
+    //       border: InputBorder.none,
+    //     ),
+    //     onChanged: (val) {
+    //       correctOption = val;
+    //     },
+    //     autovalidateMode: AutovalidateMode.disabled,
+    //     validator: (input) => input!.isEmpty ? 'Enter correct option' : null,
+    //   ),
+    // );
     final questionField = TextFieldContainer(
       child: TextFormField(
         autofocus: false,
@@ -365,6 +393,7 @@ class _AddQuestionState extends State<AddQuestion> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  AdBannerWidget(),
                   Text(
                     "QUIZ TITLE : ${widget.quizTitle}",
                     style: const TextStyle(
@@ -449,8 +478,13 @@ class _AddQuestionState extends State<AddQuestion> {
                   ),
                   option4Field,
                   SizedBox(
+                    height: size.height * 0.03,
+                  ),
+                  // correctOptionField,
+                  SizedBox(
                     height: size.height * 0.05,
                   ),
+
                   _isLoading
                       ? const CircularProgressIndicator()
                       : Container(

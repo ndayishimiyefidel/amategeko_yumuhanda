@@ -2,14 +2,13 @@ import 'dart:io';
 
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
 import 'package:amategeko/services/database_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
 import '../../utils/constants.dart';
-import '../homepages/noficationtab1.dart';
 import '../homepages/notificationtab.dart';
 
 class UploadDocuments extends StatefulWidget {

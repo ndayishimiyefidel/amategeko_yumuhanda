@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class OptionTile extends StatefulWidget {
-  final String option, description, correctAnswer, optionSelected;
+  final String description, correctAnswer, optionSelected;
+  final String option;
 
   OptionTile(
       {required this.optionSelected,
@@ -21,29 +22,46 @@ class _OptionTileState extends State<OptionTile> {
       child: Row(
         children: [
           Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              border: Border.all(
-                  color: widget.description == widget.optionSelected
-                      ? widget.optionSelected == widget.correctAnswer
-                          ? Colors.green.withOpacity(0.7)
-                          : Colors.red.withOpacity(0.7)
-                      : Colors.grey,
-                  width: 1.4),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              widget.option,
-              style: TextStyle(
+              width: 35,
+              height: 35,
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: widget.description == widget.optionSelected
+                        ? widget.optionSelected == widget.correctAnswer
+                            ? Colors.green.withOpacity(0.7)
+                            : Colors.red.withOpacity(0.7)
+                        : Colors.grey,
+                    width: 1.4),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                widget.option,
+                style: TextStyle(
                   color: widget.optionSelected == widget.description
                       ? widget.optionSelected == widget.correctAnswer
                           ? Colors.green.withOpacity(0.7)
                           : Colors.red
-                      : Colors.grey),
-            ),
-          ),
+                      : Colors.grey,
+                  fontSize: widget.optionSelected == widget.description
+                      ? widget.optionSelected == widget.correctAnswer
+                          ? 20
+                          : 18
+                      : 16,
+                ),
+              )
+              // IconButton(
+              //   iconSize: 35,
+              //   padding: const EdgeInsets.only(bottom: 30),
+              //   icon: widget.option,
+              //   color: widget.optionSelected == widget.description
+              //       ? widget.optionSelected == widget.correctAnswer
+              //           ? Colors.green.withOpacity(0.7)
+              //           : Colors.red
+              //       : Colors.grey,
+              //   onPressed: () {},
+              // ),
+              ),
           const SizedBox(
             width: 10,
           ),
@@ -51,7 +69,11 @@ class _OptionTileState extends State<OptionTile> {
             child: Text(
               widget.description,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: widget.optionSelected == widget.description
+                    ? widget.optionSelected == widget.correctAnswer
+                        ? 20
+                        : 18
+                    : 16,
                 color: widget.optionSelected == widget.description
                     ? widget.optionSelected == widget.correctAnswer
                         ? Colors.green.withOpacity(0.7)

@@ -113,23 +113,28 @@ class AuthService {
     }
   }
 
-  // Future deleteUser(String email, String password) async {
-  //   try {
-  //     User user = await _auth.currentUser!;
-  //     AuthCredential credentials =
-  //         EmailAuthProvider.credential(email: email, password: password);
-  //     print(user);
-  //     UserCredential result =
-  //         await user.reauthenticateWithCredential(credentials);
-  //     await DatabaseServices(uid: result.user!.uid)
-  //         .deleteuser(); // called from database class
-  //     await result.user!.delete();
-  //     return true;
-  //   } catch (e) {
-  //     print(e.toString());
-  //     return null;
-  //   }
-  Future deleteUser(String uid) async {
-    FirebaseFirestore.instance.collection("Users").doc(uid).delete();
+  Future<void> deleteUser(String uid) async {
+    // Step 1: Delete the user from the "Users" collection
+    await FirebaseFirestore.instance.collection("Users").doc(uid).delete();
+
+    // Step 2: Check and delete documents with the same UID from "Quiz-codes" collection
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection("Quiz-codes")
+        .where("userId", isEqualTo: uid)
+        .get();
+
+    List<DocumentSnapshot> documents = querySnapshot.docs;
+    for (DocumentSnapshot doc in documents) {
+      // Delete each document that matches the user's UID
+      await doc.reference.delete();
+    }
+  }
+
+  Future<void> deleteIremboUser(String uid) async {
+    // Step 1: Delete the user from the "Users" collection
+    await FirebaseFirestore.instance
+        .collection("irembo-users")
+        .doc(uid)
+        .delete();
   }
 }

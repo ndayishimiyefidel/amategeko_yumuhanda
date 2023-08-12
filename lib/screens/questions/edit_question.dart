@@ -9,6 +9,7 @@ import 'package:random_string/random_string.dart';
 
 import '../../services/database_service.dart';
 import '../../utils/constants.dart';
+import '../../widgets/banner_widget.dart';
 
 class EditQuestion extends StatefulWidget {
   final String quizId,
@@ -38,7 +39,7 @@ class EditQuestion extends StatefulWidget {
 class _EditQuestionState extends State<EditQuestion> {
   final _formkey = GlobalKey<FormState>();
   String question = "", option1 = "", option2 = "";
-  String option3 = "", option4 = "";
+  String option3 = "", option4 = "", correctOption = "Not Specified";
   String questionUrl = "";
 
   //adding controller
@@ -47,6 +48,9 @@ class _EditQuestionState extends State<EditQuestion> {
   final TextEditingController option2Controller = TextEditingController();
   final TextEditingController option3Controller = TextEditingController();
   final TextEditingController option4Controller = TextEditingController();
+
+  // final TextEditingController correctOptionController = TextEditingController();
+
   bool _isLoading = false;
 
   final picker = ImagePicker();
@@ -70,11 +74,6 @@ class _EditQuestionState extends State<EditQuestion> {
   ///saving quiz data inside quiz
   ///creating map data
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   uploadQuizData() async {
     if (_formkey.currentState!.validate()) {
       setState(() {
@@ -95,16 +94,16 @@ class _EditQuestionState extends State<EditQuestion> {
         questionUrl = downloadlink.toString();
       }
       Map<String, String> questionMap = {
-        "question": question.isEmpty ? widget.question : question,
-        "option1": option1.isEmpty ? widget.option1 : option1,
-        "option2": option2.isEmpty ? widget.option2 : option2,
-        "option3": option3.isEmpty ? widget.option3 : option3,
-        "option4": option4.isEmpty ? widget.option4 : option4,
+        "question": questionController.text,
+        "option1": option1Controller.text,
+        "option2": option2Controller.text,
+        "option3": option3Controller.text,
+        "option4": option4Controller.text,
+        "correctOption": correctOption,
         "quizPhotoUrl": questionUrl.isEmpty ? widget.questionUrl : questionUrl,
       };
 
       ///check whether if the quiz is not filled
-      ///using collection group
       await databaseService
           .updateQuestionData(questionMap, widget.quizId, widget.question)
           .then((value) {
@@ -142,6 +141,18 @@ class _EditQuestionState extends State<EditQuestion> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    questionController.text = widget.question;
+    option1Controller.text = widget.option1;
+    option2Controller.text = widget.option2;
+    option3Controller.text = widget.option3;
+    option4Controller.text = widget.option4;
+    questionUrl = widget.questionUrl;
+    // correctOptionController.text = widget.correctOption;
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final questionField = TextFieldContainer(
@@ -153,17 +164,17 @@ class _EditQuestionState extends State<EditQuestion> {
           questionController.text = value!;
         },
         textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          icon: const Icon(
+        decoration: const InputDecoration(
+          icon: Icon(
             Icons.question_answer_outlined,
             color: kPrimaryColor,
           ),
-          hintText:
-              widget.question.isEmpty ? "Type Question.. " : widget.question,
+          hintText: "Type Question.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
           question = val;
+          print(question);
         },
         autovalidateMode: AutovalidateMode.disabled,
       ),
@@ -177,9 +188,8 @@ class _EditQuestionState extends State<EditQuestion> {
           option1Controller.text = value!;
         },
         textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          hintText:
-              widget.option1.isEmpty ? "correct option.. " : widget.option1,
+        decoration: const InputDecoration(
+          hintText: "Type option1.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -198,8 +208,8 @@ class _EditQuestionState extends State<EditQuestion> {
           option2Controller.text = value!;
         },
         textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          hintText: widget.option2.isEmpty ? "option 2.. " : widget.option2,
+        decoration: const InputDecoration(
+          hintText: "option 2.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -217,8 +227,8 @@ class _EditQuestionState extends State<EditQuestion> {
           option3Controller.text = value!;
         },
         textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          hintText: widget.option3.isEmpty ? "option 3.. " : widget.option3,
+        decoration: const InputDecoration(
+          hintText: "option 3.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -236,17 +246,38 @@ class _EditQuestionState extends State<EditQuestion> {
           option4Controller.text = value!;
         },
         textInputAction: TextInputAction.done,
-        decoration: InputDecoration(
-          hintText: widget.option4.isEmpty ? "option 4.. " : widget.option4,
+        decoration: const InputDecoration(
+          hintText: "option 4.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
           option4 = val;
+          print(option4);
         },
         autovalidateMode: AutovalidateMode.disabled,
       ),
     );
-    final addquestionBtn = Container(
+
+    // final correctField = TextFieldContainer(
+    //   child: TextFormField(
+    //     autofocus: false,
+    //     controller: correctOptionController,
+    //     keyboardType: TextInputType.text,
+    //     onSaved: (value) {
+    //       correctOptionController.text = value!;
+    //     },
+    //     textInputAction: TextInputAction.done,
+    //     decoration: const InputDecoration(
+    //       hintText: "correct option.. ",
+    //       border: InputBorder.none,
+    //     ),
+    //     onChanged: (val) {
+    //       correctOption = val;
+    //     },
+    //     autovalidateMode: AutovalidateMode.disabled,
+    //   ),
+    // );
+    final addQuestionBtn = Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       width: size.width * 0.5,
       height: size.height * 0.07,
@@ -266,7 +297,7 @@ class _EditQuestionState extends State<EditQuestion> {
         ),
       ),
     );
-    final addsubmitBtn = Container(
+    final addSubmitBtn = Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       width: size.width * 0.5,
       height: size.height * 0.07,
@@ -333,6 +364,7 @@ class _EditQuestionState extends State<EditQuestion> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  AdBannerWidget(),
                   SizedBox(
                     height: size.height * 0.05,
                   ),
@@ -432,6 +464,10 @@ class _EditQuestionState extends State<EditQuestion> {
                   ),
                   option4Field,
                   SizedBox(
+                    height: size.height * 0.03,
+                  ),
+                  // correctField,
+                  SizedBox(
                     height: size.height * 0.05,
                   ),
                   _isLoading
@@ -445,8 +481,8 @@ class _EditQuestionState extends State<EditQuestion> {
                       Expanded(
                           child: Column(
                         children: [
-                          addquestionBtn,
-                          addsubmitBtn,
+                          addQuestionBtn,
+                          addSubmitBtn,
                         ],
                       ))
                     ],

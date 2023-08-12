@@ -1,9 +1,11 @@
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../enume/user_state.dart';
@@ -40,6 +42,55 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
 
     WidgetsBinding.instance.addObserver(this);
+
+    ///initial state
+    ///
+    checkAndUpdateCodeField();
+  }
+
+  Future<void> checkAndUpdateCodeField() async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    CollectionReference<Map<String, dynamic>> quizCodesRef =
+        FirebaseFirestore.instance.collection("Quiz-codes");
+
+    // Query documents where "endTime" is not an empty string
+    QuerySnapshot<Map<String, dynamic>> endTimeSnapshot =
+        await quizCodesRef.where("endTime", isNotEqualTo: "").get();
+
+    // Query documents where "code" is not null
+    QuerySnapshot<Map<String, dynamic>> codeSnapshot =
+        await quizCodesRef.where("code", isNotEqualTo: "").get();
+
+    // Get the list of document IDs for both queries
+    List<String> endTimeDocIds =
+        endTimeSnapshot.docs.map((doc) => doc.id).toList();
+    List<String> codeDocIds = codeSnapshot.docs.map((doc) => doc.id).toList();
+
+    // Combine and remove duplicates from both lists of document IDs
+    Set<String> combinedDocIds = {...endTimeDocIds, ...codeDocIds};
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Iterate through the combined document IDs and perform the check
+    for (String docId in combinedDocIds) {
+      final endTimeData = endTimeSnapshot.docs
+          .firstWhereOrNull((doc) => doc.id == docId)
+          ?.data();
+      final codeData =
+          codeSnapshot.docs.firstWhereOrNull((doc) => doc.id == docId)?.data();
+
+      final endTime =
+          endTimeData?["endTime"]; // Assuming "endTime" is stored as timestamp
+      final code = codeData?["code"];
+
+      if (endTime is int && now >= endTime && code != "") {
+        print("update data");
+        batch.update(quizCodesRef.doc(docId), {"code": ""});
+      }
+    }
+
+    await batch.commit();
   }
 
   @override
@@ -93,14 +144,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: MyStatefulWidget(),
+    return WillPopScope(
+      onWillPop: () async {
+        // Override the back button behavior
+        // Navigator.pushAndRemoveUntil(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => LoginScreen()),
+        //   // Replace SignIn with your login page
+        //   (route) => false,
+        // );
+        SystemNavigator.pop();
+        return false; // Return false to prevent default back button behavior
+      },
+      child: const Scaffold(
+        body: MyStatefulWidget(),
+      ),
     );
   }
 }
 
 class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({
+  const MyStatefulWidget({
     Key? key,
   }) : super(key: key);
 

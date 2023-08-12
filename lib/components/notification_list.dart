@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,28 +15,32 @@ class UsersNotificationList extends StatefulWidget {
   final String name;
 
   // final String secondaryText;
-  final String image;
+  // final String image;
   final String time;
-  final String quizId, quizTitle;
+
+  // final String quizId;
+  final String quizTitle;
   final String userId;
   final String email;
   final String phone;
   final String code, docId;
-  final bool isQuiz;
+  final isQuiz;
+  final endTime;
 
   const UsersNotificationList({
     super.key,
     required this.name,
-    required this.image,
+    // required this.image,
     required this.time,
     required this.email,
     required this.userId,
     required this.phone,
-    required this.quizId,
+    // required this.quizId,
     required this.quizTitle,
     required this.code,
     required this.docId,
-    required this.isQuiz,
+    this.isQuiz,
+    this.endTime,
   });
 
   @override
@@ -50,9 +57,37 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
   late SharedPreferences preferences;
   bool _isLoading = false;
 
+  InterstitialAd? _interstitialAd;
+  Timer? interstitialTimer;
+
+  void loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          print('InterstitialAd failed to load: $error');
+        },
+      ),
+    );
+  }
+
+  void showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    } else {
+      print('InterstitialAd is not loaded yet.');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    loadInterstitialAd();
     getCurrUser(); //get login data
     requestPermission(); //request permission
     loadFCM(); //load fcm
@@ -79,15 +114,11 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     var dateTimeFormat =
         DateFormat('dd/MM/yyyy, hh:mm a').format(date); // 12/31/2000, 10:00 PM
+    int timestamp1 = int.parse(widget.endTime);
+    var date1 = DateTime.fromMillisecondsSinceEpoch(timestamp1);
+    var dateTimeFormat1 = DateFormat('dd/MM/yyyy, hh:mm a').format(date1);
     return InkWell(
-      onTap: () {
-        // _getEditIcon();
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return OpenNotification(
-        //     notificationId: widget.docId,
-        //   );
-        // }));
-      },
+      onTap: () {},
       child: Container(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 5, bottom: 10),
         child: Row(
@@ -95,17 +126,6 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
             Expanded(
               child: Row(
                 children: <Widget>[
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(widget.image),
-                        maxRadius: 30,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: size.width * 0.03,
-                  ),
                   Expanded(
                     child: Container(
                       color: Colors.transparent,
@@ -175,14 +195,26 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                             userRole == "Admin"
                                 ? widget.isQuiz == true
                                     ? "Quiz code: ${widget.code}"
-                                    : "Group code: ${widget.code}"
+                                    : "code: ${widget.code}"
                                 : "",
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.green,
                               fontStyle: FontStyle.italic,
                             ),
-                          )
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            userRole == "Admin"
+                                ? "End Date Time : $dateTimeFormat1"
+                                : "",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade500,
+                                fontStyle: FontStyle.italic),
+                          ),
                         ],
                       ),
                     ),
@@ -199,13 +231,17 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                               children: <Widget>[
                                 _getGenerateIcon(),
                                 SizedBox(
-                                  height: size.height * 0.03,
+                                  height: size.height * 0.02,
                                 ),
                                 _isLoading
                                     ? const CircularProgressIndicator()
                                     : Container(
                                         child: null,
                                       ),
+                                _setEndTimeIcon(),
+                                SizedBox(
+                                  height: size.height * 0.02,
+                                ),
                                 _getDeleteIcon(),
                               ],
                             ),
@@ -236,6 +272,8 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         ),
       ),
       onTap: () {
+        //gen
+        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });
@@ -245,6 +283,71 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     );
   }
 
+  Widget _setEndTimeIcon() {
+    return GestureDetector(
+      child: const CircleAvatar(
+        backgroundColor: Colors.green,
+        radius: 14.0,
+        child: Icon(
+          Icons.date_range_outlined,
+          color: Colors.white,
+          size: 20.0,
+          semanticLabel: "change time",
+        ),
+      ),
+      onTap: () {
+        showInterstitialAd();
+        setState(() {
+          _isLoading = true;
+        });
+        _pickDate();
+        print("document id :${widget.docId}");
+
+        //date picker
+      },
+    );
+  }
+
+  DateTime? _selectedDate;
+
+  Future<void> _pickDate() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+        _updateEndTimeInFirestore();
+      });
+    }
+  }
+
+  Future<void> _updateEndTimeInFirestore() async {
+    try {
+      final CollectionReference collection = FirebaseFirestore.instance.collection(
+          'Quiz-codes'); // Replace 'your_collection' with the actual collection name in Firestore
+
+      await collection.doc(widget.docId).update({
+        'endTime': _selectedDate?.millisecondsSinceEpoch.toString(),
+      });
+
+      // Successfully updated the endTime in Firestore
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      // Handle error if any
+      print('Error updating endTime: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   String generatedCode = randomNumeric(6);
 
   Future<void> _generateCode(String docId) async {
@@ -252,8 +355,8 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         .collection("Quiz-codes")
         .doc(docId)
         .update({"code": generatedCode, "isOpen": true}).then((value) {
-      _getToken();
       setState(() {
+        _getToken();
         _isLoading = false;
         showDialog(
             context: context,
@@ -310,6 +413,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         ),
       ),
       onTap: () {
+        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });
@@ -323,7 +427,17 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         .collection("Quiz-codes")
         .doc(docId)
         .delete()
-        .then((value) {
+        .then((value) async {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("Users")
+          .where("uid", isEqualTo: docId)
+          .get();
+
+      List<DocumentSnapshot> documents = querySnapshot.docs;
+      for (DocumentSnapshot doc in documents) {
+        // Delete each document that matches the user's UID
+        await doc.reference.delete();
+      }
       setState(() {
         _isLoading = false;
         showDialog(

@@ -57,7 +57,7 @@ class _UserNotificationState extends State<UserNotification> {
               stream: FirebaseFirestore.instance
                   .collection("Quiz-codes")
                   .where("userId",
-                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -108,12 +108,12 @@ class _UserNotificationState extends State<UserNotification> {
                     itemBuilder: (context, index) {
                       return UsersNotificationList(
                         name: snapshot.data!.docs[index]["name"],
-                        image: snapshot.data!.docs[index]["photoUrl"],
+                        // image: snapshot.data!.docs[index]["photoUrl"],
                         time: snapshot.data!.docs[index]["createdAt"],
                         email: snapshot.data!.docs[index]["email"],
                         userId: snapshot.data!.docs[index]["userId"],
                         phone: snapshot.data!.docs[index]["phone"],
-                        quizId: snapshot.data!.docs[index]["quizId"],
+                        // quizId: snapshot.data!.docs[index]["quizId"],
                         quizTitle: snapshot.data!.docs[index]["quizTitle"],
                         code: snapshot.data!.docs[index]["code"],
                         isQuiz: snapshot.data!.docs[index]["isQuiz"],
