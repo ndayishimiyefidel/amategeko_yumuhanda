@@ -23,7 +23,7 @@ class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
   @override
-  _SignInState createState() => _SignInState();
+  State createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
@@ -73,11 +73,12 @@ class _SignInState extends State<SignIn> {
   void initState() {
     super.initState();
     loadInterstitialAd();
+    //addCorrectOptionField();
 
-    // Start the timer to show the interstitial ad every 4 minutes
-    interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-      showInterstitialAd();
-    });
+    // // Start the timer to show the interstitial ad every 4 minutes
+    // interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+    //   showInterstitialAd();
+    // });
 
     _passwordVisible = false;
     _messaging.getToken().then((value) {
@@ -91,6 +92,23 @@ class _SignInState extends State<SignIn> {
       checkLoginState();
     });
     getCurrUserId();
+  }
+
+  Future<void> addCorrectOptionField() async {
+    CollectionReference quizmakerCollectionRef = FirebaseFirestore.instance
+        .collection('Users'); // Updated collection name
+
+    QuerySnapshot quizmakerQuerySnapshot = await quizmakerCollectionRef.get();
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    for (QueryDocumentSnapshot quizmakerDoc in quizmakerQuerySnapshot.docs) {
+      batch.update(
+          quizmakerDoc.reference, {'role': "User"}); // Update the main document
+
+      // If there's no nested collection, you don't need to query or update anything inside it.
+    }
+    await batch.commit();
   }
 
   String? currentuserid;
@@ -383,25 +401,6 @@ class _SignInState extends State<SignIn> {
       var user = FirebaseAuth.instance.currentUser;
 
       showInterstitialAd();
-
-      // await _auth
-      //     .signInWithEmailAndPassword(
-      //         email: emailAddress.toString().trim(), password: password.trim())
-      //     .then((auth) {
-      //   user = auth.user;
-      // }).catchError((err) {
-      //   setState(() {
-      //     isLoading = false;
-      //   });
-      //   ScaffoldMessenger.of(context)
-      //       .showSnackBar(SnackBar(content: Text(err.message)));
-      // });
-
-      // if (user != null) {
-      //   FirebaseFirestore.instance
-      //       .collection("Users")
-      //       .doc(user!.uid)
-      //       .update({"state": 1});
 
       FirebaseFirestore.instance
           .collection("Users")
