@@ -8,6 +8,7 @@ import 'package:amategeko/widgets/play_quiz_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -24,7 +25,8 @@ class OpenQuiz extends StatefulWidget {
   final String title;
   final quizNumber;
 
-  OpenQuiz({required this.quizId, required this.title, this.quizNumber});
+  const OpenQuiz(
+      {super.key, required this.quizId, required this.title, this.quizNumber});
 
   @override
   State<OpenQuiz> createState() => _OpenQuizState();
@@ -49,8 +51,9 @@ class _OpenQuizState extends State<OpenQuiz>
   bool isBannerLoaded = false;
   bool isBannerVisible = false;
   Timer? bannerTimer;
-  InterstitialAd? _interstitialAd;
+
   Timer? interstitialTimer;
+  InterstitialAd? _interstitialAd;
 
   void loadInterstitialAd() {
     InterstitialAd.load(
@@ -61,7 +64,9 @@ class _OpenQuizState extends State<OpenQuiz>
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
         },
       ),
     );
@@ -77,9 +82,9 @@ class _OpenQuizState extends State<OpenQuiz>
   }
 
   //shared preferences
-  late SharedPreferences preferences, _preferences;
+  late SharedPreferences preferences;
   String? userRole;
-  late ConnectivityResult _connectivityResult;
+  ConnectivityResult? _connectivityResult;
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
@@ -128,9 +133,12 @@ class _OpenQuizState extends State<OpenQuiz>
   void initState() {
     super.initState();
     // Enable Firestore offline persistence
-    FirebaseFirestore.instance.enablePersistence().catchError((err) {
-      print("Firebase persistence error: $err");
-    });
+    if (kIsWeb) {
+      FirebaseFirestore.instance.enablePersistence().catchError((err) {
+        print("Firebase persistence error: $err");
+      });
+    }
+
     // Initialize connectivity
     Connectivity().onConnectivityChanged.listen((result) {
       setState(() {
@@ -140,9 +148,7 @@ class _OpenQuizState extends State<OpenQuiz>
 
     // Initialize shared preferences
     SharedPreferences.getInstance().then((prefs) {
-      setState(() {
-        _preferences = prefs;
-      });
+      setState(() {});
     });
     _controller1 = PageController(initialPage: 0);
     //interestial ads
@@ -191,6 +197,7 @@ class _OpenQuizState extends State<OpenQuiz>
         vsync: this, duration: Duration(seconds: limitTime));
     _controller.addListener(() {
       if (_controller.isCompleted) {
+        showInterstitialAd();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -311,7 +318,7 @@ class _OpenQuizState extends State<OpenQuiz>
     return FloatingActionButton.extended(
       backgroundColor: kPrimaryLightColor,
       onPressed: () {
-        showInterstitialAd();
+        //showInterstitialAd();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -491,12 +498,9 @@ class _OpenQuizState extends State<OpenQuiz>
                                                   total: total),
                                             ));
                                       } else {
-                                        if (_controller1!.page?.toInt() == 4 ||
-                                            _controller1!.page?.toInt() == 8 ||
-                                            _controller1!.page?.toInt() == 12 ||
-                                            _controller1!.page?.toInt() == 16) {
-                                          showInterstitialAd();
-                                        }
+                                        // if (_controller1!.page?.toInt() == 16) {
+                                        //   showInterstitialAd();
+                                        // }
                                         _controller1!.nextPage(
                                             duration: const Duration(
                                                 milliseconds: 250),
@@ -527,7 +531,7 @@ class _OpenQuizState extends State<OpenQuiz>
               }
           }
         }),
-        if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
+        // if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
       ],
     );
   }
@@ -559,8 +563,9 @@ class QuizPlayTile extends StatefulWidget {
   final String quizTitle;
   final String userRole;
 
-  QuizPlayTile(
-      {required this.questionModel,
+  const QuizPlayTile(
+      {super.key,
+      required this.questionModel,
       required this.index,
       required this.quizId,
       required this.quizTitle,
@@ -642,17 +647,18 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                           children: [
                             Expanded(
                               child: Material(
+                                  color: Colors.white,
                                   // display new updated image
                                   borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
+                                      Radius.circular(1)),
                                   clipBehavior: Clip.hardEdge,
                                   // display new updated image
                                   child: hasInternetConnection
                                       ? Image.network(
                                           widget.questionModel.questionImgUrl,
-                                          width: size.width * 0.5,
-                                          // height: size.height * 0.5,
-                                          fit: BoxFit.fill,
+                                          width: size.width * 0.1,
+                                          height: size.height * 0.2,
+                                          fit: BoxFit.contain,
                                           loadingBuilder: (BuildContext context,
                                               Widget child,
                                               ImageChunkEvent?
@@ -683,9 +689,9 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                                       : CachedNetworkImage(
                                           imageUrl: widget
                                               .questionModel.questionImgUrl,
-                                          width: size.width * 0.5,
-                                          // height: size.height * 0.2,
-                                          fit: BoxFit.fill,
+                                          width: size.width * 0.1,
+                                          height: size.height * 0.2,
+                                          fit: BoxFit.contain,
                                           placeholder: (context, url) =>
                                               const Center(
                                                   child:

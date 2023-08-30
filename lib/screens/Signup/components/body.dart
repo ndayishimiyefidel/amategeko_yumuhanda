@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
@@ -46,7 +47,6 @@ class _SignUpState extends State<SignUp> {
   late SharedPreferences preferences;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isloading = false;
-  late bool _passwordVisible;
   final userRole = "User";
   String? deviceId;
   String? deviceEmail;
@@ -90,7 +90,6 @@ class _SignUpState extends State<SignUp> {
 
     print("Referral code");
     print(widget.referralCode);
-    _passwordVisible = false;
     _messaging.getToken().then((value) {
       fcmToken = value;
     });
@@ -164,7 +163,10 @@ class _SignUpState extends State<SignUp> {
         // Generate a random email based on the user's name
         String randomEmail =
             generateRandomEmail(nameEditingController.text.toString().trim());
-        print(randomEmail);
+
+        if (kDebugMode) {
+          print(randomEmail);
+        }
 
         if (document.isEmpty) {
           await _auth

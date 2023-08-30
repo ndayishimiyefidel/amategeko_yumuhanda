@@ -311,7 +311,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
-              AdBannerWidget(),
+              const AdBannerWidget(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30.0, 10, 30, 10),
                 child: Container(
@@ -582,16 +582,41 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            ViewReferrals(
-                                                referralCode:
-                                                    referralCode.toString(),
-                                                refUid: currentuserid),
-                                      ),
-                                    );
+                                    if (_isConnected) {
+                                      showInterstitialAd();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              ViewReferrals(
+                                                  referralCode:
+                                                      referralCode.toString(),
+                                                  refUid: currentuserid),
+                                        ),
+                                      );
+                                    } else if (_interstitialAd == null) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              ViewReferrals(
+                                                  referralCode:
+                                                      referralCode.toString(),
+                                                  refUid: currentuserid),
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              ViewReferrals(
+                                                  referralCode:
+                                                      referralCode.toString(),
+                                                  refUid: currentuserid),
+                                        ),
+                                      );
+                                    }
                                   },
                                   child: const DashboardCard(
                                     name: "My Referrals",

@@ -16,8 +16,8 @@ import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('Handling a background message ${message.messageId}');
-}
+      print('Handling a background message ${message.messageId}');
+  }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +34,9 @@ void main() async {
       await FirebaseFirestore.instance.enablePersistence();
     }
   } catch (e) {
-    print("Error enabling persistence on web: $e");
+    if (kDebugMode) {
+      print("Error enabling persistence on web: $e");
+    }
   }
 
   // loadInterstitialAd();
@@ -42,30 +44,17 @@ void main() async {
     initialLink: Uri.parse(initialLink.toString()),
   ));
 }
-
-// Future<void> handleDeepLink(Uri? link) async {
-//   if (link != null && link.queryParameters.containsKey("referral")) {
-//     String? referralCode = link.queryParameters["referral"];
-//     if (referralCode != null && referralCode.isNotEmpty) {
-//       // Navigate to the SignUpScreen with the referral code
-//       print("my referral");
-//       print(referralCode);
-//       navigatorKey.currentState?.pushReplacement(
-//         MaterialPageRoute(
-//           builder: (context) => SignUpScreen(referralCode: referralCode),
-//         ),
-//       );
-//     }
-//   }
-// }
 Future<void> handleDeepLink(Uri? link) async {
   try {
     if (link != null && link.queryParameters.containsKey("referral")) {
       String? referralCode = link.queryParameters["referral"];
       if (referralCode != null && referralCode.isNotEmpty) {
         // Navigate to the SignUpScreen with the referral code
-        print("my referral");
-        print(referralCode);
+        
+        if (kDebugMode) {
+          print("my referral");
+          print(referralCode);
+        }
         navigatorKey.currentState?.pushReplacement(
           MaterialPageRoute(
             builder: (context) => SignUpScreen(referralCode: referralCode),
@@ -74,7 +63,9 @@ Future<void> handleDeepLink(Uri? link) async {
       }
     }
   } catch (e) {
-    print("Error handling deep link: $e");
+    if (kDebugMode) {
+      print("Error handling deep link: $e");
+    }
   }
 }
 
@@ -89,7 +80,9 @@ void loadInterstitialAd() {
         _interstitialAd = ad;
       },
       onAdFailedToLoad: (error) {
-        print('InterstitialAd failed to load: $error');
+        if (kDebugMode) {
+          print('InterstitialAd failed to load: $error');
+        }
       },
     ),
   );
@@ -100,7 +93,9 @@ void showInterstitialAd() {
     _interstitialAd!.show();
     _interstitialAd = null;
   } else {
-    print('InterstitialAd is not loaded yet.');
+    if (kDebugMode) {
+      print('InterstitialAd is not loaded yet.');
+    }
   }
 }
 
@@ -112,7 +107,7 @@ class MyApp extends StatefulWidget {
   final Uri? initialLink;
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {

@@ -108,7 +108,7 @@ class _UserList100State extends State<UserList100> {
               stream: FirebaseFirestore.instance
                   .collection("Users")
                   .orderBy("createdAt", descending: true)
-                  .limit(100)
+                  .limit(10)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

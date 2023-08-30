@@ -105,6 +105,11 @@ class SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    // FirebaseFirestore.instance
+    //     .collection("Users")
+    //     .doc("1S2L04bN31U8SWk3AJjlUlWolp23")
+    //     .update({"role": "Ambassador"}).then(
+    //         (value) => {print("docs updated")});
     readDataFromLocal();
   }
 
@@ -487,7 +492,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'App Key',
+                                          'Change Role',
                                           style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold),
@@ -506,7 +511,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       child: TextField(
                                         readOnly: false,
                                         decoration: const InputDecoration(
-                                          hintText: "New Phone Number",
+                                          hintText: "Ambassador",
                                         ),
                                         controller:
                                             passwordTextEditingController,

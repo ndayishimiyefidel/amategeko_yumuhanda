@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,7 @@ class UserList extends StatefulWidget {
   const UserList({super.key});
 
   @override
-  _UserListState createState() => _UserListState();
+  State createState() => _UserListState();
 }
 
 class _UserListState extends State<UserList> {
@@ -215,7 +214,7 @@ class _UserListState extends State<UserList> {
                   );
                 } else {
                   snapshot.data!.docs
-                      .removeWhere((i) => i["uid" ?? ''] == currentuserid);
+                      .removeWhere((i) => i["uid"] == currentuserid);
                   allUsersList = snapshot.data!.docs;
 
                   return ListView.separated(

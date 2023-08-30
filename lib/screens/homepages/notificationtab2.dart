@@ -115,7 +115,7 @@ class _NotificationTab2State extends State<NotificationTab2> {
   void dispose() {
     // Dispose the banner timer when the widget is disposed
     _bannerAd.dispose();
-    _interstitialAd!.dispose();
+    _interstitialAd?.dispose();
     interstitialTimer?.cancel();
     bannerTimer?.cancel();
     super.dispose();

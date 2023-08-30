@@ -77,7 +77,7 @@ class _AllUsersState extends State<AllUsers>
                 ),
               );
             },
-          )
+          ),
         ],
       ),
       body: userRole == "Admin" || userRole == "Caller"

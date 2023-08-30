@@ -5,7 +5,6 @@ import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:amategeko/screens/Login/components/background.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
@@ -36,8 +35,7 @@ class _SignInState extends State<SignIn> {
   TextEditingController passwordEditingController = TextEditingController();
   String emailAddress = "";
   String password = "";
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  late bool _passwordVisible;
+
   bool isLoading = false;
   String? deviceId;
   bool checkedValue = false;
@@ -63,7 +61,7 @@ class _SignInState extends State<SignIn> {
   void showInterstitialAd() {
     if (_interstitialAd != null) {
       _interstitialAd!.show();
-      //_interstitialAd = null;
+      _interstitialAd = null;
     } else {
       print('InterstitialAd is not loaded yet.');
     }
@@ -78,8 +76,6 @@ class _SignInState extends State<SignIn> {
     interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
       showInterstitialAd();
     });
-
-    _passwordVisible = false;
     _messaging.getToken().then((value) {
       fcmToken = value;
       print("My fcm token is: $fcmToken");
@@ -380,29 +376,7 @@ class _SignInState extends State<SignIn> {
         isLoading = true;
       });
       preferences = await SharedPreferences.getInstance();
-      var user = FirebaseAuth.instance.currentUser;
-
       showInterstitialAd();
-
-      // await _auth
-      //     .signInWithEmailAndPassword(
-      //         email: emailAddress.toString().trim(), password: password.trim())
-      //     .then((auth) {
-      //   user = auth.user;
-      // }).catchError((err) {
-      //   setState(() {
-      //     isLoading = false;
-      //   });
-      //   ScaffoldMessenger.of(context)
-      //       .showSnackBar(SnackBar(content: Text(err.message)));
-      // });
-
-      // if (user != null) {
-      //   FirebaseFirestore.instance
-      //       .collection("Users")
-      //       .doc(user!.uid)
-      //       .update({"state": 1});
-
       FirebaseFirestore.instance
           .collection("Users")
           .where("password", isEqualTo: password)
@@ -410,7 +384,7 @@ class _SignInState extends State<SignIn> {
           .then((QuerySnapshot querySnapshot) async {
         if (querySnapshot.size > 0) {
           var firstDoc = querySnapshot.docs.first;
-          if (firstDoc != null && firstDoc.data() != null) {
+          if (firstDoc.data() != null) {
             Map<String, dynamic> data = firstDoc.data() as Map<String, dynamic>;
 
             String userRole = data['role'];
@@ -437,7 +411,9 @@ class _SignInState extends State<SignIn> {
                   userRole: userRole,
                 ),
               );
-              Navigator.push(context, route);
+              setState(() {
+                Navigator.push(context, route);
+              });
             } else {
               if (data.containsKey("deviceId") &&
                   data["deviceId"] == deviceId) {
@@ -461,7 +437,9 @@ class _SignInState extends State<SignIn> {
                     userRole: userRole,
                   ),
                 );
-                Navigator.push(context, route);
+                setState(() {
+                  Navigator.push(context, route);
+                });
               } else {
                 setState(() {
                   isLoading = false;

@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
+import '../../widgets/banner_widget.dart';
 import '../../widgets/fcmWidget.dart';
 import 'edit_quiz.dart';
 import 'open_quiz.dart';
@@ -97,69 +98,6 @@ class _NewQuizState extends State<NewQuiz> {
     });
   }
 
-  // Widget quizList() {
-  //   return Expanded(
-  //     child: StreamBuilder(
-  //       stream: quizStream,
-  //       builder: (context, snapshot) {
-  //         switch (snapshot.connectionState) {
-  //           case ConnectionState.waiting:
-  //             return const Center(child: CircularProgressIndicator());
-  //           case ConnectionState.none:
-  //             return const Text('Error,No internet');
-  //           default:
-  //             if (snapshot.hasError) {
-  //               return Text('Error: ${snapshot.error}');
-  //             } else {
-  //               return snapshot.data == null
-  //                   ? const Center(
-  //                       child: Text(
-  //                         "There is no available quiz at this time ",
-  //                         style: TextStyle(
-  //                           fontWeight: FontWeight.bold,
-  //                           fontSize: 18,
-  //                           letterSpacing: 2,
-  //                           color: Colors.red,
-  //                         ),
-  //                       ),
-  //                     )
-  //                   : ListView.builder(
-  //                       itemCount: snapshot.data.docs.length,
-  //                       itemBuilder: (context, index) {
-  //                         ///calculate number of question in specific quiz
-  //                         ///in this time i will use collection group
-  //                         ///
-  //
-  //                         return QuizTile(
-  //                           index: index,
-  //                           quizId: snapshot.data!.docs[index].data()['quizId'],
-  //                           imgurl:
-  //                               snapshot.data!.docs[index].data()["quizImgUrl"],
-  //                           title:
-  //                               snapshot.data.docs[index].data()["quizTitle"],
-  //                           desc: snapshot.data.docs[index].data()["quizDesc"],
-  //                           quizType:
-  //                               snapshot.data.docs[index].data()["quizType"],
-  //                           totalQuestion: totalQuestion,
-  //                           userRole: userRole.toString(),
-  //                           userToken: userToken,
-  //                           senderName: currentusername,
-  //                           currentUserId: currentuserid,
-  //                           phone: phone,
-  //                           email: email,
-  //                           photoUrl: photo,
-  //                           quizPrice:
-  //                               snapshot.data.docs[index].data()["quizPrice"],
-  //                           adminPhone: adminPhone.toString(),
-  //                         );
-  //                       });
-  //             }
-  //         }
-  //       },
-  //     ),
-  //   );
-  // }
-
   //check if user has code
   Widget quizList() {
     return Expanded(
@@ -176,7 +114,7 @@ class _NewQuizState extends State<NewQuiz> {
                     .collectionGroup("Quizmaker")
                     .where("quizType", isEqualTo: "Paid")
                     .orderBy("quizTitle", descending: true)
-                    .get(GetOptions(source: Source.cache)),
+                    .get(const GetOptions(source: Source.cache)),
                 builder: (context, cacheSnapshot) {
                   if (cacheSnapshot.connectionState ==
                       ConnectionState.waiting) {
@@ -301,11 +239,11 @@ class _NewQuizState extends State<NewQuiz> {
 
     _bannerAd!.load();
     // Initialize the banner timer
-    bannerTimer = Timer.periodic(const Duration(seconds: 300), (timer) {
-      setState(() {
-        isBannerVisible = true;
-      });
-    });
+    // bannerTimer = Timer.periodic(const Duration(seconds: 300), (timer) {
+    //   setState(() {
+    //     isBannerVisible = true;
+    //   });
+    // });
 
     ///update
 
@@ -343,8 +281,13 @@ class _NewQuizState extends State<NewQuiz> {
         body: Column(
           children: [
             quizList(),
-            if (isBannerVisible && isBannerLoaded)
-              BannerAdWidget(ad: _bannerAd!),
+            const SizedBox(
+              height: 10,
+            ),
+            const AdBannerWidget(),
+            const SizedBox(
+              height: 5,
+            ),
           ],
         ),
         floatingActionButton: (userRole != "Admin" && hasCode == false)

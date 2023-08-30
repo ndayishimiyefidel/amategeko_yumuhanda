@@ -60,6 +60,7 @@ android {
     //         signingConfig signingConfigs.debug
     //         minifyEnabled true
     //         shrinkResources true
+    //9,15
     //     }
     // }
     signingConfigs {
