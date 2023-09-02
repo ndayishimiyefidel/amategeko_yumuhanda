@@ -12,6 +12,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
@@ -330,7 +331,7 @@ class _SignInState extends State<SignIn> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         const Text(
-                          "Ntugira Konti ?   ",
+                          "Niba uri mushya?   ",
                           style: TextStyle(
                             color: kPrimaryColor,
                             fontSize: 16,
@@ -359,6 +360,35 @@ class _SignInState extends State<SignIn> {
                       ],
                     )
                   : const SizedBox(),
+              SizedBox(
+                height: size.height * 0.01,
+              ),
+              GestureDetector(
+                onTap: () {
+                  _launchURL(
+                      "https://doc-hosting.flycricket.io/rwanda-traffic-rules-privacy-policy/4ffe9e57-7316-45d0-b5aa-7749fa65ea19/privacy");
+                },
+                child: const Text(
+                  "Privacy Policy",
+                  style: TextStyle(fontSize: 16, color: Colors.blueAccent),
+                ),
+              ),
+              SizedBox(
+                height: size.height * 0.03,
+              ),
+              GestureDetector(
+                onTap: () {
+                  _launchURL(
+                      "https://doc-hosting.flycricket.io/rwanda-traffic-rules-terms-of-use/a8f1833a-7c5c-4493-bdce-6184680f081c/terms");
+                },
+                child: const Text(
+                  "Terms and condition of use",
+                  style: TextStyle(fontSize: 16, color: Colors.blueAccent),
+                ),
+              ),
+              SizedBox(
+                height: size.height * 0.01,
+              ),
               AdBannerWidget(),
               SizedBox(
                 height: size.height * 0.06,
@@ -368,6 +398,14 @@ class _SignInState extends State<SignIn> {
         ),
       ),
     );
+  }
+
+  _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   void loginUser() async {

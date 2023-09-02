@@ -154,7 +154,7 @@ class _OpenQuizState extends State<OpenQuiz>
     //interestial ads
     loadInterstitialAd();
     // Start the timer to show the interstitial ad every 4 minutes
-    // interstitialTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+    // interstitialTimer = Timer.periodic(const Duration(minutes: 4), (timer) {
     //   showInterstitialAd();
     // });
 
@@ -498,9 +498,13 @@ class _OpenQuizState extends State<OpenQuiz>
                                                   total: total),
                                             ));
                                       } else {
-                                        // if (_controller1!.page?.toInt() == 16) {
-                                        //   showInterstitialAd();
-                                        // }
+                                        if (_controller1!.page?.toInt() == 10) {
+                                          showInterstitialAd();
+                                          _controller1!.nextPage(
+                                              duration: const Duration(
+                                                  milliseconds: 250),
+                                              curve: Curves.easeInExpo);
+                                        }
                                         _controller1!.nextPage(
                                             duration: const Duration(
                                                 milliseconds: 250),
@@ -531,7 +535,7 @@ class _OpenQuizState extends State<OpenQuiz>
               }
           }
         }),
-        // if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
+        //if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
       ],
     );
   }

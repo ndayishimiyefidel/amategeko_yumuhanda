@@ -270,9 +270,13 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
           ),
           ListTile(
-            onTap: () => deleteUser(auth.currentUser!.uid),
+            onTap: () => {
+              //String? currentuserid;
+            },
             leading: IconButton(
-              onPressed: () => deleteUser(auth.currentUser!.uid),
+              onPressed: () => {
+                //deleteUser(auth.currentUser!.uid),
+              },
               icon: const Icon(
                 Icons.delete,
                 size: 30,

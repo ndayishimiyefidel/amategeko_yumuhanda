@@ -317,40 +317,42 @@ class _NewQuizState extends State<NewQuiz> {
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Column(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "1.Saba code igufasha gufungura application,kugirango uhabwe kode ubanza kwishyura 1500 rwf ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.blueAccent,
+                              SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          "1.Saba code igufasha gufungura application,kugirango uhabwe kode ubanza kwishyura 1500 rwf ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.blueAccent,
+                                          ),
+                                          textAlign: TextAlign.start,
                                         ),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      Text(
-                                        "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umuhondo ibi byose ubikora wafunguye connection",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.redAccent,
+                                        Text(
+                                          "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umuhondo ibi byose ubikora wafunguye connection",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.redAccent,
+                                          ),
+                                          textAlign: TextAlign.start,
                                         ),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                      Text(
-                                        "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam ",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.blueAccent,
+                                        Text(
+                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam ",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.blueAccent,
+                                          ),
+                                          textAlign: TextAlign.start,
                                         ),
-                                        textAlign: TextAlign.start,
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                               SizedBox(height: 5),
                             ],
@@ -360,7 +362,7 @@ class _NewQuizState extends State<NewQuiz> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.yellow, elevation: 3),
                               onPressed: () async {
-                                //saba
+                                //saba code
                                 requestCode(userToken, currentuserid,
                                     currentusername, "Exam");
                               },
@@ -421,26 +423,7 @@ class _NewQuizState extends State<NewQuiz> {
         .where("isQuiz", isEqualTo: true)
         .get()
         .then((value) {
-      if (value.size != 0) {
-        setState(() {
-          isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Your request have been already sent,Please wait the team is processing it."),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
-        });
-      } else {
+      if (value.size == 0) {
         Map<String, dynamic> checkCode = {
           "userId": currentUserId,
           "name": senderName,
@@ -503,6 +486,26 @@ class _NewQuizState extends State<NewQuiz> {
                   );
                 });
           });
+        });
+      } else {
+        setState(() {
+          print(value.size);
+          isLoading = false;
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text(
+                      "Your request have been already sent,Please wait the team is processing it."),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Close"))
+                  ],
+                );
+              });
         });
       }
     });
@@ -960,7 +963,8 @@ class _QuizTileState extends State<QuizTile> {
                                       setState(() {
                                         _isLoading = true;
                                       });
-                                      deleteQuiz(widget.quizId);
+                                      _showDeleteConfirmationDialog();
+                                      //  deleteQuiz(widget.quizId);
                                     },
                                     child: const Text(
                                       "Delete Quiz",
@@ -1020,6 +1024,37 @@ class _QuizTileState extends State<QuizTile> {
       });
       FirebaseFirestore.instance.collection("Quizmaker").doc(docId).delete();
     });
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete Quiz'),
+          content: const Text('Are you sure you want to delete this quiz?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                // Perform the delete operation here
+                deleteQuiz(widget.quizId);
+                Navigator.of(context).pop(); // Close the dialog
+                setState(() {
+                  _isLoading = true;
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> checkValidCode(

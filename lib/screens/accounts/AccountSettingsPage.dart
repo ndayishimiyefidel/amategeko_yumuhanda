@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../resources/user_state_methods.dart';
 import '../../utils/constants.dart';
+import '../../utils/reward_video_manager.dart';
 import '../../widgets/MainDrawer.dart';
 import '../../widgets/ProgressWidget.dart';
 
@@ -49,7 +50,11 @@ class UserSettings extends StatelessWidget {
         ),
         actions: [
           InkWell(
-            onTap: () => UserStateMethods().logoutuser(context),
+            onTap: () => {
+              AdManager.loadRewardAd(),
+              AdManager.showRewardAd(),
+              UserStateMethods().logoutuser(context),
+            },
             child: const Padding(
               padding: EdgeInsets.only(
                 left: 20,

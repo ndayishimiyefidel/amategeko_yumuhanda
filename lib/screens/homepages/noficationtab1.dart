@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/notification_list_modified.dart';
+import '../../utils/constants.dart';
 import '../../widgets/changing_banner.dart';
 
 class NotificationTab1 extends StatefulWidget {
@@ -123,92 +124,152 @@ class _NotificationTab1State extends State<NotificationTab1> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (isBannerVisible && isBannerLoaded)
-              BannerAdWidget(ad: _bannerAd),
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection("Quiz-codes")
-                  // .where("createdAt", isNotEqualTo: "")
-                  .orderBy("createdAt", descending: true)
-                  .limit(200)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const CircularProgressIndicator();
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                } else {
-                  var filteredDocs = snapshot.data!.docs;
-                  filteredDocs.removeWhere((i) => i["userId"] == currentuserid);
-
-                  // Eliminate duplicates based on document ID
-                  var docIds = <String>{};
-                  var uniqueDocs = <DocumentSnapshot>[];
-                  for (var doc in filteredDocs) {
-                    if (docIds.add(doc.id)) {
-                      uniqueDocs.add(doc);
-                    }
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (isBannerVisible && isBannerLoaded)
+                BannerAdWidget(ad: _bannerAd),
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection("Quiz-codes")
+                    .orderBy("createdAt", descending: true)
+                    .limit(200)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(kPrimaryColor));
+                  } else if (!snapshot.hasData ||
+                      snapshot.data == null ||
+                      snapshot.data!.size == 0) {
+                    return Center(
+                      child: Text("No data available"),
+                    );
+                  } else {
+                    List<DocumentSnapshot<Map<String, dynamic>>> documents =
+                        snapshot.data!.docs;
+                    documents
+                        .removeWhere((doc) => doc["userId"] == currentuserid);
+                    allUsersList = documents;
+                    print("Abafite code");
+                    print(documents.length);
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(top: 16),
+                      itemCount: documents.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final data = documents[index].data();
+                        return ModifiedUsersNotificationList(
+                          name: data!["name"],
+                          // image: data["photoUrl"],
+                          time: data["createdAt"],
+                          email: data["email"],
+                          userId: data["userId"],
+                          phone: data["phone"],
+                          // quizId: data["quizId"],
+                          quizTitle: data["quizTitle"],
+                          code: data["code"],
+                          endTime: data.containsKey("endTime")
+                              ? data["endTime"]
+                              : "1684242113231",
+                          docId: documents[index].reference.id.toString(),
+                          // isQuiz: data["isQuiz"],
+                        );
+                      },
+                    );
                   }
+                },
+              ),
+            ],
+          )
+          // child: Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: <Widget>[
+          //     if (isBannerVisible && isBannerLoaded)
+          //       BannerAdWidget(ad: _bannerAd),
+          //     StreamBuilder<QuerySnapshot>(
+          //       stream: FirebaseFirestore.instance
+          //           .collection("Quiz-codes")
+          //           .where("code", isNotEqualTo: "")
+          //           .where("createdAt", isNotEqualTo: "")
+          //           .orderBy("createdAt", descending: true)
+          //           .limit(200)
+          //           .snapshots(),
+          //       builder: (context, snapshot) {
+          //         if (!snapshot.hasData) {
+          //           return const CircularProgressIndicator();
+          //         } else if (snapshot.connectionState ==
+          //             ConnectionState.waiting) {
+          //           return const CircularProgressIndicator();
+          //         } else {
+          //           var filteredDocs = snapshot.data!.docs;
+          //           filteredDocs.removeWhere((i) => i["userId"] == currentuserid);
 
-                  // Sort the unique documents by "createdAt" field
-                  uniqueDocs.sort((a, b) {
-                    DateTime dateTimeA = DateTime.fromMillisecondsSinceEpoch(
-                        int.parse((a["createdAt"] as String)) ~/ 1000);
-                    DateTime dateTimeB = DateTime.fromMillisecondsSinceEpoch(
-                        int.parse((b["createdAt"] as String)) ~/ 1000);
-                    return dateTimeA.compareTo(dateTimeB);
-                  });
+          //           // Eliminate duplicates based on document ID
+          //           var docIds = <String>{};
+          //           var uniqueDocs = <DocumentSnapshot>[];
+          //           for (var doc in filteredDocs) {
+          //             if (docIds.add(doc.id)) {
+          //               uniqueDocs.add(doc);
+          //             }
+          //           }
 
-                  allUsersList = uniqueDocs;
-                  print("abafite code");
-                  print(uniqueDocs.length);
-                  return ListView.builder(
-                    padding: const EdgeInsets.only(top: 16),
-                    itemCount: filteredDocs.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      final data =
-                          filteredDocs[index].data() as Map<String, dynamic>;
-                      return Column(
-                        children: <Widget>[
-                          ModifiedUsersNotificationList(
-                            name: data["name"] ?? "Unknown Name",
-                            // image: data["photoUrl"],
-                            time: data["createdAt"] ?? "Unknown Time",
-                            email: data["email"] ?? "Unknown Email",
-                            userId: data["userId"] ?? "Unknown User ID",
-                            phone: data["phone"] ?? "Unknown Phone",
-                            // quizId: data["quizId"],
-                            quizTitle:
-                                data["quizTitle"] ?? "Unknown Quiz Title",
-                            code: data["code"] ?? "Unknown Code",
-                            docId: uniqueDocs[index].reference.id.toString(),
-                            // isQuiz: data["isQuiz"],
-                            endTime: data.containsKey("endTime")
-                                ? data["endTime"]
-                                : "1684242113231",
-                          ),
-                          if (index <
-                              uniqueDocs.length -
-                                  1) // Check if not the last item
-                            const Divider(),
-                          // Add a Divider widget between items
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ],
-        ),
-      ),
+          //           // Sort the unique documents by "createdAt" field
+          //           uniqueDocs.sort((a, b) {
+          //             DateTime dateTimeA = DateTime.fromMillisecondsSinceEpoch(
+          //                 int.parse((a["createdAt"] as String)) ~/ 1000);
+          //             DateTime dateTimeB = DateTime.fromMillisecondsSinceEpoch(
+          //                 int.parse((b["createdAt"] as String)) ~/ 1000);
+          //             return dateTimeA.compareTo(dateTimeB);
+          //           });
+
+          //           allUsersList = uniqueDocs;
+          //           print("abafite code");
+
+          //           return ListView.builder(
+          //             padding: const EdgeInsets.only(top: 16),
+          //             itemCount: snapshot,
+          //             shrinkWrap: true,
+          //             physics: const NeverScrollableScrollPhysics(),
+          //             itemBuilder: (context, index) {
+          //               final data =
+          //                   filteredDocs[index].data() as Map<String, dynamic>;
+          //               return Column(
+          //                 children: <Widget>[
+          //                   ModifiedUsersNotificationList(
+          //                     name: data["name"] ?? "Unknown Name",
+          //                     // image: data["photoUrl"],
+          //                     time: data["createdAt"] ?? "Unknown Time",
+          //                     email: data["email"] ?? "Unknown Email",
+          //                     userId: data["userId"] ?? "Unknown User ID",
+          //                     phone: data["phone"] ?? "Unknown Phone",
+          //                     // quizId: data["quizId"],
+          //                     quizTitle:
+          //                         data["quizTitle"] ?? "Unknown Quiz Title",
+          //                     code: data["code"] ?? "Unknown Code",
+          //                     docId: uniqueDocs[index].reference.id.toString(),
+          //                     // isQuiz: data["isQuiz"],
+          //                     endTime: data.containsKey("endTime")
+          //                         ? data["endTime"]
+          //                         : "1684242113231",
+          //                   ),
+          //                   if (index <
+          //                       uniqueDocs.length -
+          //                           1) // Check if not the last item
+          //                     const Divider(),
+          //                   // Add a Divider widget between items
+          //                 ],
+          //               );
+          //             },
+          //           );
+          //         }
+          //       },
+          //     ),
+          //   ],
+          // ),
+          ),
     );
   }
 }

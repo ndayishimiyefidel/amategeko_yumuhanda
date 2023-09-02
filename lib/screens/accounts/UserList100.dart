@@ -123,7 +123,7 @@ class _UserList100State extends State<UserList100> {
                   );
                 } else {
                   snapshot.data!.docs
-                      .removeWhere((i) => i["uid" ?? ''] == currentuserid);
+                      .removeWhere((i) => i["uid"] == currentuserid);
                   allUsersList = snapshot.data!.docs;
 
                   return ListView.builder(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/constants.dart';
+import '../../../utils/reward_video_manager.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/signup_screen.dart';
 import 'background.dart';
@@ -20,29 +22,55 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    //isSignedIn();
+    AdManager.loadRewardAd();
   }
 
+  bool adShown = AdManager.showRewardAd();
+
   loginNavigator() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LoginScreen();
-        },
-      ),
-    );
+    if (adShown) {
+      AdManager.showRewardAd();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return const LoginScreen();
+          },
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return const LoginScreen();
+          },
+        ),
+      );
+    }
   }
 
   signupNavigator() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return SignUpScreen();
-        },
-      ),
-    );
+    if (adShown) {
+      AdManager.showRewardAd();
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return SignUpScreen();
+          },
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return SignUpScreen();
+          },
+        ),
+      );
+    }
   }
 
   @override
@@ -68,11 +96,11 @@ class _BodyState extends State<Body> {
               height: size.height * 0.45,
             ),
             SizedBox(height: size.height * 0.01),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, right: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "ICYITONDERWA:",
                     style: TextStyle(
