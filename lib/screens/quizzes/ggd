@@ -1,0 +1,30 @@
+  Future<void> addCorrectOptionField() async {
+    // Step 1: Get current timestamp in milliseconds since epoch
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+
+    // Step 2: Convert milliseconds to DateTime
+    DateTime currentDateTime =
+        DateTime.fromMillisecondsSinceEpoch(currentTimestamp);
+
+    // Step 3: Add 2 months to the DateTime object
+    DateTime updatedDateTime = currentDateTime.add(const Duration(days: 20));
+
+    // Step 4: Convert the updated DateTime object back to milliseconds
+    int updatedTimestamp = updatedDateTime.millisecondsSinceEpoch;
+
+    CollectionReference quizmakerCollectionRef = FirebaseFirestore.instance
+        .collection('Quiz-codes'); // Updated collection name
+
+    QuerySnapshot quizmakerQuerySnapshot = await quizmakerCollectionRef.get();
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    for (QueryDocumentSnapshot quizmakerDoc in quizmakerQuerySnapshot.docs) {
+      batch.update(quizmakerDoc.reference,
+          {'endTime': updatedTimestamp.toString()}); // Update the main document
+
+      // If there's no nested collection, you don't need to query or update anything inside it.
+    }
+
+    await batch.commit();
+  }

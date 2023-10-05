@@ -9,7 +9,7 @@ class ReadText extends StatefulWidget {
   final String quizId;
   final String title;
 
-  ReadText({
+ const  ReadText({
     super.key,
     required this.quizId,
     required this.title,
@@ -22,8 +22,7 @@ class ReadText extends StatefulWidget {
 String courseId = "";
 String courseTitle = "";
 
-class _ReadTextState extends State<ReadText>
-    with SingleTickerProviderStateMixin {
+class _ReadTextState extends State<ReadText> with SingleTickerProviderStateMixin {
   DatabaseService databaseService = DatabaseService();
   QuerySnapshot? questionSnapshot;
   late AnimationController _controller;
@@ -36,13 +35,6 @@ class _ReadTextState extends State<ReadText>
     return textModel;
   }
 
-  @override
-  void dispose() {
-    if (_controller.isAnimating || _controller.isCompleted) {
-      _controller.dispose();
-    }
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -59,49 +51,56 @@ class _ReadTextState extends State<ReadText>
 
   bool isFABExtended = false;
 
+  
+  @override
+  void dispose() {
+    if (_controller.isAnimating || _controller.isCompleted) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(builder: (context, snapshot) {
-      switch (snapshot.connectionState) {
-        case ConnectionState.waiting:
-          return const CircularProgressIndicator();
-        default:
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * 0.4,
-              child: ListView.builder(
+    return FutureBuilder<QuerySnapshot>(
+      future: FirebaseFirestore.instance
+          .collection("courses")
+          .doc(widget.quizId)
+          .collection("course-text")
+          .get(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const CircularProgressIndicator();
+          default:
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: ListView.builder(
                   physics: const PageScrollPhysics(),
                   itemCount: questionSnapshot?.docs.length ?? 0,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding:
                           const EdgeInsets.only(left: 10, right: 10, top: 5),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            TextTile(
-                              textModel: getTextModelFromDatasnapshot(
-                                  questionSnapshot!.docs[index]),
-                              index: index,
-                              courseId: widget.quizId,
-                              courseTitle: widget.title,
-                            ),
-                            const SizedBox(
-                              height: 30.0,
-                            ),
-                          ],
+                      child: TextTile(
+                        textModel: getTextModelFromDatasnapshot(
+                          questionSnapshot!.docs[index],
                         ),
+                        index: index,
+                        courseId: widget.quizId,
+                        courseTitle: widget.title,
                       ),
                     );
-                  }),
-            );
-          }
-      }
-    });
+                  },
+                ),
+              );
+            }
+        }
+      },
+    );
   }
 }
 
@@ -111,43 +110,39 @@ class TextTile extends StatefulWidget {
   final String courseId;
   final String courseTitle;
 
-  TextTile(
-      {super.key,
-      required this.textModel,
-      required this.index,
-      required this.courseId,
-      required this.courseTitle});
+  const TextTile({
+    super.key,
+    required this.textModel,
+    required this.index,
+    required this.courseId,
+    required this.courseTitle,
+  });
 
   @override
   State<TextTile> createState() => _TextTileState();
 }
 
 class _TextTileState extends State<TextTile> {
-  bool _isLoading = false;
-
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(top: 0),
-      child: Expanded(
-        child: SingleChildScrollView(
-          child: Text(
-            widget.textModel.courseText,
-            textAlign: TextAlign.start,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.normal,
-              height: 1.5,
-              color: Colors.black87,
-            ),
+      child: SingleChildScrollView(
+        child: Text(
+          widget.textModel.courseText,
+          textAlign: TextAlign.start,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.normal,
+            height: 1.5,
+            color: Colors.black87,
           ),
         ),
       ),
     );
   }
 
-  //shared preferences
+  // Shared preferences
   late SharedPreferences preferences;
   late String currentuserid;
   late String currentusername;

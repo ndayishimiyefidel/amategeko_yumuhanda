@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class DatabaseService {
 //create account
@@ -9,7 +10,9 @@ class DatabaseService {
         .doc(userId)
         .set(userData)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
     });
   }
 
@@ -28,7 +31,10 @@ class DatabaseService {
         .collection("Groups")
         .add(fileData)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -37,7 +43,10 @@ class DatabaseService {
         .collection("Documents")
         .add(fileData)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -79,7 +88,10 @@ class DatabaseService {
         .collection("QNA")
         .add(questionData)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -91,7 +103,10 @@ class DatabaseService {
         .collection("courseQuiz")
         .add(questionData)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -103,7 +118,10 @@ class DatabaseService {
         .collection("course-images")
         .add(courseImage)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -115,7 +133,10 @@ class DatabaseService {
         .collection("course-text")
         .add(courseData)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -127,7 +148,10 @@ class DatabaseService {
         .collection("course-audios")
         .add(courseLink)
         .catchError((e) {
-      print(e.toString());
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      return e;
     });
   }
 
@@ -167,7 +191,9 @@ class DatabaseService {
         .then((QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) async {
         String docsId = doc.reference.id;
-        print("subdoc_id${doc.reference.id}");
+        if (kDebugMode) {
+          print("subdoc_id${doc.reference.id}");
+        }
         await FirebaseFirestore.instance
             .collection("courses")
             .doc(courseId)
@@ -175,7 +201,9 @@ class DatabaseService {
             .doc(docsId)
             .update(questionData)
             .onError((error, stackTrace) {
-          print(error);
+          if (kDebugMode) {
+            print(error);
+          }
         });
       });
     });
@@ -230,6 +258,7 @@ class DatabaseService {
         .collection("courses")
         .doc(courseId)
         .collection("course-text")
+        .orderBy("createdAt",descending: false)
         .get();
   }
 }

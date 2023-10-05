@@ -6,6 +6,7 @@ import 'package:amategeko/screens/Login/components/background.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
@@ -53,7 +54,9 @@ class _SignInState extends State<SignIn> {
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
         },
       ),
     );
@@ -64,7 +67,9 @@ class _SignInState extends State<SignIn> {
       _interstitialAd!.show();
       _interstitialAd = null;
     } else {
-      print('InterstitialAd is not loaded yet.');
+      if (kDebugMode) {
+        print('InterstitialAd is not loaded yet.');
+      }
     }
   }
 
@@ -74,12 +79,14 @@ class _SignInState extends State<SignIn> {
     loadInterstitialAd();
 
     // Start the timer to show the interstitial ad every 4 minutes
-    interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+    interstitialTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
       showInterstitialAd();
     });
     _messaging.getToken().then((value) {
       fcmToken = value;
-      print("My fcm token is: $fcmToken");
+      if (kDebugMode) {
+        print("My fcm token is: $fcmToken");
+      }
     });
 
     // Await the retrieveDeviceId() function here
@@ -97,13 +104,17 @@ class _SignInState extends State<SignIn> {
 
     setState(() {
       currentuserid = preferences.getString("uid");
-      print(currentuserid);
+      if (kDebugMode) {
+        print(currentuserid);
+      }
     });
   }
 
   Future<void> retrieveDeviceId() async {
     deviceId = await DeviceIdManager.getDeviceId();
-    print("Device ID: $deviceId");
+    if (kDebugMode) {
+      print("Device ID: $deviceId");
+    }
   }
 
   Future<void> signupNavigator() async {
@@ -236,68 +247,10 @@ class _SignInState extends State<SignIn> {
                       Icons.call,
                       color: kPrimaryColor,
                     ),
-                    // suffixIcon: IconButton(
-                    //   icon: Icon(
-                    //     _passwordVisible
-                    //         ? Icons.visibility_off
-                    //         : Icons.visibility,
-                    //     color: kPrimaryColor,
-                    //   ),
-                    //   onPressed: () {
-                    //     setState(() {
-                    //       _passwordVisible = !_passwordVisible;
-                    //     });
-                    //   },
-                    // ),
                     border: InputBorder.none,
                   ),
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 20),
-              //   child: CheckboxListTile(
-              //     title: Text("Remember Me"),
-              //     value: checkedValue,
-              //     onChanged: (newValue) {
-              //       setState(() {
-              //         checkedValue = newValue!;
-              //       });
-              //     },
-              //     controlAffinity:
-              //         ListTileControlAffinity.leading, //  <-- leading Checkbox
-              //   ),
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.only(right: 45, bottom: 20),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.end,
-              //     children: <Widget>[
-              //       const Text(
-              //         "Wibagiwe numero ya terefone? ",
-              //         style: TextStyle(color: kPrimaryColor),
-              //       ),
-              //       GestureDetector(
-              //         onTap: () {
-              //           Navigator.push(
-              //             context,
-              //             MaterialPageRoute(
-              //               builder: (context) {
-              //                 return const ForgotScreen();
-              //               },
-              //             ),
-              //           );
-              //         },
-              //         child: const Text(
-              //           "Gusubiramo",
-              //           style: TextStyle(
-              //             color: Colors.red,
-              //             fontWeight: FontWeight.bold,
-              //           ),
-              //         ),
-              //       )
-              //     ],
-              //   ),
-              // ),
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 width: size.width * 0.3,
@@ -389,7 +342,7 @@ class _SignInState extends State<SignIn> {
               SizedBox(
                 height: size.height * 0.01,
               ),
-              AdBannerWidget(),
+              const AdBannerWidget(),
               SizedBox(
                 height: size.height * 0.06,
               ),
@@ -414,7 +367,7 @@ class _SignInState extends State<SignIn> {
         isLoading = true;
       });
       preferences = await SharedPreferences.getInstance();
-      showInterstitialAd();
+      //showInterstitialAd();
       FirebaseFirestore.instance
           .collection("Users")
           .where("password", isEqualTo: password)
@@ -461,8 +414,11 @@ class _SignInState extends State<SignIn> {
                 await preferences.setString("email", data["email"]);
                 await preferences.setString("role", data["role"]);
                 await preferences.setString("phone", data["phone"]);
-                print("db device id");
-                print(data["deviceId"]);
+                if (kDebugMode) {
+                  print("db device id");
+                                  print(data["deviceId"]);
+
+                }
 
                 setState(() {
                   isLoading = false;

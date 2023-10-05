@@ -19,11 +19,11 @@ class HomeScreen extends StatefulWidget {
   final String currentuserid;
   final String userRole;
 
-  HomeScreen({Key? key, required this.currentuserid, required this.userRole})
+  const HomeScreen({Key? key, required this.currentuserid, required this.userRole})
       : super(key: key);
 
   @override
-  _HomeScreenState createState() =>
+  State createState() =>
       _HomeScreenState(currentuserid: currentuserid, userRole: userRole);
 }
 
@@ -150,10 +150,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         // Navigator.pushAndRemoveUntil(
         //   context,
         //   MaterialPageRoute(builder: (context) => LoginScreen()),
-        //   // Replace SignIn with your login page
         //   (route) => false,
         // );
-        SystemNavigator.pop();
+        // SystemNavigator.pop();
         return false; // Return false to prevent default back button behavior
       },
       child: const Scaffold(
@@ -169,19 +168,17 @@ class MyStatefulWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+  State createState() => _MyStatefulWidgetState();
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   late SharedPreferences preferences;
   late String userRole = "";
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   final List<Widget> _widgetOptions = <Widget>[
     const Home(), //index 0
     Quizzes(), //index 1
-    Notifications(), //index 2// index 3
+    const Notifications(), //index 2// index 3
     const AmategekoYose(), //index 4
     UserSettings(), //index 5
   ];

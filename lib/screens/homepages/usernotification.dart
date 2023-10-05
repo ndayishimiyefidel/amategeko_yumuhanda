@@ -10,11 +10,10 @@ class UserNotification extends StatefulWidget {
   const UserNotification({super.key});
 
   @override
-  _UserNotificationState createState() => _UserNotificationState();
+ State createState() => _UserNotificationState();
 }
 
 class _UserNotificationState extends State<UserNotification> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // List allUsers = [];
   var allUsersList;
@@ -41,7 +40,6 @@ class _UserNotificationState extends State<UserNotification> {
       currentuserphoto = preferences.getString("photo")!;
       userRole = preferences.getString("role")!;
       phoneNumber = preferences.getString("phone")!;
-      print("user role is $userRole");
     });
   }
 

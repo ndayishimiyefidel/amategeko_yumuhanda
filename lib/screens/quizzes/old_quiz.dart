@@ -110,7 +110,6 @@ class _OldQuizState extends State<OldQuiz> {
                           ///calculate number of question in specific quiz
                           ///in this time i will use collection group
                           ///
-                          int quizNo = snapshot.data.docs.length;
                           return QuizTile(
                             quizId: snapshot.data!.docs[index].data()['quizId'],
                             imgurl:

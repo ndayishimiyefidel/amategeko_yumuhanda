@@ -11,7 +11,7 @@ class Abiyandikishe extends StatefulWidget {
   const Abiyandikishe({super.key});
 
   @override
-  _AbiyandikisheState createState() => _AbiyandikisheState();
+  State createState() => _AbiyandikisheState();
 }
 
 class _AbiyandikisheState extends State<Abiyandikishe> {
@@ -55,7 +55,7 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: Drawer(
+      drawer:const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),

@@ -1,3 +1,4 @@
+import 'package:amategeko/screens/amasomo/course_audio.dart';
 import 'package:amategeko/screens/amasomo/course_description.dart';
 import 'package:amategeko/screens/amasomo/create_question.dart';
 import 'package:amategeko/screens/amasomo/open_modified_quiz.dart';
@@ -49,7 +50,7 @@ class _CourseContentsState extends State<CourseContents> {
       phone = preferences.getString("phone")!;
       email = preferences.getString("email")!;
     });
-    print(userRole);
+   
   }
 
   @override
@@ -91,73 +92,66 @@ class _CourseContentsState extends State<CourseContents> {
         ],
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ReadText(quizId: widget.courseId, title: widget.courseTitle),
-                const SizedBox(
-                  height: 10,
-                ),
-                // ReadAudio(courseId: widget.courseId),
-                // const SizedBox(
-                //   height: 20,
-                // ),
-                userRole == "Admin"
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        CreateQuestion(
-                                      courseId: widget.courseId,
-                                      courseTitle: widget.courseTitle,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text("Create Quiz")),
-                          ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          OpenModifiedQuiz(
-                                            courseId: widget.courseId,
-                                          )),
-                                );
-                              },
-                              child: const Text("Fungura Imyitozo")),
-                        ],
-                      )
-                    : ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    OpenModifiedQuiz(
-                                      courseId: widget.courseId,
-                                    )),
-                          );
-                        },
-                        child: const Text("Kora Imyitozo")),
-              ],
-            ),
-          ),
-        ),
+     body: SingleChildScrollView(
+  child: Column(
+    children: [
+      ReadText(quizId: widget.courseId, title: widget.courseTitle),
+      const SizedBox(
+        height: 10,
       ),
+      ReadAudio(courseId: widget.courseId,userRole:userRole.toString(),),
+      const SizedBox(
+        height: 20,
+      ),
+      userRole == "Admin"
+          ? Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => CreateQuestion(
+                          courseId: widget.courseId,
+                          courseTitle: widget.courseTitle,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text("Create Quiz"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => OpenModifiedQuiz(
+                          courseId: widget.courseId,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text("Fungura Imyitozo"),
+                ),
+              ],
+            )
+          : ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => OpenModifiedQuiz(
+                      courseId: widget.courseId,
+                    ),
+                  ),
+                );
+              },
+              child: const Text("Kora Imyitozo"),
+            ),
+    ],
+  ),
+)
+
     );
   }
 }

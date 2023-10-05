@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -13,29 +14,22 @@ import '../widgets/fcmWidget.dart';
 
 class ModifiedUsersNotificationList extends StatefulWidget {
   final String name;
-
-  // final String secondaryText;
-  // final String image;
   final String time;
-
-  // final String quizId;
   final String quizTitle;
   final String userId;
   final String email;
   final String phone;
   final String code, docId;
-  final isQuiz;
-  final endTime;
+  final bool? isQuiz;
+  final String? endTime;
 
   const ModifiedUsersNotificationList({
     super.key,
     required this.name,
-    // required this.image,
     required this.time,
     required this.email,
     required this.userId,
     required this.phone,
-    // required this.quizId,
     required this.quizTitle,
     required this.code,
     required this.docId,
@@ -44,7 +38,7 @@ class ModifiedUsersNotificationList extends StatefulWidget {
   });
 
   @override
-  _ModifiedUsersNotificationListState createState() =>
+  State createState() =>
       _ModifiedUsersNotificationListState();
 }
 
@@ -71,7 +65,9 @@ class _ModifiedUsersNotificationListState
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
         },
       ),
     );
@@ -82,7 +78,9 @@ class _ModifiedUsersNotificationListState
       _interstitialAd!.show();
       _interstitialAd = null;
     } else {
-      print('InterstitialAd is not loaded yet.');
+      if (kDebugMode) {
+        print('InterstitialAd is not loaded yet.');
+      }
     }
   }
 
@@ -116,41 +114,18 @@ class _ModifiedUsersNotificationListState
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     var dateTimeFormat =
         DateFormat('dd/MM/yyyy, hh:mm a').format(date); // 12/31/2000, 10:00 PM
-    int timestamp1 = int.parse(widget.endTime);
+    int timestamp1 = int.parse(widget.endTime.toString());
     var date1 = DateTime.fromMillisecondsSinceEpoch(timestamp1);
     var dateTimeFormat1 = DateFormat('dd/MM/yyyy, hh:mm a').format(date1);
     return InkWell(
       onTap: () {
-        // _getEditIcon();
-        // Navigator.push(context, MaterialPageRoute(builder: (context) {
-        //   return OpenNotification(
-        //     notificationId: widget.docId,
-        //   );
-        // }));
       },
-      child: Container(
+      child: widget.code!=""?Container(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 0),
-        child: widget.code == ""
-            ? Container(
-                child: null,
-              )
-            : Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Row(
-                      children: <Widget>[
-                        // Stack(
-                        //   children: [
-                        //     CircleAvatar(
-                        //       backgroundImage: NetworkImage(widget.image),
-                        //       maxRadius: 30,
-                        //     ),
-                        //   ],
-                        // ),
-                        SizedBox(
-                          width: size.width * 0.03,
-                        ),
-                        Expanded(
+        child: Row(
+                    children: <Widget>[
+                      Flexible(
+                      flex: 5,
                           child: Container(
                             color: Colors.transparent,
                             child: Column(
@@ -183,9 +158,6 @@ class _ModifiedUsersNotificationListState
                                         ? Expanded(
                                             child: IconButton(
                                               onPressed: () async {
-                                                //indirect phone call
-                                                // launchUrl('tel://${widget.phone}' as Uri);
-                                                //direct phone call
                                                 await FlutterPhoneDirectCaller
                                                     .callNumber(widget.phone);
                                               },
@@ -245,11 +217,10 @@ class _ModifiedUsersNotificationListState
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: size.width * 0.03,
-                        ),
+                        const SizedBox(width: 30.0),
                         userRole == "Admin"
-                            ? Expanded(
+                            ? Flexible(
+                              flex: 2,
                                 child: Container(
                                   color: Colors.transparent,
                                   child: Padding(
@@ -282,10 +253,7 @@ class _ModifiedUsersNotificationListState
                               ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-      ),
+      ):const SizedBox(),
     );
   }
 
@@ -307,7 +275,6 @@ class _ModifiedUsersNotificationListState
           _isLoading = true;
         });
         _generateCode(widget.docId);
-        print("document id :${widget.docId}");
       },
     );
   }
@@ -330,7 +297,6 @@ class _ModifiedUsersNotificationListState
           _isLoading = true;
         });
         _pickDate();
-        print("document id :${widget.docId}");
 
         //date picker
       },
@@ -370,7 +336,6 @@ class _ModifiedUsersNotificationListState
       });
     } catch (e) {
       // Handle error if any
-      print('Error updating endTime: $e');
       setState(() {
         _isLoading = false;
       });
@@ -419,7 +384,6 @@ class _ModifiedUsersNotificationListState
         if (value.size == 1) {
           Map<String, dynamic> fcmToken = value.docs.first.data();
           userToken = fcmToken["fcmToken"];
-          print("user device fcm Token is  $userToken");
           //send push notification to user
           String body =
               "Mwiriwe neza ${widget.name}, ubu ngubu wemerewe gukora ibizamini byose ntankomyi kuko wamaze kwishyura.\n Murakoze mukomeze kwiga neza";

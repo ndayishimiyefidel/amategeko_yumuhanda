@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:amategeko/enume/models/question_model.dart';
 import 'package:amategeko/screens/amasomo/play_modified_quiz.dart';
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/quizzes/result_screen.dart';
 import 'package:amategeko/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
@@ -14,7 +18,9 @@ import 'edit_quiz_question.dart';
 
 class OpenModifiedQuiz extends StatefulWidget {
   final String courseId;
+  // ignore: prefer_typing_uninitialized_variables
   final title;
+  // ignore: prefer_typing_uninitialized_variables
   final quizNumber;
 
   OpenModifiedQuiz({required this.courseId, this.title, this.quizNumber});
@@ -37,11 +43,42 @@ String questionImgUrl = "";
 bool ans = false;
 
 class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
-    with SingleTickerProviderStateMixin {
+     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+  Timer? interstitialTimer;
+  InterstitialAd? _interstitialAd;
+
+  void loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
+        },
+      ),
+    );
+  }
+
+  void showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null;
+    } else {
+      print('InterstitialAd is not loaded yet.');
+    }
+  }
   DatabaseService databaseService = DatabaseService();
   QuerySnapshot? questionSnapshot;
   late AnimationController _controller;
   final limitTime = 1200;
+  int currentPageIndex = 0;
 
   QuestionModel getQuestionModelFromDatasnapshot(
       DocumentSnapshot questionSnapshot) {
@@ -65,23 +102,14 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
     return questionModel;
   }
 
-  bool btnPressed = false;
-  PageController? _controller1;
+bool btnPressed = false;
+late PageController _controller1;
   String btnText = "Next";
   String btnTextPrevious = "Previous";
   bool answered = false;
 
   @override
-  void dispose() {
-    if (_controller.isAnimating || _controller.isCompleted) {
-      _controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
   void initState() {
-    print(widget.courseId);
     _controller1 = PageController(initialPage: 0);
     databaseService.getModifiedQuizQuestion(widget.courseId).then((value) {
       questionSnapshot = value;
@@ -95,6 +123,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
         vsync: this, duration: Duration(seconds: limitTime));
     _controller.addListener(() {
       if (_controller.isCompleted) {
+        showInterstitialAd();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -107,23 +136,91 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
       }
     });
     _controller.forward();
+
+    loadInterstitialAd();
     super.initState();
   }
 
-  bool isFABExtended = false;
 
-  // Create function for button action change:
+  // onPressed callback for the "Next" button.
+  void onNextPressed() {
+    if (currentPageIndex < (questionSnapshot?.docs.length ?? 0) - 1) {
+      // If there are more questions, move to the next question.
+      currentPageIndex++;
+      if (kDebugMode) {
+        print("current page $currentPageIndex");
+      }
+      if (currentPageIndex == 4) {
+        showInterstitialAd(); //show ads on question 10
+        _controller1.animateToPage(
+          currentPageIndex, // Use the updated index
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInExpo,
+        );
+      }
+      _controller1.animateToPage(
+        currentPageIndex, // Use the updated index
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInExpo,
+      );
+      if (currentPageIndex == (questionSnapshot?.docs.length)! - 1) {
+        setState(() {
+          btnText = "Soza Quiz";
+        });
+      }
+      setState(() {
+        btnPressed = false;
+      });
+    } else {
+      // If there are no more questions, navigate to the Results screen.
 
-  void _switchButton() {
-    setState(
-      () {
-        isFABExtended = !isFABExtended;
-      },
-    );
+      showInterstitialAd();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Results(
+            correct: _correct,
+            incorrect: _incorrect,
+            total: total,
+          ),
+        ),
+      );
+    }
+  }
+
+  // Modify the onPressed callback for the "Previous" button.
+  void onPreviousPressed() {
+    if (currentPageIndex > 0) {
+      setState(() {
+        btnText = "Next";
+      });
+      // If there are previous questions, move to the previous question.
+      currentPageIndex--; // Decrement the current page index
+      _controller1.animateToPage(
+        currentPageIndex, // Use the updated index
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInExpo,
+      );
+      setState(() {
+        btnPressed = false;
+      });
+    }
+  }
+
+
+  @override
+  void dispose() {
+    if (_controller.isAnimating || _controller.isCompleted) {
+      _controller.dispose();
+    }
+    _controller1.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -192,121 +289,88 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
               ],
             ),
           ),
-          FutureBuilder<QuerySnapshot>(builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const CircularProgressIndicator();
-              default:
-                if (snapshot.hasError) {
+
+            FutureBuilder<QuerySnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection("courses")
+                  .doc(widget.courseId)
+                  .collection("courseQuiz")
+                  .get(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
                   return const CircularProgressIndicator();
-                } else {
-                  return PageView.builder(
-                      controller: _controller1!,
-                      onPageChanged: (page) {
-                        if (page == questionSnapshot!.docs.length - 1) {
-                          setState(() {
-                            btnText = "Soza Imyitozo";
-                          });
-                        }
-                        setState(() {
-                          answered = false;
-                        });
-                      },
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: questionSnapshot?.docs.length ?? 0,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, right: 20, top: 80),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                ModifiedQuizPlayTile(
-                                  questionModel:
-                                      getQuestionModelFromDatasnapshot(
-                                          questionSnapshot!.docs[index]),
-                                  index: index,
-                                  quizId: widget.courseId,
-                                  quizTitle: "Testing Quiz",
-                                ),
-                                const SizedBox(
-                                  height: 30.0,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    RawMaterialButton(
-                                      onPressed: () {
-                                        if (_controller1!.page?.toInt() ==
-                                            questionSnapshot!.docs.length - 1) {
-                                        } else {
-                                          print("hello");
-                                          _controller1!.previousPage(
-                                              duration: const Duration(
-                                                  milliseconds: 250),
-                                              curve: Curves.easeInExpo);
-
-                                          setState(() {
-                                            btnPressed = false;
-                                          });
-                                        }
-                                      },
-                                      shape: const StadiumBorder(),
-                                      fillColor: Colors.blue,
-                                      padding: const EdgeInsets.all(18.0),
-                                      elevation: 0.0,
-                                      child: Text(
-                                        btnTextPrevious,
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 18),
-                                      ),
+                default:
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return PageView.builder(
+                        controller: _controller1,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: questionSnapshot?.docs.length ?? 0,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 80),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                   ModifiedQuizPlayTile(
+                                      questionModel:
+                                          getQuestionModelFromDatasnapshot(
+                                              questionSnapshot!.docs[currentPageIndex]),
+                                      index: currentPageIndex,
+                                      quizId: widget.courseId,
+                                      quizTitle: "Testing Quiz",
                                     ),
-                                    RawMaterialButton(
-                                      onPressed: () {
-                                        if (_controller1!.page?.toInt() ==
-                                            questionSnapshot!.docs.length - 1) {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Results(
-                                                    correct: _correct,
-                                                    incorrect: _incorrect,
-                                                    total: total),
-                                              ));
-                                        } else {
-                                          _controller1!.nextPage(
-                                              duration: const Duration(
-                                                  milliseconds: 250),
-                                              curve: Curves.easeInExpo);
-
-                                          setState(() {
-                                            btnPressed = false;
-                                          });
-                                        }
-                                      },
-                                      shape: const StadiumBorder(),
-                                      fillColor: Colors.blue,
-                                      padding: const EdgeInsets.all(14.0),
-                                      elevation: 0.0,
-                                      child: Text(
-                                        btnText,
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 18),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RawMaterialButton(
+                                        onPressed: onPreviousPressed,
+                                        shape: const StadiumBorder(),
+                                        fillColor: Colors.blue,
+                                        padding: const EdgeInsets.all(14.0),
+                                        elevation: 0.0,
+                                        child: Text(
+                                          btnTextPrevious,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
+                                      RawMaterialButton(
+                                        onPressed: onNextPressed,
+                                        shape: const StadiumBorder(),
+                                        fillColor: Colors.blue,
+                                        padding: const EdgeInsets.all(14.0),
+                                        elevation: 0.0,
+                                        child: Text(
+                                          btnText,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      });
-                }
-            }
-          }),
+                          );
+                        });
+                  }
+              }
+            }),
         ],
       ),
 
@@ -343,7 +407,7 @@ class ModifiedQuizPlayTile extends StatefulWidget {
   final String quizId;
   final String quizTitle;
 
-  ModifiedQuizPlayTile(
+  const ModifiedQuizPlayTile(
       {super.key,
       required this.questionModel,
       required this.index,
@@ -404,25 +468,23 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                 children: <Widget>[
                   (widget.questionModel.questionImgUrl.isEmpty)
                       ? Container()
-                      : Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Material(
-                                  // display new updated image
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  clipBehavior: Clip.hardEdge,
-                                  // display new updated image
-                                  child: Image.network(
-                                    widget.questionModel.questionImgUrl,
-                                    width: size.width * 0.5,
-                                    height: size.height * 0.2,
-                                    fit: BoxFit.cover,
-                                  )),
-                            ],
-                          ),
-                        ),
+                      : Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Material(
+                              // display new updated image
+                              borderRadius: const BorderRadius.all(
+                                  Radius.circular(5)),
+                              clipBehavior: Clip.hardEdge,
+                              // display new updated image
+                              child: Image.network(
+                                widget.questionModel.questionImgUrl,
+                                width: size.width * 0.5,
+                                height: size.height * 0.2,
+                                fit: BoxFit.cover,
+                              )),
+                        ],
+                      ),
                 ],
               ),
             ),
@@ -705,12 +767,9 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                     actions: [
                       TextButton(
                           onPressed: () {
-                            Navigator.pushReplacement(context,
-                                MaterialPageRoute(builder: (context) {
-                              return Quizzes();
-                            }));
+                            Navigator.pop(context);
                           },
-                          child: const Text("Close"))
+                          child: const Text("ok"))
                     ],
                   );
                 });

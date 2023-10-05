@@ -177,7 +177,7 @@ class _AllCourseState extends State<AllCourse> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => Notifications(),
+                    builder: (BuildContext context) => const Notifications(),
                   ),
                 );
               },
@@ -202,8 +202,8 @@ class _AllCourseState extends State<AllCourse> {
         body: quizList(),
         floatingActionButton: (userRole == "Admin")
             ? FloatingActionButton.extended(
-                label: Row(
-                  children: const [
+                label: const Row(
+                  children: [
                     Text(
                       "Create Course",
                       style: TextStyle(
@@ -363,8 +363,6 @@ class CourseTile extends StatefulWidget {
 
 class _CourseTileState extends State<CourseTile> {
   bool _isLoading = false;
-  final _formkey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -410,6 +408,7 @@ class _CourseTileState extends State<CourseTile> {
                             GestureDetector(
                               onTap: () {
                                 //all
+                              if(widget.userRole=="Admin"){
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -420,6 +419,11 @@ class _CourseTileState extends State<CourseTile> {
                                     },
                                   ),
                                 );
+                                }
+                                else{
+                                  navigateToIshuli(widget.currentUserId,true);
+                                }
+
                               },
                               child: const Icon(
                                 Icons.play_circle_fill_outlined,
@@ -547,92 +551,28 @@ class _CourseTileState extends State<CourseTile> {
             });
       });
     });
-
-    // await FirebaseFirestore.instance
-    //     .collection("courses")
-    //     .doc(docId)
-    //     .collection("course-audios")
-    //     .get()
-    //     .then((QuerySnapshot querySnapshot) {
-    //   querySnapshot.docs.forEach((doc) {
-    //     doc.reference.delete().then((value) {
-    //       //question delete
-    //       setState(() {
-    //         _isLoading = false;
-    //         showDialog(
-    //             context: context,
-    //             builder: (context) {
-    //               return AlertDialog(
-    //                 content: const Text("Quiz deleted successfully!"),
-    //                 actions: [
-    //                   TextButton(
-    //                       onPressed: () {
-    //                         Navigator.of(context).pop();
-    //                       },
-    //                       child: const Text("Close"))
-    //                 ],
-    //               );
-    //             });
-    //       });
-    //     });
-    //   });
-    //   FirebaseFirestore.instance.collection("Quizmaker").doc(docId).delete();
-    // });
   }
 
-  Future<void> checkValidCode(
-      String currentUserId, String code, String quizId) async {
+  Future<void> navigateToIshuli(
+      String currentUserId, bool hasAdded) async {
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
-        .where("code", isEqualTo: code)
-        .where("isQuiz", isEqualTo: true)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        print(doc.reference.id);
-        FirebaseFirestore.instance
-            .collection("Quiz-codes")
-            .doc(doc.reference.id)
-            .update({"isOpen": true}).then((value) {
-          if (querySnapshot.size == 1) {
-            setState(() {
-              _isLoading = false;
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) {
-              //       return OpenQuiz(
-              //         quizId: widget.quizId,
-              //         title: widget.title,
-              //         quizNumber: widget.index + 1,
-              //       );
-              //     },
-              //   ),
-              // );
-            });
-          } else {
-            setState(() {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: const Text(
-                          "Invalid code for this quiz,Double check and try again"),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Close"))
-                      ],
-                    );
-                  });
-            });
-          }
+        .where("isOpen", isEqualTo: true)
+        .where("addedToClass", isEqualTo: true)
+        .get().then((value) => {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return CourseContents(
+                  courseId: widget.courseId,
+                  courseTitle: widget.title);
+            },
+          ),
+        ),
+  
         });
-      });
-    });
   }
 
 //request code

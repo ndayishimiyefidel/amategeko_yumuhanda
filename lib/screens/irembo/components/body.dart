@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,7 @@ class SignUp extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _SignUpState createState() => _SignUpState();
+  State createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
@@ -41,7 +43,9 @@ class _SignUpState extends State<SignUp> {
     preferences = await SharedPreferences.getInstance();
     setState(() {
       currentuserid = preferences.getString("uid")!;
+      // ignore: avoid_print
       print("current user id");
+      // ignore: avoid_print
       print(currentuserid);
     });
   }
@@ -52,9 +56,6 @@ class _SignUpState extends State<SignUp> {
         isloading = true;
       });
       preferences = await SharedPreferences.getInstance();
-      var firebaseUser = FirebaseAuth.instance.currentUser;
-      //BEFORE CREATING A NEW ACCOUNT MAKE SURE THE DEVICE IS ALREADY REGISTERED YET.
-
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection("irembo-users")
           .where("uid", isEqualTo: currentuserid.toString())
@@ -173,6 +174,7 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       name = val;
+                      // ignore: avoid_print
                       print(name);
                     },
                     validator: (nameValue) {
@@ -210,7 +212,17 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       id = val;
+                      // ignore: avoid_print
                       print(id);
+                    },
+                      validator: (id) {
+                      if (id!.isEmpty) {
+                        return 'This field is mandatory';
+                      }
+                      else if (id.length !=16) {
+                        return 'id must be at equal to 16 digits ';
+                      }
+                      return null;
                     },
                     cursorColor: kPrimaryColor,
                     decoration: const InputDecoration(
@@ -230,7 +242,25 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       phoneNumber = val;
+                      // ignore: avoid_print
                       print(phoneNumber);
+                    },
+                      validator: (phoneValue) {
+                      if (phoneValue!.isEmpty) {
+                        return 'This field is mandatory';
+                      }
+                      if (phoneValue.length !=10) {
+                        return 'name must be at least 10 digits ';
+                      }
+                      const String p = "^07[2,389]\\d{7}";
+                      RegExp regExp = RegExp(p);
+
+                      if (regExp.hasMatch(phoneValue)) {
+                        // So, the email is valid
+                        return null;
+                      }
+
+                      return 'This is not a valid name';
                     },
                     cursorColor: kPrimaryColor,
                     decoration: const InputDecoration(

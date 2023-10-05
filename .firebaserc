@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "amategeko-75e59",
-    "staging": "amategeko-75e59"
+    "staging": "amategeko-75e59",
+    "storage": "amategeko-75e59"
   },
   "targets": {},
   "etags": {

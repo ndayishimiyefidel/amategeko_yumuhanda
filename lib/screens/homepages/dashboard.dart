@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:amategeko/screens/ambassador/view_referrals.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,7 +29,7 @@ class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-  _HomeState createState() => _HomeState();
+State createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
@@ -49,7 +50,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
         },
       ),
     );
@@ -86,7 +89,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         return null;
       }
     } catch (e) {
-      print("Error getting referral code: $e");
+      if (kDebugMode) {
+        print("Error getting referral code: $e");
+      }
       return null;
     }
   }
@@ -101,10 +106,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
       _getReferralCode().then((code) {
-        setState(() {
-          referralCode = code;
-          print(referralCode);
-        });
+         referralCode = code;
       });
     });
   }
@@ -150,9 +152,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     animationController.dispose();
-    _interstitialAd!.dispose();
+    _interstitialAd?.dispose();
     interstitialTimer?.cancel();
     super.dispose();
   }
@@ -160,8 +161,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-
     animationController.forward();
     return AnimatedBuilder(
       animation: animationController,
@@ -404,7 +403,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         context,
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              Notifications(),
+                                              const Notifications(),
                                         ),
                                       );
                                     } else if (_interstitialAd == null) {
@@ -412,7 +411,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         context,
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              Notifications(),
+                                              const Notifications(),
                                         ),
                                       );
                                     } else {
@@ -420,7 +419,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         context,
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              Notifications(),
+                                              const Notifications(),
                                         ),
                                       );
                                     }
@@ -678,7 +677,44 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                               )
-                            : Container(),
+                            :Transform(
+                                transform: Matrix4.translationValues(
+                                    muchDelayedAnimation.value * width, 0, 0),
+                                child: Bouncing(
+                                  onPress: () {
+                                    if (_isConnected) {
+                                      showInterstitialAd();
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const AllCourse(),
+                                      ),
+                                    );
+                                    } else if (_interstitialAd == null) {
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const AllCourse(),
+                                      ),
+                                    );
+                                    } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const AllCourse(),
+                                      ),
+                                    );
+                                    }
+                                  },
+                                  child: const DashboardCard(
+                                    name: "Ishuri online",
+                                    imgpath: "mwarimu.jpg",
+                                  ),
+                                ),
+                              ),
                       ],
                     ),
                   ),

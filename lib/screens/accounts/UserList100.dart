@@ -1,30 +1,31 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/chat_for_users_list.dart';
 import '../../utils/constants.dart';
-import '../../widgets/changing_banner.dart';
-
 class UserList100 extends StatefulWidget {
   const UserList100({super.key});
 
+  // const UserList100({super.key});
+
   @override
-  _UserList100State createState() => _UserList100State();
+  State createState() => _UserList100State();
 }
 
 class _UserList100State extends State<UserList100> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late BannerAd _bannerAd;
+  BannerAd ?_bannerAd;
   bool isBannerLoaded = false;
   bool isBannerVisible = false;
   Timer? bannerTimer;
 
   // List allUsers = [];
-  var allUsersList;
+  var allUsersList=[];
   late String currentuserid;
   late String currentusername;
   late String currentuserphoto;
@@ -35,31 +36,6 @@ class _UserList100State extends State<UserList100> {
   @override
   initState() {
     super.initState();
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-        },
-        // Add other banner ad listener callbacks as needed.
-      ),
-    );
-
-    _bannerAd.load();
-    // Initialize the banner timer
-    bannerTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      setState(() {
-        isBannerVisible = true;
-      });
-    });
-
     getCurrUserId();
     FirebaseFirestore.instance
         .collection("Users")
@@ -67,7 +43,9 @@ class _UserList100State extends State<UserList100> {
         .get()
         .then((value) {
       numbers = value.docs.length;
-      print(numbers);
+      if (kDebugMode) {
+        print(numbers);
+      }
     });
   }
 
@@ -85,7 +63,7 @@ class _UserList100State extends State<UserList100> {
   @override
   void dispose() {
     // Dispose the banner timer when the widget is disposed
-    _bannerAd.dispose();
+    _bannerAd?.dispose();
     bannerTimer?.cancel();
     super.dispose();
   }
@@ -102,13 +80,11 @@ class _UserList100State extends State<UserList100> {
             const SizedBox(
               height: 10,
             ),
-            if (isBannerVisible && isBannerLoaded)
-              BannerAdWidget(ad: _bannerAd),
             StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection("Users")
                   .orderBy("createdAt", descending: true)
-                  .limit(10)
+                  .limit(500)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -125,6 +101,11 @@ class _UserList100State extends State<UserList100> {
                   snapshot.data!.docs
                       .removeWhere((i) => i["uid"] == currentuserid);
                   allUsersList = snapshot.data!.docs;
+
+
+                  if (kDebugMode) {
+                    print("number of user : ${allUsersList.length}");
+                  }
 
                   return ListView.builder(
                     padding: const EdgeInsets.only(top: 16, left: 20),

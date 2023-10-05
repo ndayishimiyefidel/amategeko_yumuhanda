@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:amategeko/enume/models/question_model.dart';
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/quizzes/result_screen.dart';
@@ -23,6 +22,7 @@ import '../questions/edit_question.dart';
 class OpenQuiz extends StatefulWidget {
   final String quizId;
   final String title;
+  // ignore: prefer_typing_uninitialized_variables
   final quizNumber;
 
   const OpenQuiz(
@@ -46,12 +46,9 @@ String questionImgUrl = "";
 bool ans = false;
 
 class _OpenQuizState extends State<OpenQuiz>
-    with SingleTickerProviderStateMixin {
-  late BannerAd _bannerAd;
-  bool isBannerLoaded = false;
-  bool isBannerVisible = false;
-  Timer? bannerTimer;
-
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   Timer? interstitialTimer;
   InterstitialAd? _interstitialAd;
 
@@ -77,14 +74,15 @@ class _OpenQuizState extends State<OpenQuiz>
       _interstitialAd!.show();
       _interstitialAd = null;
     } else {
-      print('InterstitialAd is not loaded yet.');
+      if (kDebugMode) {
+        print('InterstitialAd is not loaded yet.');
+      }
     }
   }
 
   //shared preferences
   late SharedPreferences preferences;
   String? userRole;
-  ConnectivityResult? _connectivityResult;
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
@@ -98,8 +96,8 @@ class _OpenQuizState extends State<OpenQuiz>
   DatabaseService databaseService = DatabaseService();
   QuerySnapshot? questionSnapshot;
   late AnimationController _controller;
-  final limitTime = 1200;
-  int currentQuestionIndex = 0;
+  final limitTime = 1200*60*20;
+  int currentPageIndex = 0;
 
   QuestionModel getQuestionModelFromDatasnapshot(
       DocumentSnapshot questionSnapshot) {
@@ -127,63 +125,16 @@ class _OpenQuizState extends State<OpenQuiz>
   String btnText = "Next";
   String btnTextPrevious = "Previous";
   bool answered = false;
-  PageController? _controller1;
+  late PageController _controller1;
 
+//initial state
   @override
   void initState() {
     super.initState();
-    // Enable Firestore offline persistence
-    if (kIsWeb) {
-      FirebaseFirestore.instance.enablePersistence().catchError((err) {
-        print("Firebase persistence error: $err");
-      });
-    }
 
-    // Initialize connectivity
-    Connectivity().onConnectivityChanged.listen((result) {
-      setState(() {
-        _connectivityResult = result;
-      });
-    });
-
-    // Initialize shared preferences
-    SharedPreferences.getInstance().then((prefs) {
-      setState(() {});
-    });
+    //initiliaze controller
     _controller1 = PageController(initialPage: 0);
-    //interestial ads
-    loadInterstitialAd();
-    // Start the timer to show the interstitial ad every 4 minutes
-    // interstitialTimer = Timer.periodic(const Duration(minutes: 4), (timer) {
-    //   showInterstitialAd();
-    // });
-
-    //banner add
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-        },
-        // Add other banner ad listener callbacks as needed.
-      ),
-    );
-
-    _bannerAd.load();
-    // Initialize the banner timer
-    bannerTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-      setState(() {
-        isBannerVisible = true;
-      });
-    });
-    // addCorrectOptionField();
+    //call current data
     getCurrUserData();
     databaseService.getQuizQuestion(widget.quizId).then((value) {
       questionSnapshot = value;
@@ -218,37 +169,6 @@ class _OpenQuizState extends State<OpenQuiz>
     }
   }
 
-  Future<void> addCorrectOptionField() async {
-    // Step 1: Get current timestamp in milliseconds since epoch
-    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
-
-    // Step 2: Convert milliseconds to DateTime
-    DateTime currentDateTime =
-        DateTime.fromMillisecondsSinceEpoch(currentTimestamp);
-
-    // Step 3: Add 2 months to the DateTime object
-    DateTime updatedDateTime = currentDateTime.add(const Duration(days: 20));
-
-    // Step 4: Convert the updated DateTime object back to milliseconds
-    int updatedTimestamp = updatedDateTime.millisecondsSinceEpoch;
-
-    CollectionReference quizmakerCollectionRef = FirebaseFirestore.instance
-        .collection('Quiz-codes'); // Updated collection name
-
-    QuerySnapshot quizmakerQuerySnapshot = await quizmakerCollectionRef.get();
-
-    WriteBatch batch = FirebaseFirestore.instance.batch();
-
-    for (QueryDocumentSnapshot quizmakerDoc in quizmakerQuerySnapshot.docs) {
-      batch.update(quizmakerDoc.reference,
-          {'endTime': updatedTimestamp.toString()}); // Update the main document
-
-      // If there's no nested collection, you don't need to query or update anything inside it.
-    }
-
-    await batch.commit();
-  }
-
   void handleScreenshot() {
     setState(() {
       isQuizVisible = false;
@@ -260,19 +180,16 @@ class _OpenQuizState extends State<OpenQuiz>
     if (_controller.isAnimating || _controller.isCompleted) {
       _controller.dispose();
     }
-    //screenshotCallback.removeListener(handleScreenshot);
     if (userRole != "Admin") {
       screenshotCallback.dispose();
     }
-
-    // Dispose the banner timer when the widget is disposed
-    _bannerAd.dispose();
-    bannerTimer?.cancel();
+    _controller1.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -318,7 +235,7 @@ class _OpenQuizState extends State<OpenQuiz>
     return FloatingActionButton.extended(
       backgroundColor: kPrimaryLightColor,
       onPressed: () {
-        //showInterstitialAd();
+        showInterstitialAd();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -340,6 +257,72 @@ class _OpenQuizState extends State<OpenQuiz>
         ),
       ),
     );
+  }
+
+  // Modify the onPressed callback for the "Next" button.
+  void onNextPressed() {
+    if (currentPageIndex < (questionSnapshot?.docs.length ?? 0) - 1) {
+      // If there are more questions, move to the next question.
+      currentPageIndex++;
+      if (kDebugMode) {
+        print("current page $currentPageIndex");
+      }
+      if (currentPageIndex == 9) {
+        //showInterstitialAd(); //show ads on question 10
+        _controller1.animateToPage(
+          currentPageIndex, // Use the updated index
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInExpo,
+        );
+      }
+      _controller1.animateToPage(
+        currentPageIndex, // Use the updated index
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInExpo,
+      );
+      if (currentPageIndex == (questionSnapshot?.docs.length)! - 1) {
+        setState(() {
+          btnText = "Soza Exam";
+        });
+      }
+      setState(() {
+        btnPressed = false;
+      });
+    } else {
+      // If there are no more questions, navigate to the Results screen.
+
+      showInterstitialAd();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Results(
+            correct: _correct,
+            incorrect: _incorrect,
+            total: total,
+          ),
+        ),
+      );
+    }
+  }
+
+  // Modify the onPressed callback for the "Previous" button.
+  void onPreviousPressed() {
+    if (currentPageIndex > 0) {
+      setState(() {
+        btnText = "Next";
+      });
+      // If there are previous questions, move to the previous question.
+      currentPageIndex--; // Decrement the current page index
+      _controller1.animateToPage(
+        currentPageIndex, // Use the updated index
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInExpo,
+      );
+      setState(() {
+        btnPressed = false;
+      });
+    }
   }
 
   Widget buildHiddenContent() {
@@ -413,129 +396,89 @@ class _OpenQuizState extends State<OpenQuiz>
             ],
           ),
         ),
-        FutureBuilder<QuerySnapshot>(builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const CircularProgressIndicator();
-            default:
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return PageView.builder(
-                    controller: _controller1!,
-                    onPageChanged: (page) {
-                      if (page == questionSnapshot!.docs.length - 1) {
-                        setState(() {
-                          btnText = "Soza Exam";
-                        });
-                      }
-                      setState(() {
-                        answered = false;
-                      });
-                    },
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: questionSnapshot?.docs.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding:
-                            const EdgeInsets.only(left: 20, right: 20, top: 80),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              QuizPlayTile(
-                                questionModel: getQuestionModelFromDatasnapshot(
-                                    questionSnapshot!.docs[index]),
-                                index: index,
-                                quizId: widget.quizId,
-                                quizTitle: widget.title,
-                                userRole: userRole.toString(),
-                              ),
-                              const SizedBox(
-                                height: 30.0,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+        FutureBuilder<QuerySnapshot>(
+            future: FirebaseFirestore.instance
+                .collection("Quizmaker")
+                .doc(widget.quizId)
+                .collection("QNA")
+                .get(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const CircularProgressIndicator();
+                default:
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return PageView.builder(
+                        controller: _controller1,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: questionSnapshot?.docs.length ?? 0,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 80),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  RawMaterialButton(
-                                    onPressed: () {
-                                      if (_controller1!.page?.toInt() ==
-                                          questionSnapshot!.docs.length - 1) {
-                                      } else {
-                                        _controller1!.previousPage(
-                                            duration: const Duration(
-                                                milliseconds: 250),
-                                            curve: Curves.easeInExpo);
-
-                                        setState(() {
-                                          btnPressed = false;
-                                        });
-                                      }
-                                    },
-                                    shape: const StadiumBorder(),
-                                    fillColor: Colors.blue,
-                                    padding: const EdgeInsets.all(18.0),
-                                    elevation: 0.0,
-                                    child: Text(
-                                      btnTextPrevious,
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 18),
-                                    ),
+                                  QuizPlayTile(
+                                    questionModel:
+                                        getQuestionModelFromDatasnapshot(
+                                            questionSnapshot!
+                                                .docs[currentPageIndex]),
+                                    index: currentPageIndex,
+                                    quizId: widget.quizId,
+                                    quizTitle: widget.title,
+                                    userRole: userRole.toString(),
                                   ),
-                                  RawMaterialButton(
-                                    onPressed: () {
-                                      if (_controller1!.page?.toInt() ==
-                                          questionSnapshot!.docs.length - 1) {
-                                        showInterstitialAd();
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => Results(
-                                                  correct: _correct,
-                                                  incorrect: _incorrect,
-                                                  total: total),
-                                            ));
-                                      } else {
-                                        if (_controller1!.page?.toInt() == 10) {
-                                          showInterstitialAd();
-                                          _controller1!.nextPage(
-                                              duration: const Duration(
-                                                  milliseconds: 250),
-                                              curve: Curves.easeInExpo);
-                                        }
-                                        _controller1!.nextPage(
-                                            duration: const Duration(
-                                                milliseconds: 250),
-                                            curve: Curves.easeInExpo);
-
-                                        setState(() {
-                                          btnPressed = false;
-                                        });
-                                      }
-                                    },
-                                    shape: const StadiumBorder(),
-                                    fillColor: Colors.blue,
-                                    padding: const EdgeInsets.all(14.0),
-                                    elevation: 0.0,
-                                    child: Text(
-                                      btnText,
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 18),
-                                    ),
+                                  const SizedBox(
+                                    height: 20.0,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      RawMaterialButton(
+                                        onPressed: onPreviousPressed,
+                                        shape: const StadiumBorder(),
+                                        fillColor: Colors.blue,
+                                        padding: const EdgeInsets.all(14.0),
+                                        elevation: 0.0,
+                                        child: Text(
+                                          btnTextPrevious,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18),
+                                        ),
+                                      ),
+                                      RawMaterialButton(
+                                        onPressed: onNextPressed,
+                                        shape: const StadiumBorder(),
+                                        fillColor: Colors.blue,
+                                        padding: const EdgeInsets.all(14.0),
+                                        elevation: 0.0,
+                                        child: Text(
+                                          btnText,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
                                   ),
                                 ],
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    });
+                              ),
+                            ),
+                          );
+                        });
+                  }
               }
-          }
-        }),
-        //if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
+            }),
       ],
     );
   }
@@ -766,7 +709,9 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
           ),
           GestureDetector(
             onTap: () {
-              print("correct option: ${widget.questionModel.correctOption}");
+              if (kDebugMode) {
+                print("correct option: ${widget.questionModel.correctOption}");
+              }
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option2 ==
@@ -941,7 +886,6 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                 option3: widget.questionModel.option3,
                 option4: widget.questionModel.option4,
                 quizTitle: widget.quizTitle,
-                // correctOption: widget.questionModel.correctOption,
               );
             },
           ),
@@ -978,7 +922,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
         .where("question", isEqualTo: question)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         doc.reference.delete().then((value) {
           //question delete
           setState(() {
@@ -1002,7 +946,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                 });
           });
         });
-      });
+      }
     });
   }
 }

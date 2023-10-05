@@ -1,8 +1,11 @@
+import 'package:amategeko/utils/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 
 import '../../services/auth.dart';
 
@@ -20,7 +23,7 @@ class IremboUsersList extends StatefulWidget {
       required this.myAddress});
 
   @override
-  _IremboUsersListState createState() => _IremboUsersListState();
+  State createState() => _IremboUsersListState();
 }
 
 class _IremboUsersListState extends State<IremboUsersList> {
@@ -110,11 +113,21 @@ class _IremboUsersListState extends State<IremboUsersList> {
       await firestore
           .collection('Users')
           .doc(widget.userId)
+          // ignore: avoid_print
           .update({'called': called}).then((value) => {print("Updated")});
     } catch (e) {
-      print("Error updating user's call status: $e");
+      if (kDebugMode) {
+        print("Error updating user's call status: $e");
+      }
       // Handle the error if needed
     }
+  }
+
+  void _copyToClipboard(String textToCopy) {
+    Clipboard.setData(ClipboardData(text: textToCopy));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$textToCopy copied to clipboard')),
+    );
   }
 
   @override
@@ -138,6 +151,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                     child: Container(
                       color: Colors.transparent,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: Column(
@@ -146,11 +160,18 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                 Text("Name: ${widget.name}"),
                                 Expanded(
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Phone: ${widget.myPhone}"),
-                                      const SizedBox(
-                                        width: 60,
+                                      IconButton(
+                                        onPressed: () {
+                                          _copyToClipboard(widget.myPhone);
+                                        },
+                                        icon:const Icon(
+                                          Icons.copy,
+                                          size: 25,
+                                          color: kPrimaryColor,
+                                        ),
                                       ),
                                       IconButton(
                                         onPressed: () async {
@@ -158,6 +179,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                               await _hasUserBeenCalled();
                                           if (!hasBeenCalled) {
                                             bool? confirmed =
+                                                // ignore: use_build_context_synchronously
                                                 await _showCallConfirmationDialog(
                                                     context);
                                             if (confirmed == true) {
@@ -171,6 +193,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                             // User has been called before, show a message or perform any other action
                                             // as needed.
                                             bool? confirmed =
+                                                // ignore: use_build_context_synchronously
                                                 await _showCallConfirmationDialog(
                                                     context);
                                             if (confirmed == true) {
@@ -204,26 +227,43 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                     ],
                                   ),
                                 ),
-                                Text(
-                                  "ID: ${widget.identity}",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade500,
-                                      fontStyle: FontStyle.italic),
-                                ),
-                                Text(
+                                  Text(
                                   "Akarere: ${widget.myAddress}",
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
                                       fontStyle: FontStyle.italic),
                                 ),
-                                Text(
+                                  Text(
                                   "Joined date: $dateTimeFormat",
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
                                       fontStyle: FontStyle.italic),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "ID: ${widget.identity}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade500,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        _copyToClipboard(widget.identity);
+                                      },
+                                      icon: const Icon(
+                                          Icons.copy,
+                                          size: 25,
+                                          color: kPrimaryColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

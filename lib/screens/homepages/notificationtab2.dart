@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,18 +14,17 @@ class NotificationTab2 extends StatefulWidget {
   const NotificationTab2({super.key});
 
   @override
-  _NotificationTab2State createState() => _NotificationTab2State();
+  State createState() => _NotificationTab2State();
 }
 
 class _NotificationTab2State extends State<NotificationTab2> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late BannerAd _bannerAd;
   bool isBannerLoaded = false;
   bool isBannerVisible = true;
   Timer? bannerTimer;
 
   // List allUsers = [];
-  var allUsersList;
+  List<Map<String, dynamic>> allUsersList = [];
   String? currentuserid;
   String? currentusername;
   late String currentuserphoto;
@@ -34,43 +34,13 @@ class _NotificationTab2State extends State<NotificationTab2> {
   late String quizTitle;
   late SharedPreferences preferences;
 
-  InterstitialAd? _interstitialAd;
-  Timer? interstitialTimer;
-
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      //_interstitialAd = null;
-    } else {
-      print('InterstitialAd is not loaded yet.');
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    loadInterstitialAd();
-
-    // Start the timer to show the interstitial ad every 4 minutes
-    // interstitialTimer = Timer.periodic(const Duration(minutes: 4), (timer) {
-    //   showInterstitialAd();
-    // });
-
+    getCurrUserId();
+    _loadAds();
+  }
+  void _loadAds() async{
     //banner
     _bannerAd = BannerAd(
       adUnitId: 'ca-app-pub-2864387622629553/7276208106',
@@ -85,18 +55,10 @@ class _NotificationTab2State extends State<NotificationTab2> {
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
           ad.dispose();
         },
-        // Add other banner ad listener callbacks as needed.
       ),
     );
 
     _bannerAd.load();
-    // Initialize the banner timer
-    // bannerTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-    //   setState(() {
-    //     isBannerVisible = true;
-    //   });
-    // });
-    getCurrUserId();
   }
 
   getCurrUserId() async {
@@ -107,7 +69,6 @@ class _NotificationTab2State extends State<NotificationTab2> {
       currentuserphoto = preferences.getString("photo")!;
       userRole = preferences.getString("role")!;
       phoneNumber = preferences.getString("phone")!;
-      print("user role is $userRole");
     });
   }
 
@@ -115,8 +76,6 @@ class _NotificationTab2State extends State<NotificationTab2> {
   void dispose() {
     // Dispose the banner timer when the widget is disposed
     _bannerAd.dispose();
-    _interstitialAd?.dispose();
-    interstitialTimer?.cancel();
     bannerTimer?.cancel();
     super.dispose();
   }
@@ -140,44 +99,55 @@ class _NotificationTab2State extends State<NotificationTab2> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(
+                  return const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation(kPrimaryColor));
                 } else if (!snapshot.hasData ||
                     snapshot.data == null ||
                     snapshot.data!.size == 0) {
-                  return Center(
+                  return const Center(
                     child: Text("No data available"),
                   );
                 } else {
-                  List<DocumentSnapshot<Map<String, dynamic>>> documents =
-                      snapshot.data!.docs;
-                  documents
-                      .removeWhere((doc) => doc["userId"] == currentuserid);
-                  allUsersList = documents;
-                  print("Abadafite code");
-                  print(documents.length);
+                  final documents = snapshot.data!.docs;
+                  documents.removeWhere((doc) => doc["userId"] == currentuserid);
+                  allUsersList = documents.map((doc) {
+                    final data = doc.data();
+                    return {
+                      "name": data["name"],
+                      "time": data["createdAt"],
+                      "email": data["email"],
+                      "userId": data["userId"],
+                      "phone": data["phone"],
+                      "quizTitle": data["quizTitle"],
+                      "code": data["code"],
+                      "endTime": data.containsKey("endTime")
+                          ? data["endTime"]
+                          : "1684242113231",
+                      "docId": doc.reference.id.toString(),
+                    };
+                  }).toList();
+                  if (kDebugMode) {
+                    print("Abadafite code ${allUsersList.length}");
+                  }
                   return ListView.builder(
                     padding: const EdgeInsets.only(top: 16),
-                    itemCount: documents.length,
+                    itemCount: allUsersList.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
-                      final data = documents[index].data();
+                    final data = allUsersList[index];
                       return UsersNotificationList(
-                        name: data!["name"],
-                        // image: data["photoUrl"],
-                        time: data["createdAt"],
+                        name: data["name"],
+                        time: data["time"],
                         email: data["email"],
                         userId: data["userId"],
                         phone: data["phone"],
-                        // quizId: data["quizId"],
                         quizTitle: data["quizTitle"],
                         code: data["code"],
                         endTime: data.containsKey("endTime")
                             ? data["endTime"]
                             : "1684242113231",
-                        docId: documents[index].reference.id.toString(),
-                        // isQuiz: data["isQuiz"],
+                        docId: data['docId'],
                       );
                     },
                   );

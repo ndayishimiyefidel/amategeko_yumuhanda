@@ -64,7 +64,9 @@ class _SignUpState extends State<SignUp> {
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
         },
       ),
     );
@@ -75,7 +77,9 @@ class _SignUpState extends State<SignUp> {
       _interstitialAd!.show();
       _interstitialAd = null;
     } else {
-      print('InterstitialAd is not loaded yet.');
+      if (kDebugMode) {
+        print('InterstitialAd is not loaded yet.');
+      }
     }
   }
 
@@ -84,12 +88,15 @@ class _SignUpState extends State<SignUp> {
     super.initState();
     loadInterstitialAd();
     // Start the timer to show the interstitial ad every 4 minutes
-    interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
+    interstitialTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
       showInterstitialAd();
     });
 
-    print("Referral code");
-    print(widget.referralCode);
+
+    if (kDebugMode) {
+      print("Referral code");
+      print(widget.referralCode);
+    }
     _messaging.getToken().then((value) {
       fcmToken = value;
     });
@@ -101,7 +108,7 @@ class _SignUpState extends State<SignUp> {
         setState(() {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
           );
         });
       }
@@ -116,13 +123,17 @@ class _SignUpState extends State<SignUp> {
     preferences = await SharedPreferences.getInstance();
     setState(() {
       currentuserid = preferences.getString("uid")!;
-      print(currentuserid);
+      if (kDebugMode) {
+        print(currentuserid);
+      }
     });
   }
 
   Future<void> retrieveDeviceId() async {
     deviceId = await DeviceIdManager.getDeviceId();
-    print("Device ID: $deviceId");
+    if (kDebugMode) {
+      print("Device ID: $deviceId");
+    }
   }
 
   String sanitizeName(String name) {
@@ -151,9 +162,7 @@ class _SignUpState extends State<SignUp> {
         preferences = await SharedPreferences.getInstance();
         var firebaseUser = FirebaseAuth.instance.currentUser;
         //
-        showInterstitialAd();
-        //BEFORE CREATING A NEW ACCOUNT MAKE SURE THE DEVICE IS ALREADY REGISTERED YET.
-
+        //showInterstitialAd();
         final QuerySnapshot checkToken = await FirebaseFirestore.instance
             .collection("Users")
             .where("deviceId", isEqualTo: deviceId)
@@ -185,7 +194,8 @@ class _SignUpState extends State<SignUp> {
           if (firebaseUser != null) {
             final QuerySnapshot result = await FirebaseFirestore.instance
                 .collection("Users")
-                .where("uid", isEqualTo: firebaseUser!.uid)
+                // .where("uid", isEqualTo: firebaseUser!.uid)
+                .where("phone",isEqualTo: phoneNumber.trim())
                 .get();
 
             final List<DocumentSnapshot> documents = result.docs;
@@ -360,7 +370,9 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       name = val;
-                      print(name);
+                      if (kDebugMode) {
+                        print(name);
+                      }
                     },
                     validator: (nameValue) {
                       if (nameValue!.isEmpty) {
@@ -463,7 +475,7 @@ class _SignUpState extends State<SignUp> {
                 TextFieldContainer(
                   child: TextFormField(
                     controller: passwordEditingController,
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.phone,
                     textInputAction: TextInputAction.done,
                     onChanged: (val) {
                       password = val;
@@ -563,7 +575,7 @@ class _SignUpState extends State<SignUp> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return LoginScreen();
+                                    return const LoginScreen();
                                   },
                                 ),
                               );

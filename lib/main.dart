@@ -11,12 +11,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:upgrader/upgrader.dart';
-
 import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-      print('Handling a background message ${message.messageId}');
+      if (kDebugMode) {
+        print('Handling a background message ${message.messageId}');
+      }
   }
 
 void main() async {
@@ -50,7 +51,6 @@ Future<void> handleDeepLink(Uri? link) async {
       String? referralCode = link.queryParameters["referral"];
       if (referralCode != null && referralCode.isNotEmpty) {
         // Navigate to the SignUpScreen with the referral code
-        
         if (kDebugMode) {
           print("my referral");
           print(referralCode);

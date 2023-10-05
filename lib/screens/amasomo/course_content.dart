@@ -73,39 +73,36 @@ class _CourseContentState extends State<CourseContent> {
     }
   }
 
-  List<String> uploadedUrls = [];
+  String uploadedUrl = "";
   String downloadUrl = "";
   late String fileName;
 
-  Future<void> uploadFilesToFirebaseStorage() async {
-    List<File> files = [];
-    // Allow the user to select multiple audio files
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-      allowMultiple: true,
-    );
+Future<void> uploadFilesToFirebaseStorage() async {
+  // Allow the user to select a single audio file
+  FilePickerResult? result = await FilePicker.platform.pickFiles(
+    type: FileType.audio,
+  );
 
-    if (result != null && result.files.isNotEmpty) {
-      files = result.paths.map((path) => File(path!)).toList();
+  if (result != null && result.files.isNotEmpty) {
+    File file = File(result.files.single.path!);
+    fileName = 'audio/${path.basename(file.path)}';
+    final refs = FirebaseStorage.instance.ref().child(fileName);
+    uploadTask = refs.putFile(file);
 
-      // Upload each file to Firebase Storage
-      for (File file in files) {
-        // String fileName = path.basename(file.path);
-        fileName = 'audio/${path.basename(file.path)}';
-        final refs = FirebaseStorage.instance.ref().child(fileName);
-        UploadTask task = refs.putFile(file);
-        final snapshot = await task.whenComplete(() {});
-        final downloadUrl = await snapshot.ref.getDownloadURL();
-        setState(() {
-          uploadedUrls.add(downloadUrl);
-          print(downloadUrl);
+    await uploadTask!.whenComplete(() {});
+    final snapshot = await uploadTask!.whenComplete(() {});
+    final downloadUrl = await snapshot.ref.getDownloadURL();
 
-          ///save to firestore
-          saveAudioFiles();
-        });
-      }
-    }
+    setState(() {
+      uploadedUrl=downloadUrl.toString();
+      print(downloadUrl);
+    });
+
+    // Save the audio file to Firestore after uploading
+    saveAudioFiles();
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -272,6 +269,7 @@ class _CourseContentState extends State<CourseContent> {
       Map<String, String> courseMap = {
         "courseId": widget.courseId,
         'courseDesc': courseDesc,
+        "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
       };
       await databaseService
           .addCourseData(courseMap, widget.courseId)
@@ -290,28 +288,30 @@ class _CourseContentState extends State<CourseContent> {
     }
   }
 
-  Future<void> saveAudioFiles() async {
+Future<void> saveAudioFiles() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  Map<String, dynamic> courseMap = {
+    "courseId": widget.courseId,
+    "fileName": fileName,
+    'downloadUrl': uploadedUrl,
+     "createdAt": DateTime.now().millisecondsSinceEpoch.toString(), // Save the list directly
+  };
+
+  await databaseService.addCourseAudio(courseMap, widget.courseId).then((value) {
     setState(() {
-      _isLoading = true;
+      _isLoading = false;
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const AlertDialog(
+              content: Text("audio uploaded"),
+            );
+          });
     });
-    Map<String, String> courseMap = {
-      "courseId": widget.courseId,
-      "fileName": fileName,
-      'downloadUrl': '$uploadedUrls',
-    };
-    await databaseService
-        .addCourseAudio(courseMap, widget.courseId)
-        .then((value) {
-      setState(() {
-        _isLoading = false;
-        showDialog(
-            context: context,
-            builder: (context) {
-              return const AlertDialog(
-                content: Text("audio uploaded"),
-              );
-            });
-      });
-    });
-  }
+  });
+}
+
 }

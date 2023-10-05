@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/questions/add_question.dart';
 import 'package:amategeko/services/auth.dart';
@@ -76,14 +75,12 @@ class _NewQuizState extends State<NewQuiz> {
       if (value.size == 1) {
         setState(() {
           hasCode = true;
-          print(hasCode);
         });
       }
     });
   }
 
   getToken() async {
-    //delete quiz
     await FirebaseFirestore.instance
         .collection("Users")
         .where("role", isEqualTo: "Admin")
@@ -93,7 +90,6 @@ class _NewQuizState extends State<NewQuiz> {
         Map<String, dynamic> adminData = value.docs.first.data();
         userToken = adminData["fcmToken"];
         adminPhone = adminData["phone"];
-        print("Admin Token is  $userToken");
       }
     });
   }
@@ -181,10 +177,10 @@ class _NewQuizState extends State<NewQuiz> {
                               .get()
                               .then((value) {
                             // Cache the new data
-                            value.docs.forEach((doc) {
+                            for (var doc in value.docs) {
                               doc.reference
                                   .set(doc.data(), SetOptions(merge: true));
-                            });
+                            }
                           });
 
                           return QuizTile(
@@ -238,17 +234,8 @@ class _NewQuizState extends State<NewQuiz> {
     );
 
     _bannerAd!.load();
-    // Initialize the banner timer
-    // bannerTimer = Timer.periodic(const Duration(seconds: 300), (timer) {
-    //   setState(() {
-    //     isBannerVisible = true;
-    //   });
-    // });
-
-    ///update
 
     _messaging.getToken().then((value) {
-      print("My token is $value");
     });
     databaseService.getNewQuizData().then((value) async {
       setState(() {
@@ -396,11 +383,6 @@ class _NewQuizState extends State<NewQuiz> {
                                 ),
                               ),
                             ),
-                            // TextButton(
-                            //     onPressed: () {
-                            //       Navigator.of(context).pop();
-                            //     },
-                            //     child: const Text("Close"))
                           ],
                         );
                       });
@@ -481,7 +463,7 @@ class _NewQuizState extends State<NewQuiz> {
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: const Text("Close"))
+                          child: const Text("Okay"))
                     ],
                   );
                 });
@@ -489,7 +471,6 @@ class _NewQuizState extends State<NewQuiz> {
         });
       } else {
         setState(() {
-          print(value.size);
           isLoading = false;
           showDialog(
               context: context,
@@ -600,21 +581,21 @@ class _QuizTileState extends State<QuizTile> {
                       left: 20, right: 20, top: 10, bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
                       SizedBox(
                         height: size.height * 0.01,
                       ),
                       SizedBox(
                         width: double.infinity, // Full width
-                        height: size.height * 0.4,
+                        height: size.height * 0.1,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: ImageNetwork(
                             image: widget.imgurl.toString(),
                             imageCache: CachedNetworkImageProvider(
                                 widget.imgurl.toString()),
-                            height: size.height * 0.3,
+                            height: size.height * 0.1,
                             width: size.width * 0.9,
                             fitAndroidIos: BoxFit.cover,
                             fitWeb: BoxFitWeb.cover,

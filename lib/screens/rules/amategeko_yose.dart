@@ -433,6 +433,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
   @override
   void initState() {
     _messaging.getToken().then((value) {
+      // ignore: avoid_print
       print(value);
     });
     super.initState();
@@ -442,7 +443,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: Drawer(
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -472,7 +473,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },
@@ -495,7 +496,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
       body: Column(
         children: [
           documentsList(),
-          AdBannerWidget(),
+          const AdBannerWidget(),
         ],
       ),
       floatingActionButton: FloatingActionButton(

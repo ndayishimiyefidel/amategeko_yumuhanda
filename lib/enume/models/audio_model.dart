@@ -1,14 +1,11 @@
 class AudioModel {
-  String courseId;
+  final String courseId;
   final String courseAudioUrls;
-  String fileName;
-  bool isSelected;
-  String selectedAudioUrl;
+  final String fileName;
 
   AudioModel(
       {required this.courseId,
       required this.courseAudioUrls,
       required this.fileName,
-      this.isSelected = false,
-      required this.selectedAudioUrl});
+    });
 }

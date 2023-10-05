@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
@@ -10,7 +12,7 @@ import '../services/auth.dart';
 class ChatUsersList extends StatefulWidget {
   // final String secondaryText;
   final String name, role, image, time, userId, email, phone, password;
-  final referralCode;
+  final String? referralCode;
   final String? quizCode, deviceId;
 
   const ChatUsersList(
@@ -28,7 +30,7 @@ class ChatUsersList extends StatefulWidget {
       this.deviceId});
 
   @override
-  _ChatUsersListState createState() => _ChatUsersListState();
+State createState() => _ChatUsersListState();
 }
 
 class _ChatUsersListState extends State<ChatUsersList> {
@@ -118,8 +120,10 @@ class _ChatUsersListState extends State<ChatUsersList> {
       await firestore
           .collection('Users')
           .doc(widget.userId)
+          // ignore: avoid_print
           .update({'called': called}).then((value) => {print("Updated")});
     } catch (e) {
+      // ignore: avoid_print
       print("Error updating user's call status: $e");
       // Handle the error if needed
     }
@@ -136,7 +140,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
         if (userRole == "Admin" && widget.role == "Ambassador") {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return ViewReferrals(
-              referralCode: widget.referralCode,
+              referralCode: widget.referralCode.toString(),
               refUid: widget.userId,
             );
           }));
@@ -176,137 +180,139 @@ class _ChatUsersListState extends State<ChatUsersList> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(widget.name),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(widget.phone),
-                                      const SizedBox(
-                                        width: 80,
-                                      ),
-                                      widget.quizCode != "nocode"
-                                          ? SizedBox()
-                                          : IconButton(
-                                              onPressed: () async {
-                                                //     //indirect phone call
-                                                //     // launchUrl('tel://${widget.phone}' as Uri);
-                                                //     //direct phone call
-                                                bool hasBeenCalled =
-                                                    await _hasUserBeenCalled();
-                                                if (!hasBeenCalled) {
-                                                  bool? confirmed =
-                                                      await _showCallConfirmationDialog(
-                                                          context);
-                                                  if (confirmed == true) {
-                                                    await FlutterPhoneDirectCaller
-                                                        .callNumber(
-                                                            widget.phone);
-                                                    await _setUserCalled(); // Set the user as called after the call is made
-                                                    setState(
-                                                        () {}); // Update the state to reflect the change
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(widget.name),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(widget.phone),
+                                        const SizedBox(
+                                          width: 80,
+                                        ),
+                                        widget.quizCode != "nocode"
+                                            ? const SizedBox()
+                                            : IconButton(
+                                                onPressed: () async {
+                                                  //     //indirect phone call
+                                                  //     // launchUrl('tel://${widget.phone}' as Uri);
+                                                  //     //direct phone call
+                                                  bool hasBeenCalled =
+                                                      await _hasUserBeenCalled();
+                                                  if (!hasBeenCalled) {
+                                                    bool? confirmed =
+                                                        await _showCallConfirmationDialog(
+                                                            context);
+                                                    if (confirmed == true) {
+                                                      await FlutterPhoneDirectCaller
+                                                          .callNumber(
+                                                              widget.phone);
+                                                      await _setUserCalled(); // Set the user as called after the call is made
+                                                      setState(
+                                                          () {}); // Update the state to reflect the change
+                                                    }
+                                                  } else {
+                                                    // User has been called before, show a message or perform any other action
+                                                    // as needed.
+                                                    bool? confirmed =
+                                                        await _showCallConfirmationDialog(
+                                                            context);
+                                                    if (confirmed == true) {
+                                                      await FlutterPhoneDirectCaller
+                                                          .callNumber(
+                                                              widget.phone);
+                                                      await _setUserCalledStatus(
+                                                          true); // Set the user as called after the call is made
+                                                      setState(
+                                                          () {}); // Update the state to reflect the change
+                                                    }
                                                   }
-                                                } else {
-                                                  // User has been called before, show a message or perform any other action
-                                                  // as needed.
-                                                  bool? confirmed =
-                                                      await _showCallConfirmationDialog(
-                                                          context);
-                                                  if (confirmed == true) {
-                                                    await FlutterPhoneDirectCaller
-                                                        .callNumber(
-                                                            widget.phone);
-                                                    await _setUserCalledStatus(
-                                                        true); // Set the user as called after the call is made
-                                                    setState(
-                                                        () {}); // Update the state to reflect the change
-                                                  }
-                                                }
-                                              },
-                                              icon: FutureBuilder<bool>(
-                                                future: _hasUserBeenCalled(),
-                                                // Update FutureBuilder here
-                                                builder: (context, snapshot) {
-                                                  final hasBeenCalled =
-                                                      snapshot.data ?? false;
-                                                  final callColor =
-                                                      hasBeenCalled
-                                                          ? Colors.grey
-                                                          : Colors.blueAccent;
-                                                  return Icon(
-                                                    Icons.call,
-                                                    size: 30,
-                                                    color: callColor,
-                                                    weight: 30,
-                                                  );
                                                 },
+                                                icon: FutureBuilder<bool>(
+                                                  future: _hasUserBeenCalled(),
+                                                  // Update FutureBuilder here
+                                                  builder: (context, snapshot) {
+                                                    final hasBeenCalled =
+                                                        snapshot.data ?? false;
+                                                    final callColor =
+                                                        hasBeenCalled
+                                                            ? Colors.grey
+                                                            : Colors.blueAccent;
+                                                    return Icon(
+                                                      Icons.call,
+                                                      size: 30,
+                                                      color: callColor,
+                                                      weight: 30,
+                                                    );
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  widget.email,
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade500,
-                                      fontStyle: FontStyle.italic),
-                                ),
-                                Text(
-                                  "password: ${widget.password}",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade500,
-                                      fontStyle: FontStyle.italic),
-                                ),
-                                widget.role != "User"
-                                    ? Text(
-                                        "User Type: ${widget.role}",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade500,
-                                            fontStyle: FontStyle.italic),
-                                      )
-                                    : const SizedBox(),
-                                widget.quizCode == "nocode"
-                                    ? const SizedBox()
-                                    : Text(
-                                        "Quiz Code: ${widget.quizCode}",
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.blueAccent,
-                                            fontStyle: FontStyle.italic),
-                                      ),
-                                Text(
-                                  "Device Id: ${widget.deviceId ?? "no device"}",
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.redAccent,
-                                      fontStyle: FontStyle.normal),
-                                ),
-                                // widget.referralCode.isEmpty
-                                //     ? const SizedBox()
-                                //     : Expanded(
-                                //         child: Text(
-                                //           "${widget.referralCode}",
-                                //           style: TextStyle(
-                                //               fontSize: 14,
-                                //               color: Colors.grey.shade500,
-                                //               fontStyle: FontStyle.italic),
-                                //         ),
-                                //       ),
-                                Text(
-                                  "Joined date: $dateTimeFormat",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade500,
-                                      fontStyle: FontStyle.italic),
-                                ),
-                              ],
+                                  Text(
+                                    widget.email,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade500,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                  Text(
+                                    "password: ${widget.password}",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade500,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                  widget.role != "User"
+                                      ? Text(
+                                          "User Type: ${widget.role}",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey.shade500,
+                                              fontStyle: FontStyle.italic),
+                                        )
+                                      : const SizedBox(),
+                                  widget.quizCode == "nocode"
+                                      ? const SizedBox()
+                                      : Text(
+                                          "Quiz Code: ${widget.quizCode}",
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.blueAccent,
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                  Text(
+                                    "Device Id: ${widget.deviceId ?? "no device"}",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.redAccent,
+                                        fontStyle: FontStyle.normal),
+                                  ),
+                                  // widget.referralCode.isEmpty
+                                  //     ? const SizedBox()
+                                  //     : Expanded(
+                                  //         child: Text(
+                                  //           "${widget.referralCode}",
+                                  //           style: TextStyle(
+                                  //               fontSize: 14,
+                                  //               color: Colors.grey.shade500,
+                                  //               fontStyle: FontStyle.italic),
+                                  //         ),
+                                  //       ),
+                                  Text(
+                                    "Joined date: $dateTimeFormat",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade500,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           IconButton(

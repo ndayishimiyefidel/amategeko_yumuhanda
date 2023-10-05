@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:amategeko/screens/quizzes/quizzes.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -11,8 +12,8 @@ import '../homepages/notificationtab.dart';
 class Results extends StatefulWidget {
   final int correct, incorrect, total;
 
-  Results(
-      {required this.correct, required this.incorrect, required this.total});
+  const Results(
+      {super.key, required this.correct, required this.incorrect, required this.total});
 
   @override
   State<Results> createState() => _ResultsState();
@@ -33,7 +34,9 @@ class _ResultsState extends State<Results> {
           _interstitialAd = ad;
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('InterstitialAd failed to load: $error');
+          }
         },
       ),
     );
@@ -44,18 +47,24 @@ class _ResultsState extends State<Results> {
       _interstitialAd!.show();
       _interstitialAd = null;
     } else {
-      print('InterstitialAd is not loaded yet.');
+      if (kDebugMode) {
+        print('InterstitialAd is not loaded yet.');
+      }
     }
   }
 
   _checkFailed() {
-    double pass = (widget.correct + widget.incorrect) / 2 + 2;
+    // double pass = (widget.correct + widget.incorrect) / 2 + 2;
     if (widget.correct < 12) {
-      print("failed");
+      if (kDebugMode) {
+        print("failed");
+      }
       status = "Failed";
     } else {
       status = "Passed";
-      print("passed");
+      if (kDebugMode) {
+        print("passed");
+      }
     }
   }
 
@@ -97,7 +106,7 @@ class _ResultsState extends State<Results> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },

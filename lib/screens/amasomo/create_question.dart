@@ -30,10 +30,12 @@ class _CreateQuestionState extends State<CreateQuestion> {
   String option3 = "", option4 = "";
   String questionUrl = "";
   String correctAnswer = "";
+  String explainedText="";
 
   //adding controller
   final TextEditingController questionController = TextEditingController();
   final TextEditingController correctController = TextEditingController();
+  final TextEditingController  questionExplainedController = TextEditingController();
   final TextEditingController option1Controller = TextEditingController();
   final TextEditingController option2Controller = TextEditingController();
   final TextEditingController option3Controller = TextEditingController();
@@ -94,6 +96,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
         "option4": option4,
         "quizPhotoUrl": questionUrl,
         "correctAnswer": correctAnswer,
+        "explainedText":explainedText,
       };
       await databaseService
           .addCourseQuestionData(questionMap, widget.courseId)
@@ -254,8 +257,30 @@ class _CreateQuestionState extends State<CreateQuestion> {
             input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
       ),
     );
+
+    final explaineField = TextFieldContainer(
+      child: TextFormField(
+        autofocus: false,
+        controller: questionExplainedController,
+        keyboardType: TextInputType.text,
+        onSaved: (value) {
+          correctController.text = value!;
+        },
+        textInputAction: TextInputAction.done,
+        decoration: const InputDecoration(
+          hintText: "Andika icyo igazeti ivuaga",
+          border: InputBorder.none,
+        ),
+        onChanged: (val) {
+          explainedText = val;
+        },
+        autovalidateMode: AutovalidateMode.disabled,
+        // validator: (input) =>
+        //     input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
+      ),
+    );
     final addquestionBtn = Container(
-      width: size.width * 0.3,
+      width: size.width * 0.4,
       height: size.height * 0.05,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
@@ -394,9 +419,9 @@ class _CreateQuestionState extends State<CreateQuestion> {
                                         top: 0.0, right: 170.0)
                                     : const EdgeInsets.only(
                                         top: 150.0, right: 120.0),
-                                child: Row(
+                                child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     CircleAvatar(
                                       backgroundColor: Colors.red,
                                       radius: 25.0,
@@ -432,6 +457,10 @@ class _CreateQuestionState extends State<CreateQuestion> {
                     height: size.height * 0.03,
                   ),
                   correctField,
+                  SizedBox(
+                    height: size.height * 0.05,
+                  ),
+                  explaineField,
                   SizedBox(
                     height: size.height * 0.05,
                   ),
