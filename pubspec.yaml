@@ -2,7 +2,7 @@ name: amategeko
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+29
+version: 1.0.0+34
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -68,6 +68,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/files/
+    - assets/examimages/
   fonts:
     - family: Lato
       fonts:

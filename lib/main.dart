@@ -1,7 +1,9 @@
 import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:amategeko/screens/SplashScreen.dart';
 import 'package:amategeko/utils/constants.dart';
+
 import 'package:amategeko/utils/utils.dart';
+import 'package:amategeko/widgets/exam_img_widget';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -112,7 +114,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isAdShown = false;
-
+ final String img=Images.quiz10Image;
   @override
   void initState() {
     super.initState();

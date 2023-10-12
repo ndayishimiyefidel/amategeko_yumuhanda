@@ -367,7 +367,7 @@ class _SignInState extends State<SignIn> {
         isLoading = true;
       });
       preferences = await SharedPreferences.getInstance();
-      //showInterstitialAd();
+      showInterstitialAd();
       FirebaseFirestore.instance
           .collection("Users")
           .where("password", isEqualTo: password)

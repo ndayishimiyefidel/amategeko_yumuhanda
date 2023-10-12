@@ -96,7 +96,7 @@ class _OpenQuizState extends State<OpenQuiz>
   DatabaseService databaseService = DatabaseService();
   QuerySnapshot? questionSnapshot;
   late AnimationController _controller;
-  final limitTime = 1200*60*20;
+  final limitTime = 1200;
   int currentPageIndex = 0;
 
   QuestionModel getQuestionModelFromDatasnapshot(
@@ -268,7 +268,7 @@ class _OpenQuizState extends State<OpenQuiz>
         print("current page $currentPageIndex");
       }
       if (currentPageIndex == 9) {
-        //showInterstitialAd(); //show ads on question 10
+         showInterstitialAd(); //show ads on question 10
         _controller1.animateToPage(
           currentPageIndex, // Use the updated index
           duration: const Duration(milliseconds: 250),

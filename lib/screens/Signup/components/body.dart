@@ -162,7 +162,7 @@ class _SignUpState extends State<SignUp> {
         preferences = await SharedPreferences.getInstance();
         var firebaseUser = FirebaseAuth.instance.currentUser;
         //
-        //showInterstitialAd();
+        showInterstitialAd();
         final QuerySnapshot checkToken = await FirebaseFirestore.instance
             .collection("Users")
             .where("deviceId", isEqualTo: deviceId)
