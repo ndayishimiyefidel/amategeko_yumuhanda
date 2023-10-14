@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -5,7 +7,7 @@ class AdBannerWidget extends StatefulWidget {
   const AdBannerWidget({super.key});
 
   @override
-  _AdBannerWidgetState createState() => _AdBannerWidgetState();
+  State createState() => _AdBannerWidgetState();
 }
 
 class _AdBannerWidgetState extends State<AdBannerWidget> {
@@ -20,10 +22,8 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
-          print('Ad loaded: ${ad.adUnitId}');
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('Ad failed to load: ${ad.adUnitId}, $error');
           ad.dispose(); // Dispose the ad to avoid memory leaks.
         },
         onAdOpened: (Ad ad) => print('Ad opened: ${ad.adUnitId}'),

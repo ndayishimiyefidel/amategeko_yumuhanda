@@ -8,8 +8,10 @@ import 'create_quiz.dart';
 import 'old_quiz.dart';
 
 class OnlyQuiz extends StatefulWidget {
+  const OnlyQuiz({super.key});
+
   @override
-  _OnlyQuizState createState() => _OnlyQuizState();
+State createState() => _OnlyQuizState();
 }
 
 class _OnlyQuizState extends State<OnlyQuiz>
@@ -19,7 +21,7 @@ class _OnlyQuizState extends State<OnlyQuiz>
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: scaffoldKey,
-      drawer: Drawer(
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -49,7 +51,7 @@ class _OnlyQuizState extends State<OnlyQuiz>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },

@@ -61,7 +61,6 @@ class _CourseContentsState extends State<CourseContents> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

@@ -14,7 +14,7 @@ class RegisterAmbassadorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: Drawer(
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),

@@ -334,14 +334,14 @@ class DataSearch extends SearchDelegate {
 
     if (query.isNotEmpty) {
       suggestionList = [];
-      userList.forEach((element) {
+      for (var element in userList) {
         if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["email"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["password"].toLowerCase().startsWith(query.toLowerCase())) {
           suggestionList.add(element);
         }
-      });
+      }
     }
 
     return ListView.builder(

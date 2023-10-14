@@ -152,7 +152,7 @@ class _GroupListState extends State<GroupList> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: Drawer(
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -182,7 +182,7 @@ class _GroupListState extends State<GroupList> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },
@@ -585,7 +585,7 @@ class _FileTileState extends State<FileTile> {
         .where("isQuiz", isEqualTo: false)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         print(doc.reference.id);
         FirebaseFirestore.instance
             .collection("Quiz-codes")
@@ -617,7 +617,7 @@ class _FileTileState extends State<FileTile> {
             });
           }
         });
-      });
+      }
     });
   }
 

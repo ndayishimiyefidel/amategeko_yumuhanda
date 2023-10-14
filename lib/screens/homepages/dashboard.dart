@@ -20,7 +20,6 @@ import '../groups/group_list.dart';
 import '../irembo/abiyandishije.dart';
 import '../irembo/irembo_iyandikishe.dart';
 import '../quizzes/exams.dart';
-import '../quizzes/quiz.dart';
 import '../rules/amategeko_yose.dart';
 import 'noficationtab1.dart';
 import 'notificationtab.dart';
@@ -29,7 +28,7 @@ class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-State createState() => _HomeState();
+  State createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
@@ -106,7 +105,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
       _getReferralCode().then((code) {
-         referralCode = code;
+        referralCode = code;
       });
     });
   }
@@ -116,11 +115,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     super.initState();
     getCurrUserData();
     checkInternetConnection();
-
-    // Start the timer to show the interstitial ad every 4 minutes
-    // interstitialTimer = Timer.periodic(const Duration(minutes: 2), (timer) {
-    //   showInterstitialAd();
-    // });
 
     animationController =
         AnimationController(duration: const Duration(seconds: 3), vsync: this);
@@ -237,39 +231,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              if (_isConnected) {
-                                showInterstitialAd();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) => Exams(),
-                                  ),
-                                );
-                              } else if (_interstitialAd == null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) => Exams(),
-                                  ),
-                                );
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) => Exams(),
-                                  ),
-                                );
-                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) => const Exams(),
+                                ),
+                              );
                             },
                             child: const DashboardCard(
-                              name: "New Exam",
+                              name: "Exams",
                               imgpath: "exam.png",
                             ),
                           ),
                         ),
                         Transform(
                           transform: Matrix4.translationValues(
-                              delayedAnimation.value * width, 0, 0),
+                              muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
                               if (_isConnected) {
@@ -278,7 +255,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        OnlyQuiz(),
+                                        const Abiyandikishe(),
                                   ),
                                 );
                               } else if (_interstitialAd == null) {
@@ -286,7 +263,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        OnlyQuiz(),
+                                        const Abiyandikishe(),
                                   ),
                                 );
                               } else {
@@ -294,17 +271,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        OnlyQuiz(),
+                                        const Abiyandikishe(),
                                   ),
                                 );
                               }
                             },
                             child: const DashboardCard(
-                              name: "Quiz",
-                              imgpath: "quizzez.png",
+                              name: "Abiyandikishe",
+                              imgpath: "irembo.jpg",
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -639,7 +616,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         userRole == "Admin"
-                            ? Transform(
+                            ? Container()
+                            : Transform(
                                 transform: Matrix4.translationValues(
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
@@ -650,7 +628,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         context,
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              const Abiyandikishe(),
+                                              const AllCourse(),
                                         ),
                                       );
                                     } else if (_interstitialAd == null) {
@@ -658,7 +636,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         context,
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              const Abiyandikishe(),
+                                              const AllCourse(),
                                         ),
                                       );
                                     } else {
@@ -666,47 +644,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         context,
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
-                                              const Abiyandikishe(),
+                                              const AllCourse(),
                                         ),
                                       );
-                                    }
-                                  },
-                                  child: const DashboardCard(
-                                    name: "Abiyandikishe",
-                                    imgpath: "irembo.jpg",
-                                  ),
-                                ),
-                              )
-                            :Transform(
-                                transform: Matrix4.translationValues(
-                                    muchDelayedAnimation.value * width, 0, 0),
-                                child: Bouncing(
-                                  onPress: () {
-                                    if (_isConnected) {
-                                      showInterstitialAd();
-                                      Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            const AllCourse(),
-                                      ),
-                                    );
-                                    } else if (_interstitialAd == null) {
-                                      Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            const AllCourse(),
-                                      ),
-                                    );
-                                    } else {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            const AllCourse(),
-                                      ),
-                                    );
                                     }
                                   },
                                   child: const DashboardCard(

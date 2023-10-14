@@ -17,7 +17,7 @@ class AddQuestion extends StatefulWidget {
   final bool isNew;
 
   const AddQuestion(
-      {required this.quizId, required this.quizTitle, required this.isNew});
+      {super.key, required this.quizId, required this.quizTitle, required this.isNew});
 
   @override
   State<AddQuestion> createState() => _AddQuestionState();
@@ -84,7 +84,6 @@ class _AddQuestionState extends State<AddQuestion> {
         uploadTask = refs.putFile(pickedFile!);
         final snapshot = await uploadTask!.whenComplete(() {});
         final downloadlink = await snapshot.ref.getDownloadURL();
-        print("download link $downloadlink");
         questionUrl = downloadlink.toString();
       }
       Map<String, String> questionMap = {
@@ -105,7 +104,6 @@ class _AddQuestionState extends State<AddQuestion> {
           .where("quizId", isEqualTo: widget.quizId)
           .get()
           .then((querySnapshot) async {
-        print("Total question in single Quiz:  ${querySnapshot.size}");
         totQuestion = querySnapshot.size;
 
         ///19<20
@@ -393,7 +391,7 @@ class _AddQuestionState extends State<AddQuestion> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  AdBannerWidget(),
+                  const AdBannerWidget(),
                   Text(
                     "QUIZ TITLE : ${widget.quizTitle}",
                     style: const TextStyle(
@@ -416,25 +414,23 @@ class _AddQuestionState extends State<AddQuestion> {
                         children: <Widget>[
                           (pickedFile == null)
                               ? Container()
-                              : Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display new updated image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display new updated image
-                                          child: Image.file(
-                                            pickedFile!,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  ),
-                                ),
+                              : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
+                                      // display new updated image
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display new updated image
+                                      child: Image.file(
+                                        pickedFile!,
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(
@@ -443,9 +439,9 @@ class _AddQuestionState extends State<AddQuestion> {
                                         top: 0.0, right: 170.0)
                                     : const EdgeInsets.only(
                                         top: 150.0, right: 120.0),
-                                child: Row(
+                                child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     CircleAvatar(
                                       backgroundColor: Colors.red,
                                       radius: 25.0,

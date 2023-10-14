@@ -15,7 +15,7 @@ class SplashScreen extends StatefulWidget {
   final VoidCallback onAdShown;
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen>
@@ -54,7 +54,6 @@ class _SplashScreenState extends State<SplashScreen>
     userRole = preferences.getString("role");
 
     fcmToken = await _messaging.getToken();
-    print(currentuserid);
 
     if (currentuserid != null) {
       FirebaseFirestore.instance

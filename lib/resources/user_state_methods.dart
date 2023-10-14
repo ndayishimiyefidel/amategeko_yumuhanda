@@ -33,7 +33,7 @@ class UserStateMethods {
     // await preferences.clear();
 
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
         (route) => false);
   }
 }

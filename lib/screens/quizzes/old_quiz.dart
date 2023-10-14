@@ -73,7 +73,6 @@ class _OldQuizState extends State<OldQuiz> {
         Map<String, dynamic> adminData = value.docs.first.data();
         userToken = adminData["fcmToken"];
         adminPhone = adminData["phone"];
-        print("Admin Token is  $userToken");
       }
     });
   }
@@ -168,7 +167,6 @@ class _OldQuizState extends State<OldQuiz> {
     });
 
     _messaging.getToken().then((value) {
-      print("My token is $value");
     });
     databaseService.getOldQuizData().then((value) async {
       setState(() {
@@ -201,7 +199,6 @@ class _OldQuizState extends State<OldQuiz> {
       body: Column(
         children: [
           quizList(),
-          if (isBannerVisible && isBannerLoaded) BannerAdWidget(ad: _bannerAd),
         ],
       ),
     );
@@ -356,6 +353,7 @@ class _QuizTileState extends State<QuizTile> {
                                         quizId: widget.quizId,
                                         title: widget.title,
                                         quizNumber: widget.index + 1,
+                                        questions: const [],
                                       );
                                     },
                                   ),
@@ -524,6 +522,7 @@ class _QuizTileState extends State<QuizTile> {
                                               quizId: widget.quizId,
                                               title: widget.title,
                                               quizNumber: widget.index + 1,
+                                              questions: const [],
                                             );
                                           },
                                         ),
@@ -662,7 +661,7 @@ class _QuizTileState extends State<QuizTile> {
         .collection("QNA")
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         doc.reference.delete().then((value) {
           //question delete
           setState(() {
@@ -683,7 +682,7 @@ class _QuizTileState extends State<QuizTile> {
                 });
           });
         });
-      });
+      }
       FirebaseFirestore.instance.collection("Quizmaker").doc(docId).delete();
     });
   }
@@ -698,13 +697,12 @@ class _QuizTileState extends State<QuizTile> {
         .where("isQuiz", isEqualTo: true)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        print(doc.reference.id);
+      for (var doc in querySnapshot.docs) {
         FirebaseFirestore.instance
             .collection("Quiz-codes")
             .doc(doc.reference.id)
             .update({"isOpen": true});
-      });
+      }
       if (querySnapshot.size == 1) {
         setState(() {
           _isLoading = false;
@@ -716,6 +714,7 @@ class _QuizTileState extends State<QuizTile> {
                   quizId: widget.quizId,
                   title: widget.title,
                   quizNumber: widget.index + 1,
+                  questions: const [],
                 );
               },
             ),

@@ -38,7 +38,7 @@ class _PrayerState extends State<Prayer> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },

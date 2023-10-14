@@ -174,15 +174,12 @@ class _ReadAudioState extends State<ReadAudio> {
                         StreamBuilder<Duration?>(
                           stream: _audioPlayer.durationStream,
                           builder: (context, snapshot) {
-                            final duration = snapshot.data ?? Duration.zero;
                             return StreamBuilder<Duration>(
                               stream: _audioPlayer.positionStream,
                               builder: (context, snapshot) {
-                                final position = snapshot.data ?? Duration.zero;
                                 return Text(
                                   (selectedIndex == index &&
-                                          isPlayingList[index] &&
-                                          duration != null)
+                                          isPlayingList[index])
                                       ? formatTime(positions[index])
                                       : formatTime(durations[index]),
                                 );
@@ -190,7 +187,7 @@ class _ReadAudioState extends State<ReadAudio> {
                             );
                           },
                         ),
-                        
+
                        widget.userRole=="Admin" ? IconButton(
                           icon: const Icon(
                             Icons.delete,

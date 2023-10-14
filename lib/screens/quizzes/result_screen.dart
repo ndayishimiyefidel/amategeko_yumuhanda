@@ -157,7 +157,7 @@ class _ResultsState extends State<Results> {
                 onPressed: () {
                   showInterstitialAd();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Quizzes()));
+                      MaterialPageRoute(builder: (context) => const Quizzes()));
                 },
                 child: const Text("Go Home"),
               )

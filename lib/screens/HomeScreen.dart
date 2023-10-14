@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison, avoid_print
+
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,7 +7,6 @@ import 'package:collection/collection.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../enume/user_state.dart';
@@ -85,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       final code = codeData?["code"];
 
       if (endTime is int && now >= endTime && code != "") {
-        print("update data");
         batch.update(quizCodesRef.doc(docId), {"code": ""});
       }
     }
@@ -135,6 +135,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 userRole: widget.userRole)
             : print("Detached State");
         break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
+        break;
     }
   }
 
@@ -177,7 +180,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
     const Home(), //index 0
-    Quizzes(), //index 1
+    const Quizzes(), //index 1
     const Notifications(), //index 2// index 3
     const AmategekoYose(), //index 4
     UserSettings(), //index 5

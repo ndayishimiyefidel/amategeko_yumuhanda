@@ -80,11 +80,9 @@ class _CreateQuizState extends State<CreateQuiz> {
 
         final snapshot = await uploadTask!.whenComplete(() {});
         final downloadlink = await snapshot.ref.getDownloadURL();
-        print("download link $downloadlink");
         quizUrl = downloadlink.toString();
       }
 
-      print("download link $quizUrl");
 
       Map<String, String> quizMap = {
         "quizId": quizId,
@@ -138,7 +136,6 @@ class _CreateQuizState extends State<CreateQuiz> {
         ),
         onChanged: (val) {
           quizPrice = val;
-          print(quizPrice);
         },
       ),
     );
@@ -198,7 +195,6 @@ class _CreateQuizState extends State<CreateQuiz> {
         onChanged: (val) {
           setState(() {
             _selectedType = val as String;
-            print(_selectedType);
             if (_selectedType == "Free") {}
           });
         },
@@ -263,7 +259,7 @@ class _CreateQuizState extends State<CreateQuiz> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },
@@ -319,68 +315,64 @@ class _CreateQuizState extends State<CreateQuiz> {
                       child: Stack(
                         children: <Widget>[
                           (pickedFile == null)
-                              ? Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display already existing image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display already existing image
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                              width: 200.0,
-                                              height: 200.0,
-                                              padding:
-                                                  const EdgeInsets.all(20.0),
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                strokeWidth: 2.0,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                            Color>(
-                                                        Colors.lightBlueAccent),
-                                              ),
-                                            ),
-                                            imageUrl:
-                                                "https://media.gettyimages.com/id/1311206139/vector/stop-sign.jpg?s=612x612&w=gi&k=20&c=LLieTSmvLgus4NJFlsiGoL3P7qTYO3WNMql0SF7uOZA=",
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  ),
-                                )
-                              : Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display new updated image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display new updated image
-                                          child: Image.file(
-                                            pickedFile!,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  ),
-                                ),
+                              ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
+                                      // display already existing image
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display already existing image
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          width: 200.0,
+                                          height: 200.0,
+                                          padding:
+                                              const EdgeInsets.all(20.0),
+                                          child:
+                                              const CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<
+                                                        Color>(
+                                                    Colors.lightBlueAccent),
+                                          ),
+                                        ),
+                                        imageUrl:
+                                            "https://media.gettyimages.com/id/1311206139/vector/stop-sign.jpg?s=612x612&w=gi&k=20&c=LLieTSmvLgus4NJFlsiGoL3P7qTYO3WNMql0SF7uOZA=",
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              )
+                              : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
+                                      // display new updated image
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display new updated image
+                                      child: Image.file(
+                                        pickedFile!,
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              ),
                           GestureDetector(
                             onTap: selectsFile,
-                            child: Padding(
-                                padding: const EdgeInsets.only(
+                            child: const Padding(
+                                padding: EdgeInsets.only(
                                     top: 150.0, right: 120.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     CircleAvatar(
                                       backgroundColor: Colors.red,
                                       radius: 25.0,
@@ -445,7 +437,7 @@ class _CreateQuizState extends State<CreateQuiz> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return Quizzes();
+                                return const Quizzes();
                               },
                             ),
                           );

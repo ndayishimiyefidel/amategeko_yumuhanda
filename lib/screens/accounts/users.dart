@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:amategeko/screens/homepages/usernotification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -112,10 +111,10 @@ class _AllUsersState extends State<AllUsers>
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
                           ),
-                          child: TabBarView(
+                          child: const TabBarView(
                             children: <Widget>[
                               UserList100(),
-                              const UserList(),
+                              UserList(),
                             ],
                           ),
                         ),

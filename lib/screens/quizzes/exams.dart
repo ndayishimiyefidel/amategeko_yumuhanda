@@ -8,8 +8,10 @@ import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
 
 class Exams extends StatefulWidget {
+  const Exams({super.key});
+
   @override
-  _ExamsState createState() => _ExamsState();
+  State createState() => _ExamsState();
 }
 
 class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
@@ -18,7 +20,7 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: scaffoldKey,
-      drawer: Drawer(
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -48,7 +50,7 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },

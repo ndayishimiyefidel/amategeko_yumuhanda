@@ -12,12 +12,12 @@ class AllAmbassadors extends StatefulWidget {
   const AllAmbassadors({super.key});
 
   @override
-  _AllAmbassadorsState createState() => _AllAmbassadorsState();
+State createState() => _AllAmbassadorsState();
 }
 
 class _AllAmbassadorsState extends State<AllAmbassadors>
     with SingleTickerProviderStateMixin {
-  var allUsersList;
+  var allUsersList=[];
   String? currentuserid;
   String? currentusername;
   String? currentuserphoto;
@@ -28,11 +28,11 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       floatingActionButton: buildFloatingActionButton(),
-      key: _scaffoldKey,
-      drawer: Drawer(
+      key: scaffoldKey,
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -40,7 +40,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
         leading: IconButton(
           color: Colors.white,
           onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
+            scaffoldKey.currentState!.openDrawer();
           },
           icon: const Icon(
             Icons.menu,
@@ -111,7 +111,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
                         return const Center(child: Text("No ambassador"));
                       } else {
                         snapshot.data!.docs.removeWhere(
-                            (i) => i["uid" ?? ''] == currentuserid);
+                            (i) => i["uid"] == currentuserid);
                         allUsersList = snapshot.data!.docs;
 
                         return SizedBox(
@@ -139,9 +139,6 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
                                         ? quizData[0]["code"]
                                         : "nocode"; // Get the quiz code from the first document in the quiz data.
 
-                                    print(snapshot.data!.docs[index]["phone"]);
-                                    print(snapshot.data!.docs[index]
-                                        ["referralCode"]);
                                     return ChatUsersList(
                                       name: snapshot.data!.docs[index]["name"],
                                       image: snapshot.data!.docs[index]
@@ -204,7 +201,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
                             );
                           } else {
                             snapshot.data!.docs.removeWhere(
-                                (i) => i["uid" ?? ''] == currentuserid);
+                                (i) => i["uid"] == currentuserid);
                             allUsersList = snapshot.data!.docs;
                             return ListView.builder(
                               padding: const EdgeInsets.only(top: 16, left: 20),
@@ -341,14 +338,14 @@ class DataSearch extends SearchDelegate {
 
     if (query.isNotEmpty) {
       suggestionList = [];
-      userList.forEach((element) {
+      for (var element in userList) {
         if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["email"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["password"].toLowerCase().startsWith(query.toLowerCase())) {
           suggestionList.add(element);
         }
-      });
+      }
     }
     return ListView.builder(
         itemBuilder: (context, index) => ListTile(

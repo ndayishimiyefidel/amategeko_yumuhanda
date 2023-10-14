@@ -9,8 +9,10 @@ import 'create_quiz.dart';
 import 'old_quiz.dart';
 
 class Quizzes extends StatefulWidget {
+  const Quizzes({super.key});
+
   @override
-  _QuizzesState createState() => _QuizzesState();
+ State createState() => _QuizzesState();
 }
 
 class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
@@ -19,7 +21,7 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: scaffoldKey,
-      drawer: Drawer(
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -49,7 +51,7 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },
@@ -79,20 +81,18 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 10,
                     ),
-                    child: Container(
-                      child: const TabBar(
-                        labelColor: Colors.black,
-                        unselectedLabelColor: Colors.black26,
-                        indicatorColor: Colors.black,
-                        tabs: [
-                          Tab(text: 'Exam'),
-                          Tab(text: 'Quiz'),
-                        ],
-                      ),
+                    child: TabBar(
+                      labelColor: Colors.black,
+                      unselectedLabelColor: Colors.black26,
+                      indicatorColor: Colors.black,
+                      tabs: [
+                        Tab(text: 'Exam'),
+                        Tab(text: 'Quiz'),
+                      ],
                     ),
                   ),
                   Container(

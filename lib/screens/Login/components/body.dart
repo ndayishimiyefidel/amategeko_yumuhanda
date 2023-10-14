@@ -24,7 +24,7 @@ class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
   @override
-  _SignInState createState() => _SignInState();
+  State createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
@@ -122,7 +122,7 @@ class _SignInState extends State<SignIn> {
       context,
       MaterialPageRoute(
         builder: (context) {
-          return SignUpScreen();
+          return const SignUpScreen();
         },
       ),
     );
@@ -296,7 +296,7 @@ class _SignInState extends State<SignIn> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) {
-                                  return SignUpScreen();
+                                  return const SignUpScreen();
                                 },
                               ),
                             );

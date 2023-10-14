@@ -13,9 +13,9 @@ import '../homepages/notificationtab.dart';
 
 class UploadDocuments extends StatefulWidget {
   final bool isNew;
-  final documentId;
+  final String? documentId;
 
-  final filename;
+  final String? filename;
 
   const UploadDocuments(
       {Key? key, required this.isNew, this.documentId, this.filename})
@@ -191,7 +191,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },
@@ -262,7 +262,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
                                       Text(
                                         widget.isNew == true
                                             ? "Pick PDF File"
-                                            : widget.filename,
+                                            : widget.filename.toString(),
                                         style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 18,
@@ -295,12 +295,12 @@ class _UploadDocumentsState extends State<UploadDocuments> {
                                 ),
                           GestureDetector(
                             onTap: selectsFile,
-                            child: Padding(
-                                padding: const EdgeInsets.only(
+                            child: const Padding(
+                                padding: EdgeInsets.only(
                                     top: 100.0, right: 120.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     CircleAvatar(
                                       backgroundColor: kPrimaryColor,
                                       radius: 25.0,

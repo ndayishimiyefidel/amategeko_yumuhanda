@@ -21,7 +21,7 @@ class EditQuestion extends StatefulWidget {
       option4,
       quizTitle;
 
-  const EditQuestion({
+  const EditQuestion({super.key, 
     required this.quizId,
     required this.question,
     required this.questionUrl,
@@ -79,7 +79,6 @@ class _EditQuestionState extends State<EditQuestion> {
       setState(() {
         _isLoading = true;
       });
-      int totQuestion = 0;
       String refId = randomAlphaNumeric(16);
       String filepath = 'images/$refId';
 
@@ -90,7 +89,6 @@ class _EditQuestionState extends State<EditQuestion> {
         uploadTask = refs.putFile(pickedFile!);
         final snapshot = await uploadTask!.whenComplete(() {});
         final downloadlink = await snapshot.ref.getDownloadURL();
-        print("download link $downloadlink");
         questionUrl = downloadlink.toString();
       }
       Map<String, String> questionMap = {
@@ -128,6 +126,7 @@ class _EditQuestionState extends State<EditQuestion> {
                             return OpenQuiz(
                               quizId: widget.quizId,
                               title: widget.quizTitle,
+                              questions: const [],
                             );
                           }));
                         },
@@ -174,7 +173,6 @@ class _EditQuestionState extends State<EditQuestion> {
         ),
         onChanged: (val) {
           question = val;
-          print(question);
         },
         autovalidateMode: AutovalidateMode.disabled,
       ),
@@ -252,7 +250,6 @@ class _EditQuestionState extends State<EditQuestion> {
         ),
         onChanged: (val) {
           option4 = val;
-          print(option4);
         },
         autovalidateMode: AutovalidateMode.disabled,
       ),
@@ -364,7 +361,7 @@ class _EditQuestionState extends State<EditQuestion> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  AdBannerWidget(),
+                  const AdBannerWidget(),
                   SizedBox(
                     height: size.height * 0.05,
                   ),
@@ -381,46 +378,42 @@ class _EditQuestionState extends State<EditQuestion> {
                           (widget.questionUrl.isEmpty)
                               ? (pickedFile == null)
                                   ? Container()
-                                  : Container(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Material(
-                                              // display new updated image
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(125.0)),
-                                              clipBehavior: Clip.hardEdge,
-                                              // display new updated image
-                                              child: Image.file(
-                                                pickedFile!,
-                                                width: 200.0,
-                                                height: 200.0,
-                                                fit: BoxFit.cover,
-                                              )),
-                                        ],
-                                      ),
-                                    )
-                              : Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                  : Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
                                     children: [
                                       Material(
                                           // display new updated image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
+                                          borderRadius:
+                                              const BorderRadius.all(
+                                                  Radius.circular(125.0)),
                                           clipBehavior: Clip.hardEdge,
                                           // display new updated image
-                                          child: Image.network(
-                                            widget.questionUrl.toString(),
+                                          child: Image.file(
+                                            pickedFile!,
                                             width: 200.0,
                                             height: 200.0,
                                             fit: BoxFit.cover,
                                           )),
                                     ],
-                                  ),
-                                ),
+                                  )
+                              : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
+                                      // display new updated image
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display new updated image
+                                      child: Image.network(
+                                        widget.questionUrl.toString(),
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(
@@ -429,9 +422,9 @@ class _EditQuestionState extends State<EditQuestion> {
                                         top: 0.0, right: 170.0)
                                     : const EdgeInsets.only(
                                         top: 150.0, right: 120.0),
-                                child: Row(
+                                child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     CircleAvatar(
                                       backgroundColor: Colors.red,
                                       radius: 25.0,

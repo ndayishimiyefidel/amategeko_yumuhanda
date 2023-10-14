@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
 import '../../Login/login_screen.dart';
 import '../../../widgets/ProgressWidget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +16,7 @@ class Forgot extends StatefulWidget {
   const Forgot({super.key});
 
   @override
-  _ForgotState createState() => _ForgotState();
+  State createState() => _ForgotState();
 }
 
 class _ForgotState extends State<Forgot> {
@@ -32,7 +30,6 @@ class _ForgotState extends State<Forgot> {
   bool isLoading = false;
   final _firestore = FirebaseFirestore.instance;
   String emailAddress = "";
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -47,7 +44,7 @@ class _ForgotState extends State<Forgot> {
       context,
       MaterialPageRoute(
         builder: (context) {
-          return SignUpScreen();
+          return const SignUpScreen();
         },
       ),
     );
@@ -148,7 +145,7 @@ class _ForgotState extends State<Forgot> {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return LoginScreen();
+                            return const LoginScreen();
                           },
                         ),
                       );
@@ -177,7 +174,6 @@ class _ForgotState extends State<Forgot> {
       });
       preferences = await SharedPreferences.getInstance();
 
-      var user = FirebaseAuth.instance.currentUser;
 
       await _firestore
           .collection('Users')

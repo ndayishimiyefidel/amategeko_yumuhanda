@@ -10,10 +10,7 @@ class AuthService {
   //create user
   Future createUser({email, password}) async {
     try {
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      print(e.toString());
       Utils.ShowSnackBar(e.message);
     }
   }
@@ -23,12 +20,9 @@ class AuthService {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      print(e.toString());
       Utils.ShowSnackBar(e.message);
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
       }
     }
   }

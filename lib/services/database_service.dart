@@ -22,7 +22,6 @@ class DatabaseService {
         .doc(quizId)
         .set(quizData)
         .catchError((e) {
-      print(e.toString());
     });
   }
 
@@ -57,7 +56,6 @@ class DatabaseService {
         .doc(courseId)
         .set(courseData)
         .catchError((e) {
-      print(e.toString());
     });
   }
 
@@ -67,7 +65,6 @@ class DatabaseService {
         .doc(docId)
         .update(fileData)
         .catchError((e) {
-      print(e.toString());
     });
   }
 
@@ -166,7 +163,6 @@ class DatabaseService {
         .then((QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) async {
         String docsId = doc.reference.id;
-        print("subdoc_id${doc.reference.id}");
         await FirebaseFirestore.instance
             .collection("Quizmaker")
             .doc(quizId)
@@ -174,7 +170,6 @@ class DatabaseService {
             .doc(docsId)
             .update(questionData)
             .onError((error, stackTrace) {
-          print(error);
         });
       });
     });

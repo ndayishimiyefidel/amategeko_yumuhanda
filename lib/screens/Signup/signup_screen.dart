@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class SignUpScreen extends StatelessWidget {
   final String? referralCode;
 
-  SignUpScreen({this.referralCode});
+  const SignUpScreen({super.key, this.referralCode});
 
   @override
   Widget build(BuildContext context) {

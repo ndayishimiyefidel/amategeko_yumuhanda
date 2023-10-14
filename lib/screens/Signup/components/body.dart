@@ -592,7 +592,7 @@ class _SignUpState extends State<SignUp> {
                         ],
                       )
                     : const SizedBox(),
-                AdBannerWidget(),
+                const AdBannerWidget(),
               ]),
         ),
       ),

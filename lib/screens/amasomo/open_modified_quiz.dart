@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:amategeko/enume/models/question_model.dart';
 import 'package:amategeko/screens/amasomo/play_modified_quiz.dart';
-import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/quizzes/result_screen.dart';
 import 'package:amategeko/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,7 +22,7 @@ class OpenModifiedQuiz extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables
   final quizNumber;
 
-  OpenModifiedQuiz({required this.courseId, this.title, this.quizNumber});
+  const OpenModifiedQuiz({super.key, required this.courseId, this.title, this.quizNumber});
 
   @override
   State<OpenModifiedQuiz> createState() => _OpenModifiedQuizState();
@@ -631,7 +630,7 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
             },
             child: OptionModifiedTile(
               correctAnswer: widget.questionModel.correctOption,
-              option: Icon(Icons.check),
+              option: const Icon(Icons.check),
               description: widget.questionModel.option3,
               optionSelected: optionSelected,
             ),
@@ -754,7 +753,7 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
         .where("question", isEqualTo: question)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         doc.reference.delete().then((value) {
           //question delete
           setState(() {
@@ -775,7 +774,7 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                 });
           });
         });
-      });
+      }
     });
   }
 

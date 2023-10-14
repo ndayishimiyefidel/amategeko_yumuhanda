@@ -66,7 +66,7 @@ class _EditQuizState extends State<EditQuiz> {
   final TextEditingController quizdescController = TextEditingController();
   final TextEditingController quizPriceController = TextEditingController();
   String quizPrice = "";
-  String _selectedType = "";
+  final String _selectedType = "";
 
   @override
   void initState() {
@@ -101,7 +101,6 @@ class _EditQuizState extends State<EditQuiz> {
         final snapshot = await uploadTask!.whenComplete(() {});
         final downloadlink = await snapshot.ref.getDownloadURL();
         quizUrl = downloadlink.toString();
-        print("download link $quizUrl");
       }
 
       Map<String, String> quizMap = {
@@ -161,7 +160,6 @@ class _EditQuizState extends State<EditQuiz> {
         ),
         onChanged: (val) {
           quizPrice = val;
-          print(quizPrice);
         },
       ),
     );
@@ -221,7 +219,6 @@ class _EditQuizState extends State<EditQuiz> {
         onChanged: (val) {
           setState(() {
             _selectedtype = val as String;
-            print(_selectedtype);
           });
         },
         icon: const Icon(
@@ -285,7 +282,7 @@ class _EditQuizState extends State<EditQuiz> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Notifications(),
+                  builder: (BuildContext context) => const Notifications(),
                 ),
               );
             },
@@ -375,33 +372,31 @@ class _EditQuizState extends State<EditQuiz> {
                               ],
                             ),
                           )
-                              : Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Material(
-                                  // display new updated image
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(125.0)),
-                                    clipBehavior: Clip.hardEdge,
+                              : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
                                     // display new updated image
-                                    child: Image.file(
-                                      pickedFile!,
-                                      width: 200.0,
-                                      height: 200.0,
-                                      fit: BoxFit.cover,
-                                    )),
-                              ],
-                            ),
-                          ),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display new updated image
+                                      child: Image.file(
+                                        pickedFile!,
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              ),
                           GestureDetector(
                             onTap: selectsFile,
-                            child: Padding(
-                                padding: const EdgeInsets.only(
+                            child: const Padding(
+                                padding: EdgeInsets.only(
                                     top: 150.0, right: 120.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     CircleAvatar(
                                       backgroundColor: Colors.red,
                                       radius: 25.0,
@@ -466,7 +461,7 @@ class _EditQuizState extends State<EditQuiz> {
                             context,
                             MaterialPageRoute(
                               builder: (context) {
-                                return Quizzes();
+                                return const Quizzes();
                               },
                             ),
                           );

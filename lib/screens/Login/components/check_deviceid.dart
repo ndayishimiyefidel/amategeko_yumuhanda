@@ -12,9 +12,7 @@ class DeviceIdManager {
     if (_deviceId == null) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       _deviceId = prefs.getString(_deviceIdKey);
-      if (_deviceId == null) {
-        _deviceId = await _generateAndStoreDeviceId();
-      }
+      _deviceId ??= await _generateAndStoreDeviceId();
     }
     return _deviceId!;
   }
@@ -44,7 +42,7 @@ class DeviceIdManager {
       androidDeviceInfo = await deviceInfo.androidInfo;
       return "${androidDeviceInfo.id}${androidDeviceInfo.manufacturer}";
     } catch (e) {
-      print("Failed to get Android Device ID: $e"); // Print the error
+      // Print the error
       return null;
     }
   }
@@ -58,7 +56,7 @@ class DeviceIdManager {
       return "${iosDeviceInfo.identifierForVendor}${iosDeviceInfo
           .localizedModel}${iosDeviceInfo.systemVersion}";
     } catch (e) {
-      print("Failed to get iOS Device ID: $e"); // Print the error
+      // Print the error
       return null;
     }
   }

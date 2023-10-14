@@ -12,7 +12,7 @@ import '../../utils/constants.dart';
 
 class CreateQuestion extends StatefulWidget {
   final String courseId;
-  final courseTitle;
+  final String ? courseTitle;
 
   const CreateQuestion({
     super.key,
@@ -73,7 +73,6 @@ class _CreateQuestionState extends State<CreateQuestion> {
       setState(() {
         _isLoading = true;
       });
-      int totQuestion = 0;
       String refId = randomAlphaNumeric(16);
       String filepath = 'images/$refId';
 
@@ -84,7 +83,6 @@ class _CreateQuestionState extends State<CreateQuestion> {
         uploadTask = refs.putFile(pickedFile!);
         final snapshot = await uploadTask!.whenComplete(() {});
         final downloadlink = await snapshot.ref.getDownloadURL();
-        print("download link $downloadlink");
         questionUrl = downloadlink.toString();
       }
       Map<String, String> questionMap = {
@@ -279,7 +277,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
         //     input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
       ),
     );
-    final addquestionBtn = Container(
+    final addquestionBtn = SizedBox(
       width: size.width * 0.4,
       height: size.height * 0.05,
       child: ClipRRect(
@@ -392,25 +390,23 @@ class _CreateQuestionState extends State<CreateQuestion> {
                         children: <Widget>[
                           (pickedFile == null)
                               ? Container()
-                              : Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display new updated image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display new updated image
-                                          child: Image.file(
-                                            pickedFile!,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  ),
-                                ),
+                              : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
+                                      // display new updated image
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display new updated image
+                                      child: Image.file(
+                                        pickedFile!,
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(

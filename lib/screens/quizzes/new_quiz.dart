@@ -1,23 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:amategeko/components/text_field_container.dart';
-import 'package:amategeko/screens/questions/add_question.dart';
 import 'package:amategeko/services/auth.dart';
-import 'package:amategeko/services/database_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:image_network/image_network.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
 import '../../widgets/banner_widget.dart';
 import '../../widgets/fcmWidget.dart';
-import 'edit_quiz.dart';
 import 'open_quiz.dart';
 
 class NewQuiz extends StatefulWidget {
@@ -28,15 +24,9 @@ class NewQuiz extends StatefulWidget {
 }
 
 class _NewQuizState extends State<NewQuiz> {
-  BannerAd? _bannerAd;
-  bool isBannerLoaded = false;
-  bool isBannerVisible = false;
-  Timer? bannerTimer;
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Stream<dynamic>? quizStream;
   bool isLoading = false;
-  DatabaseService databaseService = DatabaseService();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   AuthService authService = AuthService();
   final user = FirebaseAuth.instance.currentUser;
@@ -94,154 +84,54 @@ class _NewQuizState extends State<NewQuiz> {
     });
   }
 
-  //check if user has code
   Widget quizList() {
-    return Expanded(
-      child: StreamBuilder(
-        stream: quizStream,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const Center(child: CircularProgressIndicator());
-            case ConnectionState.none:
-              // Use cached data if available
-              return FutureBuilder(
-                future: FirebaseFirestore.instance
-                    .collectionGroup("Quizmaker")
-                    .where("quizType", isEqualTo: "Paid")
-                    .orderBy("quizTitle", descending: true)
-                    .get(const GetOptions(source: Source.cache)),
-                builder: (context, cacheSnapshot) {
-                  if (cacheSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (cacheSnapshot.hasError) {
-                    return const Text('Error loading cached data');
-                  }
-                  if (cacheSnapshot.data == null ||
-                      cacheSnapshot.data!.docs.isEmpty) {
-                    return const Text('Error: No cached data available');
-                  }
-                  return ListView.builder(
-                    itemCount: cacheSnapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      // Use cached data
-                      final doc = cacheSnapshot.data!.docs[index];
-                      return QuizTile(
-                        index: index,
-                        quizId: doc.data()['quizId'],
-                        imgurl: doc.data()["quizImgUrl"],
-                        title: doc.data()["quizTitle"],
-                        desc: doc.data()["quizDesc"],
-                        quizType: doc.data()["quizType"],
-                        totalQuestion: totalQuestion,
-                        userRole: userRole.toString(),
-                        userToken: userToken,
-                        senderName: currentusername,
-                        currentUserId: currentuserid,
-                        phone: phone,
-                        email: email,
-                        photoUrl: photo,
-                        quizPrice: doc.data()["quizPrice"],
-                        adminPhone: adminPhone.toString(),
-                      );
-                    },
-                  );
-                },
-              );
-            default:
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return snapshot.data == null
-                    ? const Center(
-                        child: Text(
-                          "There is no available quiz at this time ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            letterSpacing: 2,
-                            color: Colors.red,
-                          ),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: snapshot.data.docs.length,
-                        itemBuilder: (context, index) {
-                          // Update cache with new data
-                          FirebaseFirestore.instance
-                              .collection("Quizmaker")
-                              .doc(snapshot.data.docs[index].data()['quizId'])
-                              .collection("QNA")
-                              .get()
-                              .then((value) {
-                            // Cache the new data
-                            for (var doc in value.docs) {
-                              doc.reference
-                                  .set(doc.data(), SetOptions(merge: true));
-                            }
-                          });
-
-                          return QuizTile(
-                            index: index,
-                            quizId: snapshot.data!.docs[index].data()['quizId'],
-                            imgurl:
-                                snapshot.data!.docs[index].data()["quizImgUrl"],
-                            title:
-                                snapshot.data.docs[index].data()["quizTitle"],
-                            desc: snapshot.data.docs[index].data()["quizDesc"],
-                            quizType:
-                                snapshot.data.docs[index].data()["quizType"],
-                            totalQuestion: totalQuestion,
-                            userRole: userRole.toString(),
-                            userToken: userToken,
-                            senderName: currentusername,
-                            currentUserId: currentuserid,
-                            phone: phone,
-                            email: email,
-                            photoUrl: photo,
-                            quizPrice:
-                                snapshot.data.docs[index].data()["quizPrice"],
-                            adminPhone: adminPhone.toString(),
-                          );
-                        },
-                      );
-              }
-          }
-        },
-      ),
-    );
-  }
+  return FutureBuilder(
+    future: DefaultAssetBundle.of(context).loadString('assets/files/data.json'),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      } else if (!snapshot.hasData) {
+        return const Text('No data available.');
+      } else {
+        final jsonData = json.decode(snapshot.data.toString());
+        final exams = jsonData['exams'];
+        return  SizedBox(height: MediaQuery.of(context).size.height*0.79,
+          child: ListView.builder(
+              itemCount: exams.length,
+              itemBuilder: (context, index) {
+                final exam = exams[index];
+                return QuizTile(
+                  index: index,
+                  quizId: exam['quizId'],
+                  imgurl: exam['examImgUrl'],
+                  title: exam['title'],
+                  quizType: exam['examType'],
+                  totalQuestion:20, // You may need to update this
+                  userRole: userRole.toString(),
+                  userToken: userToken,
+                  senderName: currentusername,
+                  currentUserId: currentuserid,
+                  phone: phone,
+                  email: email,
+                  photoUrl: photo,
+                  adminPhone: adminPhone.toString(),
+                  questions: List<Map<String, dynamic>>.from(exam['questions']),
+                );
+              },
+            ),
+        );
+      }
+    },
+  );
+}
 
   @override
   void initState() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-        },
-        // Add other banner ad listener callbacks as needed.
-      ),
-    );
-
-    _bannerAd!.load();
-
     _messaging.getToken().then((value) {
     });
-    databaseService.getNewQuizData().then((value) async {
-      setState(() {
-        quizStream = value;
-      });
-    });
+   
     //check code
     getCurrUserData(); //get login data
     requestPermission(); //request permission
@@ -254,9 +144,6 @@ class _NewQuizState extends State<NewQuiz> {
 
   @override
   void dispose() {
-    // Dispose the banner timer when the widget is disposed
-    _bannerAd!.dispose();
-    bannerTimer?.cancel();
     super.dispose();
   }
 
@@ -265,17 +152,19 @@ class _NewQuizState extends State<NewQuiz> {
     return Scaffold(
         //appbar
         key: _scaffoldKey,
-        body: Column(
-          children: [
-            quizList(),
-            const SizedBox(
-              height: 10,
-            ),
-            const AdBannerWidget(),
-            const SizedBox(
-              height: 5,
-            ),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              quizList(),
+              const SizedBox(
+                height: 10,
+              ),
+              const AdBannerWidget(),
+              const SizedBox(
+                height: 5,
+              ),
+            ],
+          ),
         ),
         floatingActionButton: (userRole != "Admin" && hasCode == false)
             ? FloatingActionButton.extended(
@@ -492,30 +381,10 @@ class _NewQuizState extends State<NewQuiz> {
     });
   }
 }
-
-class BannerAdWidget extends StatelessWidget {
-  final BannerAd ad;
-
-  const BannerAdWidget({Key? key, required this.ad}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return Container(
-      alignment: Alignment.center,
-      child: SizedBox(
-        width: size.width.toDouble(),
-        height: 50.0, // Set the desired height for the banner ad
-        child: AdWidget(ad: ad),
-      ),
-    );
-  }
-}
-
 class QuizTile extends StatefulWidget {
+  final List<Map<String, dynamic>> questions;
   final String imgurl;
   final String title;
-  final String desc;
   final String quizId;
   final String quizType;
   final int totalQuestion;
@@ -526,7 +395,6 @@ class QuizTile extends StatefulWidget {
   final String phone;
   final bool isNew = false;
   final String currentUserId;
-  final String quizPrice;
   final String email, photoUrl;
   final int index;
 
@@ -534,7 +402,6 @@ class QuizTile extends StatefulWidget {
     Key? key,
     required this.imgurl,
     required this.title,
-    required this.desc,
     required this.quizId,
     required this.quizType,
     required this.totalQuestion,
@@ -545,9 +412,8 @@ class QuizTile extends StatefulWidget {
     required this.email,
     required this.photoUrl,
     required this.userRole,
-    required this.quizPrice,
     required this.adminPhone,
-    required this.index,
+    required this.index, required this.questions,
   }) : super(key: key);
 
   @override
@@ -569,53 +435,26 @@ class _QuizTileState extends State<QuizTile> {
             shape: RoundedRectangleBorder(
               side: BorderSide(
                 color: kPrimaryColor,
-                width: size.width * 0.003,
+                width: size.width * 0.006,
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
             child: InkWell(
-              splashColor: kPrimaryColor,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 20, right: 20, top: 10, bottom: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       SizedBox(
-                        height: size.height * 0.01,
-                      ),
-                      SizedBox(
-                        width: double.infinity, // Full width
-                        height: size.height * 0.1,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: ImageNetwork(
-                            image: widget.imgurl.toString(),
-                            imageCache: CachedNetworkImageProvider(
-                                widget.imgurl.toString()),
-                            height: size.height * 0.1,
-                            width: size.width * 0.9,
-                            fitAndroidIos: BoxFit.cover,
-                            fitWeb: BoxFitWeb.cover,
-                            onLoading: const CircularProgressIndicator(
-                              color: Colors.indigoAccent,
-                            ),
-                            onError: const Icon(
-                              Icons.error,
-                              color: Colors.red,
-                            ),
-                            // errorBuilder: (context, error, stackTrace) {
-                            //   print(error);
-                            //   return const Text(
-                            //       "Failed to load image due network connection");
-                            // },
+                          child: Image.asset(widget.imgurl,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.03,
                       ),
                       Text("${widget.index + 1}. ${widget.title}",
                           style: const TextStyle(
@@ -624,27 +463,11 @@ class _QuizTileState extends State<QuizTile> {
                             color: Colors.black,
                           ),
                           textAlign: TextAlign.start),
-                      SizedBox(
-                        height: size.height * 0.03,
-                      ),
-                      Text(
-                        widget.desc,
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.blueGrey,
-                        ),
-                      ),
-                      SizedBox(
-                        height: size.height * 0.01,
-                      ),
                       _isLoading
                           ? circularprogress()
                           : Container(
                               child: null,
                             ),
-                      if (widget.userRole != "Admin")
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: ElevatedButton(
@@ -654,7 +477,7 @@ class _QuizTileState extends State<QuizTile> {
                                   color: Colors.green, width: 1),
                             ),
                             onPressed: () {
-                              if (widget.quizType == "Free") {
+                              if (widget.quizType == "Free" || widget.userRole=="Admin") {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -663,6 +486,7 @@ class _QuizTileState extends State<QuizTile> {
                                         quizId: widget.quizId,
                                         title: widget.title,
                                         quizNumber: widget.index + 1,
+                                        questions: widget.questions,
                                       );
                                     },
                                   ),
@@ -687,6 +511,7 @@ class _QuizTileState extends State<QuizTile> {
                                             quizId: widget.quizId,
                                             title: widget.title,
                                             quizNumber: widget.index + 1,
+                                            questions: widget.questions,
                                           );
                                         },
                                       ),
@@ -802,9 +627,8 @@ class _QuizTileState extends State<QuizTile> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text(
-                                  "Tangira Exam",
-                                  style: TextStyle(
+                                Text( widget.userRole=="Admin" ?"Fungur Exam":"Tangira Exam",
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       letterSpacing: 2,
                                       fontSize: 18,
@@ -821,147 +645,6 @@ class _QuizTileState extends State<QuizTile> {
                             ),
                           ),
                         )
-                      else
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: kPrimaryColor),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return OpenQuiz(
-                                              quizId: widget.quizId,
-                                              title: widget.title,
-                                              quizNumber: widget.index + 1,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    child: const Text(
-                                      "View",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: size.width * 0.1,
-                                ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: kPrimaryLightColor,
-                                      elevation: 0,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return EditQuiz(
-                                              quizId: widget.quizId,
-                                              quizTitle: widget.title,
-                                              quizType: widget.quizType,
-                                              quizImage: widget.imgurl,
-                                              quizDesc: widget.desc,
-                                              quizPrice: widget.quizPrice,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    child: const Text(
-                                      "Edit Quiz",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: size.height * 0.03,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: kPrimaryColor),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return AddQuestion(
-                                              quizId: widget.quizId,
-                                              quizTitle: widget.title,
-                                              isNew: true,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    child: const Text(
-                                      "Add",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: size.width * 0.03,
-                                ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: kPrimaryLightColor),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isLoading = true;
-                                      });
-                                      _showDeleteConfirmationDialog();
-                                      //  deleteQuiz(widget.quizId);
-                                    },
-                                    child: const Text(
-                                      "Delete Quiz",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
                     ],
                   ),
                 ),
@@ -973,70 +656,6 @@ class _QuizTileState extends State<QuizTile> {
     );
   }
 
-//delete quiz
-  Future<void> deleteQuiz(String docId) async {
-    await FirebaseFirestore.instance
-        .collection("Quizmaker")
-        .doc(docId)
-        .collection("QNA")
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        doc.reference.delete().then((value) {
-          //question delete
-          setState(() {
-            _isLoading = false;
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text("Quiz deleted successfully!"),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Close"))
-                    ],
-                  );
-                });
-          });
-        });
-      });
-      FirebaseFirestore.instance.collection("Quizmaker").doc(docId).delete();
-    });
-  }
-
-  void _showDeleteConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete Quiz'),
-          content: const Text('Are you sure you want to delete this quiz?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                // Perform the delete operation here
-                deleteQuiz(widget.quizId);
-                Navigator.of(context).pop(); // Close the dialog
-                setState(() {
-                  _isLoading = true;
-                });
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Future<void> checkValidCode(
       String currentUserId, String code, String quizId) async {
@@ -1047,8 +666,10 @@ class _QuizTileState extends State<QuizTile> {
         .where("isQuiz", isEqualTo: true)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        print(doc.reference.id);
+      for (var doc in querySnapshot.docs) {
+        if (kDebugMode) {
+          print(doc.reference.id);
+        }
         FirebaseFirestore.instance
             .collection("Quiz-codes")
             .doc(doc.reference.id)
@@ -1064,6 +685,7 @@ class _QuizTileState extends State<QuizTile> {
                       quizId: widget.quizId,
                       title: widget.title,
                       quizNumber: widget.index + 1,
+                      questions: widget.questions,
                     );
                   },
                 ),
@@ -1089,7 +711,7 @@ class _QuizTileState extends State<QuizTile> {
             });
           }
         });
-      });
+      }
     });
   }
 
@@ -1097,7 +719,7 @@ class _QuizTileState extends State<QuizTile> {
   Future<void> requestCode(String userToken, String currentUserId,
       String senderName, String title) async {
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName  naho nimero ya telefoni ni ${widget.phone} .\n  Namaze kwishyura amafaranga ${widget.quizPrice.isEmpty ? 1000 : widget.quizPrice} frw kuri nimero ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} yo gukora ibizamini.\n"
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName  naho nimero ya telefoni ni ${widget.phone} .\n  Namaze kwishyura amafaranga 1500 frw kuri nimero ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
