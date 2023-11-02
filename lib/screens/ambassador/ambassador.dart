@@ -141,12 +141,11 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
 
                                     return ChatUsersList(
                                       name: snapshot.data!.docs[index]["name"],
-                                      image: snapshot.data!.docs[index]
-                                          ["photoUrl"],
+                                  
                                       time: snapshot.data!.docs[index]
                                           ["createdAt"],
-                                      email: snapshot.data!.docs[index]
-                                          ["email"],
+                                      // email: snapshot.data!.docs[index]
+                                      //     ["email"],
                                       userId: snapshot.data!.docs[index]["uid"],
                                       phone: snapshot.data!.docs[index]
                                           ["phone"],

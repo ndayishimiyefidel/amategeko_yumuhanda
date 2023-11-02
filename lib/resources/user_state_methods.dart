@@ -28,10 +28,11 @@ class UserStateMethods {
     setUserState(
         userId: preferences.getString("uid").toString(),
         userRole: preferences.getString("role").toString(),
-        userState: UserState.Offline);
+        userState: UserState.offLine);
     await FirebaseAuth.instance.signOut();
     // await preferences.clear();
 
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
         (route) => false);

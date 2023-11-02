@@ -7,7 +7,6 @@ import 'package:amategeko/services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
@@ -45,34 +44,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
      with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  Timer? interstitialTimer;
-  InterstitialAd? _interstitialAd;
-
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          if (kDebugMode) {
-            print('InterstitialAd failed to load: $error');
-          }
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    } else {
-      print('InterstitialAd is not loaded yet.');
-    }
-  }
+  
   DatabaseService databaseService = DatabaseService();
   QuerySnapshot? questionSnapshot;
   late AnimationController _controller;
@@ -122,7 +94,6 @@ late PageController _controller1;
         vsync: this, duration: Duration(seconds: limitTime));
     _controller.addListener(() {
       if (_controller.isCompleted) {
-        showInterstitialAd();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -136,7 +107,6 @@ late PageController _controller1;
     });
     _controller.forward();
 
-    loadInterstitialAd();
     super.initState();
   }
 
@@ -149,8 +119,7 @@ late PageController _controller1;
       if (kDebugMode) {
         print("current page $currentPageIndex");
       }
-      if (currentPageIndex == 4) {
-        showInterstitialAd(); //show ads on question 10
+      if (currentPageIndex == 4) { //show ads on question 10
         _controller1.animateToPage(
           currentPageIndex, // Use the updated index
           duration: const Duration(milliseconds: 250),
@@ -171,9 +140,7 @@ late PageController _controller1;
         btnPressed = false;
       });
     } else {
-      // If there are no more questions, navigate to the Results screen.
-
-      showInterstitialAd();
+      // If there are no more questions, navigate to the Results screen
 
       Navigator.push(
         context,

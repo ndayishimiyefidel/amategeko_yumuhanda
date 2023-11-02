@@ -157,7 +157,7 @@ class _ReadAudioState extends State<ReadAudio> {
                 ListTile(
                   title: Text(fileName.toString()),
                   trailing: SizedBox(
-                    width: MediaQuery.of(context).size.width*0.32,
+                    width: MediaQuery.of(context).size.width*0.40,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

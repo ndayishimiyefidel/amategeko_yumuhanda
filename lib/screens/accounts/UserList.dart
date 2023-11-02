@@ -1,452 +1,140 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/chat_for_users_list.dart';
 import '../../utils/constants.dart';
-import '../../widgets/changing_banner.dart';
 
 class UserList extends StatefulWidget {
-  const UserList({super.key});
+  const UserList({Key? key}) : super(key: key);
 
   @override
   State createState() => _UserListState();
 }
 
 class _UserListState extends State<UserList> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late BannerAd _bannerAd;
-  bool isBannerLoaded = false;
-  bool isBannerVisible = false;
-  Timer? bannerTimer;
-
-  // List allUsers = [];
-
-  List<DocumentSnapshot> allUsersList = [];
-  late String currentuserid;
-  late String currentusername;
-  late String currentuserphoto;
-  late SharedPreferences preferences;
-  late int numbers = 0;
-
-  // Define a variable to keep track of the number of users to load at once
-  final int usersPerPage = 20;
-
-  // Define a variable to keep track of the current page (chunk) of users
-  int currentPage = 0;
-
-  // Define a variable to store whether more users are being loaded
-  bool isLoadingMore = false;
+  late String currentUserId;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-        },
-        // Add other banner ad listener callbacks as needed.
-      ),
-    );
-
-    _bannerAd.load();
-    // Initialize the banner timer
-    bannerTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      setState(() {
-        isBannerVisible = true;
-      });
-    });
-    getCurrUserId();
-    _loadUserData(); // Initial fetching of users
+    _initCurrentUser();
   }
 
-  // Function to check internet connectivity
-  Future<bool> _checkInternetConnectivity() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    return connectivityResult != ConnectivityResult.none;
-  }
-
-  Future<void> _loadUserData() async {
-    bool isConnected = await _checkInternetConnectivity();
-
-    if (isConnected) {
-      // Fetch and load user data from Firestore
-      _fetchUsers();
-    } else {
-      // Handle no internet connection
-      // Load cached user data from SharedPreferences
-      await _loadCachedUserData();
-    }
-  }
-
-  Future<void> _loadCachedUserData() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String cachedUserData = preferences.getString("cachedUserData") ?? "";
-
+  Future<void> _initCurrentUser() async {
+    final preferences = await SharedPreferences.getInstance();
+    final userId = preferences.getString("uid") ?? "defaultUserID";
     setState(() {
-      allUsersList = List.from(jsonDecode(cachedUserData));
-      numbers = allUsersList.length;
+      currentUserId = userId;
     });
-  }
-
-  getCurrUserId() async {
-    preferences = await SharedPreferences.getInstance();
-
-    setState(() {
-      currentuserid = preferences.getString("uid")!;
-      currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
-    });
-  }
-
-  // Define a function to fetch the next chunk of users from Firestore
-// Define a variable to store the last document of the previous page
-  DocumentSnapshot? lastDocument;
-
-  // Define a function to fetch the next chunk of users from Firestore
-  Future<void> _fetchUsers() async {
-    setState(() {
-      isLoadingMore = true;
-    });
-
-    Query query = FirebaseFirestore.instance
-        .collection("Users")
-        .orderBy("createdAt", descending: true)
-        .limit(usersPerPage);
-
-    if (lastDocument != null) {
-      query = query.startAfterDocument(lastDocument!);
-    }
-
-    final QuerySnapshot querySnapshot = await query.get();
-
-    setState(() {
-      isLoadingMore = false;
-      currentPage++;
-      numbers = querySnapshot.size; // Update the total number of users
-
-      if (querySnapshot.docs.isNotEmpty) {
-        lastDocument = querySnapshot.docs.last; // Store the last document
-      }
-    });
-
-    if (querySnapshot.docs.isNotEmpty) {
-      allUsersList.addAll(querySnapshot.docs);
-    }
-    if (querySnapshot.docs.isNotEmpty) {
-      lastDocument = querySnapshot.docs.last;
-
-      // Cache the fetched user data
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.setString("cachedUserData", jsonEncode(allUsersList));
-    }
-  }
-
-  @override
-  void dispose() {
-    // Dispose the banner timer when the widget is disposed
-    _bannerAd.dispose();
-    bannerTimer?.cancel();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(
-              height: 10,
-            ),
-            if (isBannerVisible && isBannerLoaded)
-              BannerAdWidget(ad: _bannerAd),
-            Center(
-              child: Container(
-                decoration: const BoxDecoration(color: Colors.green),
-                child: Text(
-                  "Total User: $numbers",
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const Divider(
-              color: Colors.black,
-            ),
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("Users")
-                  .orderBy("createdAt", descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).copyWith().size.height -
-                        MediaQuery.of(context).copyWith().size.height / 5,
-                    width: MediaQuery.of(context).copyWith().size.width,
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(kPrimaryColor),
-                      ),
-                    ),
-                  );
-                } else {
-                  snapshot.data!.docs
-                      .removeWhere((i) => i["uid"] == currentuserid);
-                  allUsersList = snapshot.data!.docs;
-
-                  return ListView.separated(
-                    separatorBuilder: (context, index) => const Divider(
-                      color: Colors.black,
-                    ),
-                    padding: const EdgeInsets.only(top: 16, left: 20),
-                    itemCount: allUsersList.length + 1,
-                    // Add one for loading indicator
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      if (index < allUsersList.length) {
-                        final user = allUsersList[index];
-                        return StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("Quiz-codes")
-                              .where("userId", isEqualTo: user["uid"])
-                              .snapshots(),
-                          builder: (context, quizSnapshot) {
-                            if (!quizSnapshot.hasData) {
-                              return const SizedBox.shrink();
-                            } else {
-                              final quizData = quizSnapshot.data!.docs;
-                              String? quizCode = quizData.isNotEmpty
-                                  ? quizData[0]["code"]
-                                  : "nocode";
-
-                              return ChatUsersList(
-                                name: user["name"],
-                                image: user["photoUrl"],
-                                time: user["createdAt"],
-                                email: user["email"],
-                                userId: user["uid"],
-                                phone: user["phone"],
-                                password: user["password"],
-                                role: user["role"],
-                                quizCode: quizCode.toString(),
-                                deviceId: user["deviceId"],
-                              );
-                            }
-                          },
-                        );
-                      } else {
-                        // If it's the last item, show a loading indicator to fetch more users
-                        return isLoadingMore
-                            ? const Center(child: CircularProgressIndicator())
-                            : const SizedBox.shrink();
-                      }
-                    },
-                  );
-                }
-              },
-            ),
-          ],
+        child: FutureBuilder<List<QueryDocumentSnapshot>>(
+          future: _fetchUserList(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildLoadingIndicator();
+            } else if (snapshot.hasError) {
+              return _buildErrorText(snapshot.error.toString());
+            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+              return _buildNoDataText();
+            } else {
+              return _buildUserListView(snapshot.data!);
+            }
+          },
         ),
       ),
     );
   }
-}
 
-// The rest of your code (ChatUsersList class and other imports) remains unchanged
+  Future<List<QueryDocumentSnapshot>> _fetchUserList() async {
+    final querySnapshot = await _firestore
+        .collection("Users")
+        .orderBy("createdAt", descending: true)
+        .get();
 
-class DataSearch extends SearchDelegate {
-  DataSearch(
-      {this.allUsersList,
-      required this.currentuserid,
-      required this.currentusername,
-      required this.currentuserphoto});
-
-  var allUsersList;
-  String currentuserid;
-  String currentusername;
-  String currentuserphoto;
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: const Icon(Icons.clear),
-        onPressed: () {
-          query = "";
-        },
-      )
-    ];
+    return querySnapshot.docs
+        .where((doc) => doc.get("uid") != currentUserId)
+        .toList();
   }
 
-  @override
-  Widget buildLeading(BuildContext context) {
-    // Leading Icon on left of appBar
-    return IconButton(
-      icon: AnimatedIcon(
-        icon: AnimatedIcons.menu_arrow,
-        progress: transitionAnimation,
+  Widget _buildLoadingIndicator() {
+    return Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(kPrimaryLightColor),
       ),
-      onPressed: () {
-        close(context, null);
-      },
     );
   }
 
-  @override
-  Widget buildResults(BuildContext context) {
-    // show some result based on selection
-
-    throw UnimplementedError();
+  Widget _buildErrorText(String error) {
+    if (kDebugMode) {
+      print("Firestore Error: $error");
+    }
+    return Center(child: Text("An error has occurred: $error"));
   }
 
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    // Show when someone searches for something
-    var userList = [];
-    allUsersList.forEach((e) {
-      userList.add(e);
-    });
-    var suggestionList = userList;
+  Widget _buildNoDataText() {
+    return Center(child: Text("No data available"));
+  }
 
-    if (query.isNotEmpty) {
-      suggestionList = [];
-      for (var element in userList) {
-        if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["email"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["password"].toLowerCase().startsWith(query.toLowerCase())) {
-          suggestionList.add(element);
-        }
-      }
+  Widget _buildUserListView(List<QueryDocumentSnapshot> users) {
+    print("Fetched Users ${users.length} ");
+    return Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (BuildContext context, int index) {
+            // final data = users[index].data();
+            final userId = users[index].get("uid") ?? currentUserId;
+
+            return FutureBuilder<String>(
+              future: _fetchQuizCode(userId.toString()),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                } else {
+                  final quizCode = snapshot.data ?? "nocode";
+                  final deviceId =
+                      users[index].get("deviceId") ?? "No device captured";
+                  final name = users[index].get("name") ?? "Unknown Name";
+                  final time = users[index].get("createdAt") ?? "1696125054318";
+                  //final userId = users[index].get("uid") ?? currentUserId;
+                  final phone = users[index].get("phone");
+                  final password = users[index].get("password");
+                  final role = users[index].get("role") ?? "User";
+                  return ChatUsersList(
+                    name: name,
+                    time: time,
+                    userId: userId,
+                    phone: phone,
+                    password: password,
+                    role: role,
+                    deviceId: deviceId,
+                    quizCode: quizCode,
+                  );
+                }
+              },
+            );
+          },
+        ));
+  }
+
+  Future<String> _fetchQuizCode(String userId) async {
+    final querySnapshot = await _firestore
+        .collection("Quiz-codes")
+        .where("userId", isEqualTo: userId)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs[0].get("code").toString();
+    } else {
+      return "nocode";
     }
-
-    return ListView.builder(
-        itemBuilder: (context, index) => ListTile(
-              onTap: () {},
-              leading: const Icon(Icons.person),
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                        text: suggestionList[index]["name"]
-                            .toLowerCase()
-                            .substring(0, query.length),
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16),
-                        children: [
-                          TextSpan(
-                              text: suggestionList[index]["name"]
-                                  .toLowerCase()
-                                  .substring(query.length),
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 16))
-                        ]),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                        text: suggestionList[index]["email"]
-                            .toLowerCase()
-                            .substring(0, query.length),
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16),
-                        children: [
-                          TextSpan(
-                              text: suggestionList[index]["email"]
-                                  .toLowerCase()
-                                  .substring(query.length),
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 16))
-                        ]),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                        text: suggestionList[index]["password"]
-                            .toLowerCase()
-                            .substring(0, query.length),
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16),
-                        children: [
-                          TextSpan(
-                              text: suggestionList[index]["password"]
-                                  .toLowerCase()
-                                  .substring(query.length),
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 16))
-                        ]),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                            text: suggestionList[index]["phone"]
-                                .toLowerCase()
-                                .substring(0, query.length),
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16),
-                            children: [
-                              TextSpan(
-                                  text: suggestionList[index]["phone"]
-                                      .toLowerCase()
-                                      .substring(query.length),
-                                  style: const TextStyle(
-                                      color: Colors.grey, fontSize: 16))
-                            ]),
-                      ),
-                      const SizedBox(
-                        width: 30,
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          await FlutterPhoneDirectCaller.callNumber(
-                              suggestionList[index]["phone"]
-                                  .toLowerCase()
-                                  .substring(query.length));
-                        },
-                        icon: const Icon(
-                          Icons.call,
-                          size: 30,
-                          color: Colors.blueAccent,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-        itemCount: suggestionList.length);
   }
 }

@@ -1,9 +1,12 @@
+import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/amasomo/course_contents.dart';
 import 'package:amategeko/services/auth.dart';
 import 'package:amategeko/services/database_service.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
 import '../../widgets/fcmWidget.dart';
-import '../homepages/notificationtab.dart';
 import 'course_content.dart';
 import 'isomo_page.dart';
 
@@ -130,7 +132,9 @@ class _AllCourseState extends State<AllCourse> {
     ////
     ///update
     _messaging.getToken().then((value) {
-      print("My token is $value");
+      if (kDebugMode) {
+        print("My token is $value");
+      }
     });
     databaseService.getCoursesData().then((value) async {
       setState(() {
@@ -172,26 +176,17 @@ class _AllCourseState extends State<AllCourse> {
             ),
           ),
           actions: [
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => const Notifications(),
-                  ),
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                ),
-                child: Icon(
-                  Icons.notifications_outlined,
-                  size: 25,
-                ),
+          CustomButton(
+          text: "Amabwiriza",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => AmabwirizaList(),
               ),
-            ),
+            );
+          },
+        )
           ],
           centerTitle: true,
           backgroundColor: kPrimaryColor,
@@ -561,7 +556,11 @@ class _CourseTileState extends State<CourseTile> {
         .where("isOpen", isEqualTo: true)
         .where("addedToClass", isEqualTo: true)
         .get().then((value) => {
-        Navigator.push(
+
+         // print("value of size ${value.size}"),
+
+          if(value.size>=1){
+          Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
@@ -571,34 +570,14 @@ class _CourseTileState extends State<CourseTile> {
             },
           ),
         ),
-  
-        });
-  }
-
-//request code
-  Future<void> requestCode(String userToken, String currentUserId,
-      String senderName, String title) async {
-    String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName  naho nimero ya telefoni ni ${widget.phone} .\n  Namaze kwishyura amafaranga ${widget.coursePrice.isEmpty ? 1000 : widget.coursePrice} frw kuri nimero ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-    String notificationTitle = "Requesting Quiz Code";
-
-    //make sure that request is not already sent
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: currentUserId)
-        .where("isQuiz", isEqualTo: true)
-        .get()
-        .then((value) {
-      if (value.size != 0) {
-        setState(() {
-          _isLoading = false;
-          showDialog(
+          }
+          else{
+         showDialog(
               context: context,
               builder: (context) {
                 return AlertDialog(
                   content: const Text(
-                      "Your request have been already sent,Please wait the team is processing it."),
+                      "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
                   actions: [
                     TextButton(
                         onPressed: () {
@@ -607,73 +586,10 @@ class _CourseTileState extends State<CourseTile> {
                         child: const Text("Close"))
                   ],
                 );
-              });
+              })
+
+          }
+
         });
-      } else {
-        Map<String, dynamic> checkCode = {
-          "userId": currentUserId,
-          "name": senderName,
-          "email": widget.email,
-          "phone": widget.phone,
-          "photoUrl": widget.photoUrl,
-          "quizId": widget.courseId,
-          "quizTitle": title,
-          "code": "",
-          "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-          "isOpen": false,
-          "isQuiz": true,
-        };
-        FirebaseFirestore.instance
-            .collection("Quiz-codes")
-            .add(checkCode)
-            .then((value) {
-          //send push notification
-          sendPushMessage(userToken, body, notificationTitle);
-          setState(() {
-            _isLoading = false;
-            Size size = MediaQuery.of(context).size;
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text(
-                        "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                    actions: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        width: size.width * 0.7,
-                        height: size.height * 0.07,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor),
-                            onPressed: () async {
-                              //direct phone call
-                              await FlutterPhoneDirectCaller.callNumber(
-                                  "*182*8*1*329494*1500#");
-                            },
-                            child: const Text(
-                              "Ishyura 1500 Rwf.",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Close"))
-                    ],
-                  );
-                });
-          });
-        });
-      }
-    });
   }
 }

@@ -11,13 +11,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
-import '../../../widgets/banner_widget.dart';
 import 'check_deviceid.dart';
 
 class SignIn extends StatefulWidget {
@@ -42,46 +40,12 @@ class _SignInState extends State<SignIn> {
   String? deviceId;
   bool checkedValue = false;
   bool isLoggedIn = false; // Track login state
-  InterstitialAd? _interstitialAd;
-  Timer? interstitialTimer;
+  
 
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          if (kDebugMode) {
-            print('InterstitialAd failed to load: $error');
-          }
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    } else {
-      if (kDebugMode) {
-        print('InterstitialAd is not loaded yet.');
-      }
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    loadInterstitialAd();
-
-    // Start the timer to show the interstitial ad every 4 minutes
-    interstitialTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      showInterstitialAd();
-    });
     _messaging.getToken().then((value) {
       fcmToken = value;
       if (kDebugMode) {
@@ -137,8 +101,6 @@ class _SignInState extends State<SignIn> {
   @override
   void dispose() {
     super.dispose();
-    _interstitialAd!.dispose();
-    interstitialTimer?.cancel();
   }
 
   @override
@@ -260,7 +222,8 @@ class _SignInState extends State<SignIn> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor),
-                    onPressed: () {
+                    onPressed: (){
+                      // _renameFields();
                       loginUser();
                     },
                     child: const Text(
@@ -340,10 +303,6 @@ class _SignInState extends State<SignIn> {
                 ),
               ),
               SizedBox(
-                height: size.height * 0.01,
-              ),
-              const AdBannerWidget(),
-              SizedBox(
                 height: size.height * 0.06,
               ),
             ],
@@ -367,14 +326,13 @@ class _SignInState extends State<SignIn> {
         isLoading = true;
       });
       preferences = await SharedPreferences.getInstance();
-      //showInterstitialAd();
       FirebaseFirestore.instance
           .collection("Users")
           .where("password", isEqualTo: password)
           .get()
           .then((QuerySnapshot querySnapshot) async {
         if (querySnapshot.size > 0) {
-          var firstDoc = querySnapshot.docs.first;
+          var firstDoc = querySnapshot.docs.last;
           if (firstDoc.data() != null) {
             Map<String, dynamic> data = firstDoc.data() as Map<String, dynamic>;
 
@@ -387,7 +345,7 @@ class _SignInState extends State<SignIn> {
               await preferences.setString("uid", data["uid"]);
               await preferences.setString("name", data["name"]);
               await preferences.setString("photo", data["photoUrl"]);
-              await preferences.setString("email", data["email"]);
+              await preferences.setString("email", data["userEmail"]);
               await preferences.setString("role", data["role"]);
               await preferences.setString("phone", data["phone"]);
 
@@ -411,7 +369,7 @@ class _SignInState extends State<SignIn> {
                 await preferences.setString("uid", data["uid"]);
                 await preferences.setString("name", data["name"]);
                 await preferences.setString("photo", data["photoUrl"]);
-                await preferences.setString("email", data["email"]);
+                await preferences.setString("email", data["userEmail"]);
                 await preferences.setString("role", data["role"]);
                 await preferences.setString("phone", data["phone"]);
                 if (kDebugMode) {

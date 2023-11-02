@@ -8,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
@@ -26,10 +25,6 @@ class OldQuiz extends StatefulWidget {
 
 class _OldQuizState extends State<OldQuiz> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late BannerAd _bannerAd;
-  bool isBannerLoaded = false;
-  bool isBannerVisible = false;
-  Timer? bannerTimer;
   Stream<dynamic>? quizStream;
   bool isLoading = false;
   DatabaseService databaseService = DatabaseService();
@@ -141,31 +136,6 @@ class _OldQuizState extends State<OldQuiz> {
 
   @override
   void initState() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-        },
-        // Add other banner ad listener callbacks as needed.
-      ),
-    );
-
-    _bannerAd.load();
-    // Initialize the banner timer
-    bannerTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      setState(() {
-        isBannerVisible = true;
-      });
-    });
-
     _messaging.getToken().then((value) {
     });
     databaseService.getOldQuizData().then((value) async {
@@ -186,8 +156,6 @@ class _OldQuizState extends State<OldQuiz> {
   @override
   void dispose() {
     // Dispose the banner timer when the widget is disposed
-    _bannerAd.dispose();
-    bannerTimer?.cancel();
     super.dispose();
   }
 

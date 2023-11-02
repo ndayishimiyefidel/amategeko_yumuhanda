@@ -1,10 +1,11 @@
+import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/quizzes/new_quiz.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
-import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
 
 class Exams extends StatefulWidget {
@@ -45,26 +46,17 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
           ),
         ),
         actions: [
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
-                ),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
+         CustomButton(
+          text: "Amabwiriza",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => AmabwirizaList(),
               ),
-              child: Icon(
-                Icons.notifications_outlined,
-                size: 25,
-              ),
-            ),
-          ),
+            );
+          },
+        )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,

@@ -9,13 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../components/text_field_container.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
-import '../../../widgets/banner_widget.dart';
 import '../../HomeScreen.dart';
 import '../../Login/components/check_deviceid.dart';
 import '../../Login/login_screen.dart';
@@ -52,46 +49,13 @@ class _SignUpState extends State<SignUp> {
   String? deviceEmail;
 
   List<dynamic> accounts = [];
-  InterstitialAd? _interstitialAd;
-  Timer? interstitialTimer;
 
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          if (kDebugMode) {
-            print('InterstitialAd failed to load: $error');
-          }
-        },
-      ),
-    );
-  }
 
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    } else {
-      if (kDebugMode) {
-        print('InterstitialAd is not loaded yet.');
-      }
-    }
-  }
+ 
 
   @override
   void initState() {
     super.initState();
-    loadInterstitialAd();
-    // Start the timer to show the interstitial ad every 4 minutes
-    interstitialTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      showInterstitialAd();
-    });
-
 
     if (kDebugMode) {
       print("Referral code");
@@ -194,8 +158,9 @@ class _SignUpState extends State<SignUp> {
           if (firebaseUser != null) {
             final QuerySnapshot result = await FirebaseFirestore.instance
                 .collection("Users")
-                // .where("uid", isEqualTo: firebaseUser!.uid)
+                .where("uid", isEqualTo: firebaseUser!.uid)
                 .where("phone",isEqualTo: phoneNumber.trim())
+                .where("password",isEqualTo:password.trim())
                 .get();
 
             final List<DocumentSnapshot> documents = result.docs;
@@ -205,7 +170,7 @@ class _SignUpState extends State<SignUp> {
                   .doc(firebaseUser!.uid)
                   .set({
                 "uid": firebaseUser!.uid,
-                "email": firebaseUser!.email,
+                "userEmail": firebaseUser!.email,
                 "name": name.toString().trim(),
                 "phone": phoneNumber.trim(),
                 "password": password.trim(),
@@ -235,7 +200,7 @@ class _SignUpState extends State<SignUp> {
               await preferences.setString("photo", documents[0]["photoUrl"]);
               await preferences.setString("phone", documents[0]["phone"]);
               await preferences.setString("role", documents[0]["role"]);
-              await preferences.setString("email", documents[0]["email"]);
+              await preferences.setString("email", documents[0]["userEmail"]);
               setState(() {
                 isloading = false;
               });
@@ -278,8 +243,7 @@ class _SignUpState extends State<SignUp> {
   @override
   void dispose() {
     super.dispose();
-    _interstitialAd!.dispose();
-    interstitialTimer?.cancel();
+
   }
 
   @override
@@ -444,7 +408,9 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       phoneNumber = val;
-                      print(phoneNumber);
+                      if (kDebugMode) {
+                        print(phoneNumber);
+                      }
                     },
                     validator: (phoneValue) {
                       if (phoneValue!.isEmpty) {
@@ -592,7 +558,6 @@ class _SignUpState extends State<SignUp> {
                         ],
                       )
                     : const SizedBox(),
-                const AdBannerWidget(),
               ]),
         ),
       ),

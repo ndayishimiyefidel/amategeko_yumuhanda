@@ -137,7 +137,7 @@ class _ViewReferralsState extends State<ViewReferrals> {
                   );
                 } else {
                   snapshot.data!.docs
-                      .removeWhere((i) => i["uid" ?? ''] == currentuserid);
+                      .removeWhere((i) => i["uid"] == currentuserid);
                   allUsersList = snapshot.data!.docs;
 
                   return ListView.builder(
@@ -164,9 +164,8 @@ class _ViewReferralsState extends State<ViewReferrals> {
 
                             return ChatUsersList(
                               name: snapshot.data!.docs[index]["name"],
-                              image: snapshot.data!.docs[index]["photoUrl"],
                               time: snapshot.data!.docs[index]["createdAt"],
-                              email: snapshot.data!.docs[index]["email"],
+                              // email: snapshot.data!.docs[index]["email"],
                               userId: snapshot.data!.docs[index]["uid"],
                               phone: snapshot.data!.docs[index]["phone"],
                               password: snapshot.data!.docs[index]["password"],

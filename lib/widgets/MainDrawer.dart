@@ -25,7 +25,7 @@ class MainDrawer extends StatefulWidget {
   });
 
   @override
-  _MainDrawerState createState() => _MainDrawerState();
+  State createState() => _MainDrawerState();
 }
 
 class _MainDrawerState extends State<MainDrawer> {
@@ -82,14 +82,14 @@ class _MainDrawerState extends State<MainDrawer> {
     String playStoreLink =
         "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
     // Redirect to the Play Store
-    launch(playStoreLink);
+    launchUrl(Uri.parse(playStoreLink));
   }
 
   Future<bool> checkAppInstalled() async {
     // Replace "com.amategeko.amategeko" with your app package name
     const String appPackage = "com.amategeko.amategeko";
     // Check if the app is installed by attempting to launch it
-    bool isInstalled = await canLaunch(appPackage);
+    bool isInstalled = await canLaunchUrl(Uri.parse(appPackage));
     return isInstalled;
   }
 
@@ -306,6 +306,7 @@ class _MainDrawerState extends State<MainDrawer> {
               .delete()
               .then((value) => {
                     UserStateMethods().logoutuser(context),
+                    // ignore: avoid_print
                     print("User deleted"),
                   })
         });

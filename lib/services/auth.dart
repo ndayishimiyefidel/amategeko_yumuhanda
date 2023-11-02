@@ -50,7 +50,8 @@ class AuthService {
     }
   }
 
-  Future<void> deleteUser(String uid) async {
+  Future<bool> deleteUser(String uid) async {
+  try {
     // Step 1: Delete the user from the "Users" collection
     await FirebaseFirestore.instance.collection("Users").doc(uid).delete();
 
@@ -65,7 +66,12 @@ class AuthService {
       // Delete each document that matches the user's UID
       await doc.reference.delete();
     }
+
+    return true; // Deletion was successful
+  } catch (e) {
+    return false; // Deletion failed
   }
+}
 
   Future<void> deleteIremboUser(String uid) async {
     // Step 1: Delete the user from the "Users" collection

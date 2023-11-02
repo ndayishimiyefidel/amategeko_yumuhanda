@@ -1,4 +1,5 @@
 import 'package:amategeko/screens/amasomo/course_content.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:random_string/random_string.dart';
 
@@ -82,7 +83,9 @@ class _IsomoPageState extends State<IsomoPage> {
         ),
         onChanged: (val) {
           coursePrice = val;
-          print(coursePrice);
+          if (kDebugMode) {
+            print(coursePrice);
+          }
         },
       ),
     );

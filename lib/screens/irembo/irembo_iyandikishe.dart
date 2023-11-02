@@ -1,4 +1,5 @@
 import 'package:amategeko/screens/irembo/components/body.dart';
+import 'package:amategeko/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class IremboSignUpScreen extends StatelessWidget {
@@ -6,7 +7,13 @@ class IremboSignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+       appBar: AppBar(
+        title: Text('KWIYANDIKISHA'),
+        backgroundColor: kPrimaryColor,
+        centerTitle: true,
+      ),
+
       body: SignUp(),
     );
   }

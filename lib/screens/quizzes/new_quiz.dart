@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
-import '../../widgets/banner_widget.dart';
 import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
 
@@ -30,6 +29,7 @@ class _NewQuizState extends State<NewQuiz> {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   AuthService authService = AuthService();
   final user = FirebaseAuth.instance.currentUser;
+    final FirebaseFirestore _firebaseFirestore =FirebaseFirestore.instance;
 
   //shared preferences
   late SharedPreferences preferences;
@@ -56,23 +56,23 @@ class _NewQuizState extends State<NewQuiz> {
       phone = preferences.getString("phone")!;
       email = preferences.getString("email")!;
     });
-    FirebaseFirestore.instance
-        .collection("Quiz-codes")
+    _firebaseFirestore.collection("Quiz-codes")
         .where("userId", isEqualTo: currentuserid.toString())
         .where("isOpen", isEqualTo: true)
         .get()
         .then((value) {
-      if (value.size == 1) {
+          if(mounted){
+   if (value.size == 1) {
         setState(() {
           hasCode = true;
         });
       }
+          }
     });
   }
 
   getToken() async {
-    await FirebaseFirestore.instance
-        .collection("Users")
+    await _firebaseFirestore.collection("Users")
         .where("role", isEqualTo: "Admin")
         .get()
         .then((value) {
@@ -158,10 +158,6 @@ class _NewQuizState extends State<NewQuiz> {
               quizList(),
               const SizedBox(
                 height: 10,
-              ),
-              const AdBannerWidget(),
-              const SizedBox(
-                height: 5,
               ),
             ],
           ),
@@ -294,7 +290,8 @@ class _NewQuizState extends State<NewQuiz> {
         .where("isQuiz", isEqualTo: true)
         .get()
         .then((value) {
-      if (value.size == 0) {
+          if(mounted){
+            if (value.size == 0) {
         Map<String, dynamic> checkCode = {
           "userId": currentUserId,
           "name": senderName,
@@ -378,6 +375,8 @@ class _NewQuizState extends State<NewQuiz> {
               });
         });
       }
+          }
+      
     });
   }
 }
@@ -487,6 +486,7 @@ class _QuizTileState extends State<QuizTile> {
                                         title: widget.title,
                                         quizNumber: widget.index + 1,
                                         questions: widget.questions,
+                                        quizType: widget.quizType,
                                       );
                                     },
                                   ),
@@ -512,6 +512,7 @@ class _QuizTileState extends State<QuizTile> {
                                             title: widget.title,
                                             quizNumber: widget.index + 1,
                                             questions: widget.questions,
+                                            quizType: widget.quizType,
                                           );
                                         },
                                       ),
@@ -593,9 +594,11 @@ class _QuizTileState extends State<QuizTile> {
                                                 onPressed: () async {
                                                   if (_formkey.currentState!
                                                       .validate()) {
+                                                if(mounted){
                                                     setState(() {
                                                       _isLoading = true;
                                                     });
+                                                }
                                                     checkValidCode(
                                                       widget.currentUserId,
                                                       code,
@@ -675,7 +678,8 @@ class _QuizTileState extends State<QuizTile> {
             .doc(doc.reference.id)
             .update({"isOpen": true}).then((value) {
           if (querySnapshot.size == 1) {
-            setState(() {
+          if(mounted){
+              setState(() {
               _isLoading = false;
               Navigator.push(
                 context,
@@ -686,13 +690,16 @@ class _QuizTileState extends State<QuizTile> {
                       title: widget.title,
                       quizNumber: widget.index + 1,
                       questions: widget.questions,
+                      quizType: widget.quizType,
                     );
                   },
                 ),
               );
             });
+          }
           } else {
-            setState(() {
+            if(mounted){
+              setState(() {
               showDialog(
                   context: context,
                   builder: (context) {
@@ -709,6 +716,7 @@ class _QuizTileState extends State<QuizTile> {
                     );
                   });
             });
+            }
           }
         });
       }
@@ -730,7 +738,8 @@ class _QuizTileState extends State<QuizTile> {
         .where("isQuiz", isEqualTo: true)
         .get()
         .then((value) {
-      if (value.size != 0) {
+      if(mounted){
+        if(value.size != 0) {
         setState(() {
           _isLoading = false;
           showDialog(
@@ -814,6 +823,8 @@ class _QuizTileState extends State<QuizTile> {
           });
         });
       }
+      }
+  
     });
   }
 }

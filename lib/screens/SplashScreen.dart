@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
 
@@ -9,10 +8,9 @@ import '../utils/constants.dart';
 import 'HomeScreen.dart';
 import 'Welcome/welcome_screen.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key, required this.onAdShown});
+class SplashScreen extends StatefulWidget {  
+  const SplashScreen({super.key});
 
-  final VoidCallback onAdShown;
 
   @override
   State createState() => _SplashScreenState();
@@ -30,19 +28,18 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    widget.onAdShown();
-    precachePicture(
-        ExactAssetPicture(
-            SvgPicture.svgStringDecoderBuilder, 'assets/icons/signup.svg'),
-        null);
-    precachePicture(
-        ExactAssetPicture(
-            SvgPicture.svgStringDecoderBuilder, 'assets/icons/chat.svg'),
-        null);
-    precachePicture(
-        ExactAssetPicture(
-            SvgPicture.svgStringDecoderBuilder, 'assets/icons/login.svg'),
-        null);
+    // precachePicture(
+    //     ExactAssetPicture(
+    //         SvgPicture.svgStringDecoderBuilder, 'assets/icons/signup.svg'),
+    //     null);
+    // precachePicture(
+    //     ExactAssetPicture(
+    //         SvgPicture.svgStringDecoderBuilder, 'assets/icons/chat.svg'),
+    //     null);
+    // precachePicture(
+    //     ExactAssetPicture(
+    //         SvgPicture.svgStringDecoderBuilder, 'assets/icons/login.svg'),
+    //     null);
     WidgetsBinding.instance.addObserver(this);
 
     navigateUser();

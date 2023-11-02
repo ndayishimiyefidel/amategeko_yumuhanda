@@ -17,6 +17,7 @@ class OpenQuiz extends StatefulWidget {
   final String title;
   // ignore: prefer_typing_uninitialized_variables
   final quizNumber;
+  final String? quizType;
   final List<Map<String, dynamic>> questions;
 
   const OpenQuiz(
@@ -24,7 +25,8 @@ class OpenQuiz extends StatefulWidget {
       required this.quizId,
       required this.title,
       this.quizNumber,
-      required this.questions});
+      required this.questions,
+      this.quizType});
 
   @override
   State<OpenQuiz> createState() => _OpenQuizState();
@@ -108,7 +110,7 @@ class _OpenQuizState extends State<OpenQuiz>
     if (kDebugMode) {
       print(" total question are:${widget.questions.length}");
 
-      print("question are:${widget.questions}");
+      ///print("question are:${widget.questions}");
     }
 
     //initiliaze controller
@@ -125,7 +127,9 @@ class _OpenQuizState extends State<OpenQuiz>
           MaterialPageRoute(
             builder: (context) {
               return Results(
-                  correct: _correct, incorrect: _incorrect, total: widget.questions.length);
+                  correct: _correct,
+                  incorrect: _incorrect,
+                  total: widget.questions.length);
             },
           ),
         );
@@ -171,7 +175,7 @@ class _OpenQuizState extends State<OpenQuiz>
           },
         ),
         title: const Text(
-          "Taking Quiz",
+          "Gukora Ikizamini",
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
@@ -310,31 +314,28 @@ class _OpenQuizState extends State<OpenQuiz>
                 "Exam No:${widget.quizNumber}",
                 textAlign: TextAlign.start,
                 style: const TextStyle(
-                  fontSize: 25,
+                  fontSize: 20,
                   color: kPrimaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
+            SizedBox(
+              height: 5,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 35),
+              padding: const EdgeInsets.only(left: 20),
               child: Text(
                 widget.questions.isEmpty
                     ? "TQ: No questionfor this exam!" // Display loading message
                     : "TQ:${widget.questions.length} question(s)",
                 textAlign: TextAlign.start,
                 style: const TextStyle(
-                  fontSize: 25,
+                  fontSize: 18,
                   color: kPrimaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
             ),
           ],
         ),
@@ -373,6 +374,7 @@ class _OpenQuizState extends State<OpenQuiz>
                       quizId: widget.quizId,
                       quizTitle: widget.title,
                       userRole: userRole.toString(),
+                      quizType: widget.quizType,
                     ),
                     const SizedBox(
                       height: 20.0,
@@ -426,6 +428,7 @@ class QuizPlayTile extends StatefulWidget {
   final String quizId;
   final String quizTitle;
   final String userRole;
+  final String? quizType;
 
   const QuizPlayTile(
       {super.key,
@@ -433,7 +436,8 @@ class QuizPlayTile extends StatefulWidget {
       required this.index,
       required this.quizId,
       required this.quizTitle,
-      required this.userRole});
+      required this.userRole,
+      this.quizType});
 
   @override
   State<QuizPlayTile> createState() => _QuizPlayTileState();
@@ -443,6 +447,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
   String optionSelected = "";
 
   bool hasInternetConnection = true;
+  bool isInCorrectOption = false;
 
   @override
   void initState() {
@@ -462,11 +467,30 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    Color backgroundColor =
+        Colors.white; // Initialize it with the default color
     return Padding(
       padding: const EdgeInsets.only(top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          (widget.quizType == "Free" && widget.index == 0)
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 0),
+                  child: Text(
+                    "NB:Guhitamo ukanda mu kavi nkuko muri exam ya provisoire kuri machine biba bimeze!",
+                    textAlign: TextAlign.start,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.red,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                )
+              : SizedBox(),
+          SizedBox(
+            height: 8,
+          ),
           Row(
             children: [
               Expanded(
@@ -487,70 +511,61 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Image.asset(widget.questionModel.questionImgUrl,fit: BoxFit.cover, )
-                          ),
+                              child: Image.asset(
+                            widget.questionModel.questionImgUrl,
+                            fit: BoxFit.cover,
+                          )),
                         ],
                       ),
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: Icon(Icons.check),
+            description: widget.questionModel.option1,
+            optionSelected: optionSelected,
+            onPressed: () {
               if (!widget.questionModel.answered) {
-                //check correct
+                // Check if the selected option is correct
                 if (widget.questionModel.option1 ==
                     widget.questionModel.correctOption) {
                   optionSelected = widget.questionModel.option1;
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option1;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
-
-                  setState(() {});
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+
+                setState(() {
+                  // Set the background color of the OptionTile
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(
-                (Icons.check),
-              ),
-              description: widget.questionModel.option1,
-              optionSelected: optionSelected,
-            ),
+            backgroundColor: backgroundColor, // Pass the background color here
           ),
           SizedBox(
             height: size.height * 0.01,
           ),
-          GestureDetector(
-            onTap: () {
-              if (kDebugMode) {
-                print("correct option: ${widget.questionModel.correctOption}");
-              }
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: const Icon(
+              (Icons.check),
+            ),
+            description: widget.questionModel.option2,
+            optionSelected: optionSelected,
+            onPressed: () {
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option2 ==
@@ -559,49 +574,37 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option2;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
-                  setState(() {});
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                setState(() {
+                  // Set the background color of the OptionTile
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(
-                (Icons.check),
-              ),
-              description: widget.questionModel.option2,
-              optionSelected: optionSelected,
-            ),
+            backgroundColor: backgroundColor,
           ),
           const SizedBox(
             height: 5,
           ),
-          GestureDetector(
-            onTap: () {
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: const Icon(
+              (Icons.check),
+            ),
+            description: widget.questionModel.option3,
+            optionSelected: optionSelected,
+            onPressed: () {
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option3 ==
@@ -610,48 +613,35 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option3;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                setState(() {
+                  // Set the background color of the OptionTile
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(
-                (Icons.check),
-              ),
-              description: widget.questionModel.option3,
-              optionSelected: optionSelected,
-            ),
+            backgroundColor: backgroundColor,
           ),
           const SizedBox(
             height: 5,
           ),
-          GestureDetector(
-            onTap: () {
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: const Icon(
+              (Icons.check),
+            ),
+            onPressed: () {
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option4 ==
@@ -666,40 +656,32 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
-                  setState(() {});
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                backgroundColor =
+                    optionSelected == widget.questionModel.correctOption
+                        ? Colors.green.withOpacity(0.7)
+                        : Colors.red.withOpacity(0.7);
               }
             },
-            child: OptionTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(
-                (Icons.check),
-              ),
-              description: widget.questionModel.option4,
-              optionSelected: optionSelected,
-            ),
+            description: widget.questionModel.option4,
+            optionSelected: optionSelected,
+            backgroundColor: backgroundColor,
           ),
           const SizedBox(
             height: 20,
           ),
+          isInCorrectOption
+              ? Text(
+                  "Igisubizo cy'ukuri ni: ${widget.questionModel.correctOption}",
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold),
+                )
+              : SizedBox(),
         ],
       ),
     );

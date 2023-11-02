@@ -1,27 +1,25 @@
 import 'dart:async';
 
+import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/ambassador/view_referrals.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
 import '../../widgets/MainDrawer.dart';
-import '../../widgets/banner_widget.dart';
 import '../accounts/users.dart';
 import '../amasomo/all_courses.dart';
-import '../ambassador/ambassador.dart';
 import '../groups/group_list.dart';
 import '../irembo/abiyandishije.dart';
 import '../irembo/irembo_iyandikishe.dart';
 import '../quizzes/exams.dart';
 import '../rules/amategeko_yose.dart';
-import 'noficationtab1.dart';
 import 'notificationtab.dart';
 
 class Home extends StatefulWidget {
@@ -36,34 +34,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  InterstitialAd? _interstitialAd;
-  Timer? interstitialTimer;
   bool _isConnected = true;
-
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          if (kDebugMode) {
-            print('InterstitialAd failed to load: $error');
-          }
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    }
-  }
-
   //shared preferences
   late SharedPreferences preferences;
   late String currentuserid;
@@ -139,16 +110,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     setState(() {
       _isConnected = connectivityResult != ConnectivityResult.none;
     });
-    if (_isConnected) {
-      loadInterstitialAd();
-    }
+    if (_isConnected) {}
   }
 
   @override
   void dispose() {
     animationController.dispose();
-    _interstitialAd?.dispose();
-    interstitialTimer?.cancel();
     super.dispose();
   }
 
@@ -189,27 +156,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ),
             ),
             actions: [
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          const NotificationTab1(),
-                    ),
-                  );
-                },
-                child: const Padding(
-                  padding: EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                  ),
-                  child: Icon(
-                    Icons.notifications_outlined,
-                    size: 25,
-                  ),
-                ),
-              ),
+                CustomButton(
+                  text: "Amabwiriza",
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => AmabwirizaList(),
+                      ),
+                    );
+                  },
+                )
+
             ],
             centerTitle: true,
             backgroundColor: kPrimaryColor,
@@ -234,7 +192,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (BuildContext context) => const Exams(),
+                                  builder: (BuildContext context) =>
+                                      const Exams(),
                                 ),
                               );
                             },
@@ -249,36 +208,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              if (_isConnected) {
-                                showInterstitialAd();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        const Abiyandikishe(),
-                                  ),
-                                );
-                              } else if (_interstitialAd == null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        const Abiyandikishe(),
-                                  ),
-                                );
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        const Abiyandikishe(),
-                                  ),
-                                );
-                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      const AllCourse(),
+                                ),
+                              );
                             },
                             child: const DashboardCard(
-                              name: "Abiyandikishe",
-                              imgpath: "irembo.jpg",
+                              name: "Ishuri online",
+                              imgpath: "mwarimu.jpg",
                             ),
                           ),
                         )
@@ -287,7 +227,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
-              const AdBannerWidget(),
+              // const AdBannerWidget(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30.0, 10, 30, 10),
                 child: Container(
@@ -321,32 +261,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               delayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              if (_isConnected) {
-                                showInterstitialAd();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        const GroupList(),
-                                  ),
-                                );
-                              } else if (_interstitialAd == null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        const GroupList(),
-                                  ),
-                                );
-                              } else {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        const GroupList(),
-                                  ),
-                                );
-                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      const GroupList(),
+                                ),
+                              );
                             },
                             child: const DashboardCard(
                               name: "Group Whatsapp",
@@ -374,32 +295,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    if (_isConnected) {
-                                      showInterstitialAd();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const Notifications(),
-                                        ),
-                                      );
-                                    } else if (_interstitialAd == null) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const Notifications(),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const Notifications(),
-                                        ),
-                                      );
-                                    }
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const Notifications(),
+                                      ),
+                                    );
                                   },
                                   child: const DashboardCard(
                                     name: "Notifications",
@@ -431,32 +333,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     delayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    if (_isConnected) {
-                                      showInterstitialAd();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const IremboSignUpScreen(),
-                                        ),
-                                      );
-                                    } else if (_interstitialAd == null) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const IremboSignUpScreen(),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const IremboSignUpScreen(),
-                                        ),
-                                      );
-                                    }
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const IremboSignUpScreen(),
+                                      ),
+                                    );
                                   },
                                   child: const DashboardCard(
                                     name: "Iyandikishe",
@@ -507,17 +390,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       context,
                                       MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            const AllCourse(),
+                                            const Abiyandikishe(),
                                       ),
                                     );
                                   },
                                   child: const DashboardCard(
-                                    name: "Ishuri online",
-                                    imgpath: "mwarimu.jpg",
+                                    name: "Abiyandikishe",
+                                    imgpath: "irembo.jpg",
                                   ),
                                 ),
-                              ),
-                              Transform(
+                              )
+,                            Transform(
                                 transform: Matrix4.translationValues(
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
@@ -526,13 +409,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                       context,
                                       MaterialPageRoute(
                                         builder: (BuildContext context) =>
-                                            const AllAmbassadors(),
+                                            ViewReferrals(
+                                                referralCode:
+                                                    referralCode.toString(),
+                                                refUid: currentuserid),
                                       ),
                                     );
                                   },
                                   child: const DashboardCard(
-                                    name: "Register Ambassador",
-                                    imgpath: "profile.png",
+                                    name: "My Referrals",
+                                    imgpath: "wgroup.jpg",
                                   ),
                                 ),
                               ),
@@ -558,41 +444,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    if (_isConnected) {
-                                      showInterstitialAd();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              ViewReferrals(
-                                                  referralCode:
-                                                      referralCode.toString(),
-                                                  refUid: currentuserid),
-                                        ),
-                                      );
-                                    } else if (_interstitialAd == null) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              ViewReferrals(
-                                                  referralCode:
-                                                      referralCode.toString(),
-                                                  refUid: currentuserid),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              ViewReferrals(
-                                                  referralCode:
-                                                      referralCode.toString(),
-                                                  refUid: currentuserid),
-                                        ),
-                                      );
-                                    }
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ViewReferrals(
+                                                referralCode:
+                                                    referralCode.toString(),
+                                                refUid: currentuserid),
+                                      ),
+                                    );
                                   },
                                   child: const DashboardCard(
                                     name: "My Referrals",
@@ -606,60 +467,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       ),
                     )
                   : const SizedBox(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30.0, 10, 30, 10),
-                child: Container(
-                  alignment: const Alignment(1.0, 0),
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10.0, right: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        userRole == "Admin"
-                            ? Container()
-                            : Transform(
-                                transform: Matrix4.translationValues(
-                                    muchDelayedAnimation.value * width, 0, 0),
-                                child: Bouncing(
-                                  onPress: () {
-                                    if (_isConnected) {
-                                      showInterstitialAd();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const AllCourse(),
-                                        ),
-                                      );
-                                    } else if (_interstitialAd == null) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const AllCourse(),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const AllCourse(),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: const DashboardCard(
-                                    name: "Ishuri online",
-                                    imgpath: "mwarimu.jpg",
-                                  ),
-                                ),
-                              ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         );

@@ -9,7 +9,6 @@ import 'package:random_string/random_string.dart';
 
 import '../../services/database_service.dart';
 import '../../utils/constants.dart';
-import '../../widgets/banner_widget.dart';
 import '../quizzes/create_quiz.dart';
 
 class AddQuestion extends StatefulWidget {
@@ -391,7 +390,6 @@ class _AddQuestionState extends State<AddQuestion> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  const AdBannerWidget(),
                   Text(
                     "QUIZ TITLE : ${widget.quizTitle}",
                     style: const TextStyle(

@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/constants.dart';
-import '../../../utils/reward_video_manager.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/signup_screen.dart';
 import 'background.dart';
@@ -21,14 +20,11 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    AdManager.loadRewardAd();
   }
 
-  bool adShown = AdManager.showRewardAd();
 
   loginNavigator() {
-    if (adShown) {
-      AdManager.showRewardAd();
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -37,22 +33,10 @@ class _BodyState extends State<Body> {
           },
         ),
       );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return const LoginScreen();
-          },
-        ),
-      );
-    }
   }
 
   signupNavigator() {
-    if (adShown) {
-      AdManager.showRewardAd();
-      Navigator.push(
+   Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) {
@@ -60,16 +44,6 @@ class _BodyState extends State<Body> {
           },
         ),
       );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return const SignUpScreen();
-          },
-        ),
-      );
-    }
   }
 
   @override

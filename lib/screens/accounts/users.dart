@@ -1,6 +1,6 @@
-
 import 'package:amategeko/screens/homepages/usernotification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +14,7 @@ class AllUsers extends StatefulWidget {
   const AllUsers({super.key});
 
   @override
-  _AllUsersState createState() => _AllUsersState();
+  State createState() => _AllUsersState();
 }
 
 class _AllUsersState extends State<AllUsers>
@@ -121,54 +121,37 @@ class _AllUsersState extends State<AllUsers>
                       ],
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("Users")
-                            .orderBy("createdAt", descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return SizedBox(
-                              height: MediaQuery.of(context)
-                                      .copyWith()
-                                      .size
-                                      .height -
-                                  MediaQuery.of(context)
-                                          .copyWith()
-                                          .size
-                                          .height /
-                                      5,
-                              width:
-                                  MediaQuery.of(context).copyWith().size.width,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation(
-                                  kPrimaryColor,
-                                )),
-                              ),
-                            );
-                          } else {
-                            snapshot.data!.docs.removeWhere(
-                                (i) => i["uid"] == currentuserid);
-                            allUsersList = snapshot.data!.docs;
-                            return ListView.builder(
-                              padding: const EdgeInsets.only(top: 16, left: 20),
-                              itemCount: snapshot.data!.docs.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  child: null,
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    ],
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("Users")
+                        .orderBy("createdAt", descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData ||
+                          snapshot.data == null ||
+                          snapshot.data!.size == 0) {
+                        return const Center(
+                          child: Text("No data available"),
+                        );
+                      } else if (snapshot.hasError) {
+                        if (kDebugMode) {
+                          print("Firestore Error: ${snapshot.error}");
+                        }
+                        return Center(
+                            child:
+                                Text("the has occurred due ${snapshot.error}"));
+                      } else {
+                        snapshot.data!.docs
+                            .removeWhere((i) => i["uid"] == currentuserid);
+                        allUsersList = snapshot.data!.docs;
+
+                        if (kDebugMode) {
+                          print(" all users ${allUsersList.length}");
+                        }
+
+                        return Container();
+                      }
+                    },
                   ),
                 ],
               ),
@@ -258,10 +241,16 @@ class DataSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // Show when someone searches for something
+    if (allUsersList == null) {
+      // Handle the case where allUsersList is null, perhaps show a loading indicator.
+      return const CircularProgressIndicator(); // Replace with your loading widget.
+    }
     var userList = [];
+
     allUsersList.forEach((e) {
       userList.add(e);
     });
+
     var suggestionList = userList;
 
     if (query.isNotEmpty) {
@@ -269,14 +258,13 @@ class DataSearch extends SearchDelegate {
       for (var element in userList) {
         if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["email"].toLowerCase().startsWith(query.toLowerCase()) ||
             element["password"].toLowerCase().startsWith(query.toLowerCase())) {
           suggestionList.add(element);
         }
       }
     }
 
-     return ListView.builder(
+    return ListView.builder(
       shrinkWrap: true,
       itemBuilder: (context, index) => ListTile(
         onTap: () {},
@@ -309,29 +297,6 @@ class DataSearch extends SearchDelegate {
               ),
             ),
             RichText(
-              text: TextSpan(
-                text: suggestionList[index]["email"]
-                    .toLowerCase()
-                    .substring(0, query.length),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-                children: [
-                  TextSpan(
-                    text: suggestionList[index]["email"]
-                        .toLowerCase()
-                        .substring(query.length),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-             RichText(
               text: TextSpan(
                 text: suggestionList[index]["password"]
                     .toLowerCase()
@@ -406,8 +371,7 @@ class DataSearch extends SearchDelegate {
                 IconButton(
                   onPressed: () {
                     deleteDocumentByPhoneNumber(
-                        context,
-                        suggestionList[index]["phone"].toString());
+                        context, suggestionList[index]["phone"].toString());
                   },
                   icon: const Icon(
                     Icons.close_outlined,
@@ -424,38 +388,39 @@ class DataSearch extends SearchDelegate {
     );
   }
 
-    Future<void> deleteDocumentByPhoneNumber(
+  Future<void> deleteDocumentByPhoneNumber(
       BuildContext context, String phoneNumber) async {
     final firestoreInstance = FirebaseFirestore.instance;
     try {
-final querySnapshot = await firestoreInstance
-        .collection('Quiz-codes')
-        .where('phone', isEqualTo: phoneNumber)
-        .get();
-    // ignore: use_build_context_synchronously, unnecessary_null_comparison
-    final bool? confirmed =
-        // ignore: use_build_context_synchronously
-        await _showConfirmationDialog(context);
-    // Loop through the query results and delete each matching document
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      if (confirmed == true) {
-        await firestoreInstance
-            .collection('users')
-            .doc(doc.id)
-            .delete()
-            .then((value) => {
-                  // ignore: avoid_print
-                  print("delete success"),
-                  showSnackbar(context, 'user has been deleted success'),
-                });
+      final querySnapshot = await firestoreInstance
+          .collection('Quiz-codes')
+          .where('phone', isEqualTo: phoneNumber)
+          .get();
+      // ignore: use_build_context_synchronously, unnecessary_null_comparison
+      final bool? confirmed =
+          // ignore: use_build_context_synchronously
+          await _showConfirmationDialog(context);
+      // Loop through the query results and delete each matching document
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        if (confirmed == true) {
+          await firestoreInstance
+              .collection('users')
+              .doc(doc.id)
+              .delete()
+              .then((value) => {
+                    // ignore: avoid_print
+                    print("delete success"),
+                    showSnackbar(context, 'user has been deleted success'),
+                  });
+        }
       }
-    }
     } catch (e) {
-     // ignore: use_build_context_synchronously
-    showSnackbar(context, 'error happenning');
+      // ignore: use_build_context_synchronously
+      showSnackbar(context, 'error happenning');
     }
   }
-   void showSnackbar(BuildContext context, String message) {
+
+  void showSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -465,7 +430,8 @@ final querySnapshot = await firestoreInstance
   }
 
   Future<bool?> _showConfirmationDialog(
-      BuildContext context,) async {
+    BuildContext context,
+  ) async {
     return await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -474,7 +440,7 @@ final querySnapshot = await firestoreInstance
           content: const Text('Are you sure you want to delete?'),
           actions: <Widget>[
             TextButton(
-              child:const Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(false);
               },

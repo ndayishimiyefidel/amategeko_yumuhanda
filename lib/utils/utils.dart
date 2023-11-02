@@ -16,9 +16,9 @@ class Utils {
 
   static int stateToNum(UserState userState) {
     switch (userState) {
-      case UserState.Offline:
+      case UserState.offLine:
         return 0;
-      case UserState.Online:
+      case UserState.onLine:
         return 1;
       default:
         return 2;
@@ -28,11 +28,11 @@ class Utils {
   static UserState numToState(int number) {
     switch (number) {
       case 0:
-        return UserState.Offline;
+        return UserState.offLine;
       case 1:
-        return UserState.Online;
+        return UserState.onLine;
       default:
-        return UserState.Waiting;
+        return UserState.waiting;
     }
   }
 

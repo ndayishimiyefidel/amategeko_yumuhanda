@@ -66,7 +66,6 @@ class _EditQuizState extends State<EditQuiz> {
   final TextEditingController quizdescController = TextEditingController();
   final TextEditingController quizPriceController = TextEditingController();
   String quizPrice = "";
-  final String _selectedType = "";
 
   @override
   void initState() {
@@ -338,40 +337,38 @@ class _EditQuizState extends State<EditQuiz> {
                       child: Stack(
                         children: <Widget>[
                           (pickedFile == null)
-                              ? Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Material(
-                                  // display already existing image
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(125.0)),
-                                    clipBehavior: Clip.hardEdge,
+                              ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Material(
                                     // display already existing image
-                                    child: CachedNetworkImage(
-                                      placeholder: (context, url) =>
-                                          Container(
-                                            width: 200.0,
-                                            height: 200.0,
-                                            padding:
-                                            const EdgeInsets.all(20.0),
-                                            child:
-                                            const CircularProgressIndicator(
-                                              strokeWidth: 2.0,
-                                              valueColor:
-                                              AlwaysStoppedAnimation<
-                                                  Color>(
-                                                  Colors.lightBlueAccent),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(125.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                      // display already existing image
+                                      child: CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(
+                                              width: 200.0,
+                                              height: 200.0,
+                                              padding:
+                                              const EdgeInsets.all(20.0),
+                                              child:
+                                              const CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                                valueColor:
+                                                AlwaysStoppedAnimation<
+                                                    Color>(
+                                                    Colors.lightBlueAccent),
+                                              ),
                                             ),
-                                          ),
-                                      imageUrl: widget.quizImage,
-                                      width: 200.0,
-                                      height: 200.0,
-                                      fit: BoxFit.cover,
-                                    )),
-                              ],
-                            ),
-                          )
+                                        imageUrl: widget.quizImage,
+                                        width: 200.0,
+                                        height: 200.0,
+                                        fit: BoxFit.cover,
+                                      )),
+                                ],
+                              )
                               : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

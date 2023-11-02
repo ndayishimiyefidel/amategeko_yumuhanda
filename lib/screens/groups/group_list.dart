@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/groups/create_group.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -14,7 +16,6 @@ import '../../services/database_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 import '../../widgets/fcmWidget.dart';
-import '../homepages/notificationtab.dart';
 
 class GroupList extends StatefulWidget {
   const GroupList({Key? key}) : super(key: key);
@@ -177,26 +178,17 @@ class _GroupListState extends State<GroupList> {
           ),
         ),
         actions: [
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => const Notifications(),
-                ),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
+         CustomButton(
+          text: "Amabwiriza",
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => AmabwirizaList(),
               ),
-              child: Icon(
-                Icons.notifications_outlined,
-                size: 25,
-              ),
-            ),
-          ),
+            );
+          },
+        )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,

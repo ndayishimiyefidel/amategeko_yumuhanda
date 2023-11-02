@@ -11,7 +11,7 @@ import '../services/auth.dart';
 
 class ChatUsersList extends StatefulWidget {
   // final String secondaryText;
-  final String name, role, image, time, userId, email, phone, password;
+  final String name, role, time, userId,phone, password;
   final String? referralCode;
   final String? quizCode, deviceId;
 
@@ -19,9 +19,7 @@ class ChatUsersList extends StatefulWidget {
       {super.key,
       this.referralCode,
       required this.name,
-      required this.image,
       required this.time,
-      required this.email,
       required this.userId,
       required this.phone,
       required this.password,
@@ -34,15 +32,17 @@ State createState() => _ChatUsersListState();
 }
 
 class _ChatUsersListState extends State<ChatUsersList> {
-  late String currentuserid;
-  late String currentusername;
-  late String currentuserphoto;
-  late String currentUserPhone;
-  String? userRole;
+  // late String currentuserid;
+  // late String currentusername;
+  // late String currentuserphoto;
+  // late String currentUserPhone;
+  // String? userRole;
   late String phoneNumber;
   late SharedPreferences preferences;
   bool isLoading = false;
   bool hasBeenCalled = false;
+  bool isDeleting=false;
+  String? deleteMessage;
 
   Future<bool> _hasUserBeenCalled() async {
     preferences = await SharedPreferences.getInstance();
@@ -61,27 +61,21 @@ class _ChatUsersListState extends State<ChatUsersList> {
   void initState() {
     super.initState();
     firestore = FirebaseFirestore.instance;
-    getCurrUser();
+   // getCurrUser();
   }
 
-  getCurrUser() async {
-    preferences = await SharedPreferences.getInstance();
-    setState(() {
-      currentuserid = preferences.getString("uid")!;
-      currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
-      currentUserPhone = preferences.getString("phone")!;
-      userRole = preferences.getString("role")!;
-    });
-  }
+  // getCurrUser() async {
+  //   preferences = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     // currentuserid = preferences.getString("uid")!;
+  //     // currentusername = preferences.getString("name")!;
+  //     // currentuserphoto = preferences.getString("photo")!;
+  //     // currentUserPhone = preferences.getString("phone")!;
+  //     userRole = preferences.getString("role")!;
+  //   });
+  // }
 
   Future<bool?> _showCallConfirmationDialog(BuildContext context) async {
-    // bool hasBeenCalled = await _hasUserBeenCalled();
-    // if (hasBeenCalled) {
-    //   // If user has already been called, show a message or perform any other action
-    //   // as needed and return null to prevent the call.
-    //   return null;
-    // }
     return await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -129,213 +123,138 @@ class _ChatUsersListState extends State<ChatUsersList> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    int timestamp = int.parse(widget.time);
-    var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    var dateTimeFormat = DateFormat('dd/MM/yyyy, hh:mm a').format(date);
-    return InkWell(
-      splashColor: Colors.brown,
-      onTap: () {
-        if (userRole == "Admin" && widget.role == "Ambassador") {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return ViewReferrals(
-              referralCode: widget.referralCode.toString(),
-              refUid: widget.userId,
-            );
-          }));
-        }
-      },
-      child: Container(
-        height: 150,
-        padding:
-            const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  // Stack(
-                  //   children: [
-                  //     CircleAvatar(
-                  //       backgroundImage: NetworkImage(widget.image),
-                  //       maxRadius: 30,
-                  //     ),
-                  //     Positioned(
-                  //       left: 0,
-                  //       top: 30,
-                  //       child: StatusIndicator(
-                  //         uid: widget.userId,
-                  //         screen: "chatListScreen",
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // const SizedBox(
-                  //   width: 16,
-                  // ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.transparent,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(widget.name),
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(widget.phone),
-                                        const SizedBox(
-                                          width: 80,
-                                        ),
-                                        widget.quizCode != "nocode"
-                                            ? const SizedBox()
-                                            : IconButton(
-                                                onPressed: () async {
-                                                  //     //indirect phone call
-                                                  //     // launchUrl('tel://${widget.phone}' as Uri);
-                                                  //     //direct phone call
-                                                  bool hasBeenCalled =
-                                                      await _hasUserBeenCalled();
-                                                  if (!hasBeenCalled) {
-                                                    bool? confirmed =
-                                                        await _showCallConfirmationDialog(
-                                                            context);
-                                                    if (confirmed == true) {
-                                                      await FlutterPhoneDirectCaller
-                                                          .callNumber(
-                                                              widget.phone);
-                                                      await _setUserCalled(); // Set the user as called after the call is made
-                                                      setState(
-                                                          () {}); // Update the state to reflect the change
-                                                    }
-                                                  } else {
-                                                    // User has been called before, show a message or perform any other action
-                                                    // as needed.
-                                                    bool? confirmed =
-                                                        await _showCallConfirmationDialog(
-                                                            context);
-                                                    if (confirmed == true) {
-                                                      await FlutterPhoneDirectCaller
-                                                          .callNumber(
-                                                              widget.phone);
-                                                      await _setUserCalledStatus(
-                                                          true); // Set the user as called after the call is made
-                                                      setState(
-                                                          () {}); // Update the state to reflect the change
-                                                    }
-                                                  }
-                                                },
-                                                icon: FutureBuilder<bool>(
-                                                  future: _hasUserBeenCalled(),
-                                                  // Update FutureBuilder here
-                                                  builder: (context, snapshot) {
-                                                    final hasBeenCalled =
-                                                        snapshot.data ?? false;
-                                                    final callColor =
-                                                        hasBeenCalled
-                                                            ? Colors.grey
-                                                            : Colors.blueAccent;
-                                                    return Icon(
-                                                      Icons.call,
-                                                      size: 30,
-                                                      color: callColor,
-                                                      weight: 30,
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    widget.email,
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey.shade500,
-                                        fontStyle: FontStyle.italic),
-                                  ),
-                                  Text(
-                                    "password: ${widget.password}",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey.shade500,
-                                        fontStyle: FontStyle.italic),
-                                  ),
-                                  widget.role != "User"
-                                      ? Text(
-                                          "User Type: ${widget.role}",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey.shade500,
-                                              fontStyle: FontStyle.italic),
-                                        )
-                                      : const SizedBox(),
-                                  widget.quizCode == "nocode"
-                                      ? const SizedBox()
-                                      : Text(
-                                          "Quiz Code: ${widget.quizCode}",
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.blueAccent,
-                                              fontStyle: FontStyle.italic),
-                                        ),
-                                  Text(
-                                    "Device Id: ${widget.deviceId ?? "no device"}",
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.redAccent,
-                                        fontStyle: FontStyle.normal),
-                                  ),
-                                  // widget.referralCode.isEmpty
-                                  //     ? const SizedBox()
-                                  //     : Expanded(
-                                  //         child: Text(
-                                  //           "${widget.referralCode}",
-                                  //           style: TextStyle(
-                                  //               fontSize: 14,
-                                  //               color: Colors.grey.shade500,
-                                  //               fontStyle: FontStyle.italic),
-                                  //         ),
-                                  //       ),
-                                  Text(
-                                    "Joined date: $dateTimeFormat",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey.shade500,
-                                        fontStyle: FontStyle.italic),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            color: Colors.red,
+@override
+Widget build(BuildContext context) {
+  int timestamp = int.parse(widget.time);
+  var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+  var dateTimeFormat = DateFormat('dd/MM/yyyy, hh:mm a').format(date);
+  return InkWell(
+    splashColor: Colors.brown,
+    onTap: () {
+      if (widget.role== "Admin" || widget.role == "Ambassador") {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return ViewReferrals(
+            referralCode: widget.referralCode.toString(),
+            refUid: widget.userId,
+          );
+        }));
+      }
+    },
+    child: Card(
+      margin: EdgeInsets.all(8), // Add margin for spacing
+      child: Row(
+        children: [
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(widget.name),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(widget.phone),
+                    const SizedBox(width: 60),
+                    widget.quizCode != "nocode"
+                        ? const SizedBox()
+                        : IconButton(
                             onPressed: () async {
-                              AuthService().deleteUser(widget.userId);
+                              bool hasBeenCalled = await _hasUserBeenCalled();
+                              bool? confirmed = await _showCallConfirmationDialog(context);
+                              if (confirmed == true) {
+                                await FlutterPhoneDirectCaller.callNumber(widget.phone);
+                                if (!hasBeenCalled) {
+                                  await _setUserCalled();
+                                } else {
+                                  await _setUserCalledStatus(true);
+                                }
+                                setState(() {}); // Update the state to reflect the change
+                              }
                             },
-                            icon: const Icon(
-                              Icons.delete,
-                              size: 30,
-                              color: Colors.red,
+                            icon: FutureBuilder<bool>(
+                              future: _hasUserBeenCalled(),
+                              builder: (context, snapshot) {
+                                final hasBeenCalled = snapshot.data ?? false;
+                                final callColor = hasBeenCalled ? Colors.grey : Colors.blueAccent;
+                                return Icon(
+                                  Icons.call,
+                                  size: 30,
+                                  color: callColor,
+                                );
+                              },
                             ),
                           ),
-                        ],
-                      ),
+                  ],
+                ),
+                Text(
+                  "password: ${widget.password}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                if (widget.quizCode != "nocode")
+                  Text(
+                    "Quiz Code: ${widget.quizCode}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.blueAccent,
+                      fontStyle: FontStyle.italic,
                     ),
                   ),
-                ],
-              ),
+                Text(
+                  "Device Id: ${widget.deviceId ?? "no device"}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.redAccent,
+                    fontStyle: FontStyle.normal,
+                  ),
+                ),
+                Text(
+                  "Joined date: $dateTimeFormat",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          
+          IconButton(
+            color: Colors.red,
+            onPressed: () async {
+            setState(() {
+      isDeleting = true;
+      deleteMessage = ''; // Clear any previous message
+    });
+
+    final deleteResult = await AuthService().deleteUser(widget.userId);
+
+    setState(() {
+      isDeleting = false;
+      if (deleteResult) {
+        deleteMessage = 'User deleted successfully';
+      } else {
+        deleteMessage = 'Failed to delete user';
+      }
+    });
+            },
+            icon: const Icon(
+              Icons.delete,
+              size: 30,
+              color: Colors.red,
+            ),
+          ),
+          isDeleting? CircularProgressIndicator():ScaffoldMessenger(child: Text(deleteMessage.toString())),
+
+
+        ],
       ),
-    );
-  }
+    ),
+  );
+
+}
+
 }

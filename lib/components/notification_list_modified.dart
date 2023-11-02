@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,41 +51,10 @@ class _ModifiedUsersNotificationListState
   late SharedPreferences preferences;
   bool _isLoading = false;
 
-  InterstitialAd? _interstitialAd;
-  Timer? interstitialTimer;
-
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          if (kDebugMode) {
-            print('InterstitialAd failed to load: $error');
-          }
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    } else {
-      if (kDebugMode) {
-        print('InterstitialAd is not loaded yet.');
-      }
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    loadInterstitialAd();
     getCurrUser(); //get login data
     requestPermission(); //request permission
     loadFCM(); //load fcm
@@ -270,7 +237,6 @@ class _ModifiedUsersNotificationListState
         ),
       ),
       onTap: () {
-        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });
@@ -292,7 +258,6 @@ class _ModifiedUsersNotificationListState
         ),
       ),
       onTap: () {
-        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });
@@ -406,7 +371,6 @@ class _ModifiedUsersNotificationListState
         ),
       ),
       onTap: () {
-        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });

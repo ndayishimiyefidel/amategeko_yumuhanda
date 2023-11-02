@@ -1,14 +1,10 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../components/notification_list.dart';
 import '../../utils/constants.dart';
-import '../../widgets/changing_banner.dart';
 
 class NotificationTab2 extends StatefulWidget {
   const NotificationTab2({super.key});
@@ -18,11 +14,6 @@ class NotificationTab2 extends StatefulWidget {
 }
 
 class _NotificationTab2State extends State<NotificationTab2> {
-  late BannerAd _bannerAd;
-  bool isBannerLoaded = false;
-  bool isBannerVisible = true;
-  Timer? bannerTimer;
-
   // List allUsers = [];
   List<Map<String, dynamic>> allUsersList = [];
   String? currentuserid;
@@ -38,28 +29,8 @@ class _NotificationTab2State extends State<NotificationTab2> {
   void initState() {
     super.initState();
     getCurrUserId();
-    _loadAds();
   }
-  void _loadAds() async{
-    //banner
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-2864387622629553/7276208106',
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          ad.dispose();
-        },
-      ),
-    );
-
-    _bannerAd.load();
-  }
+  
 
   getCurrUserId() async {
     preferences = await SharedPreferences.getInstance();
@@ -75,8 +46,6 @@ class _NotificationTab2State extends State<NotificationTab2> {
   @override
   void dispose() {
     // Dispose the banner timer when the widget is disposed
-    _bannerAd.dispose();
-    bannerTimer?.cancel();
     super.dispose();
   }
 
@@ -88,8 +57,6 @@ class _NotificationTab2State extends State<NotificationTab2> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            if (isBannerVisible && isBannerLoaded)
-              BannerAdWidget(ad: _bannerAd),
             StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection("Quiz-codes")

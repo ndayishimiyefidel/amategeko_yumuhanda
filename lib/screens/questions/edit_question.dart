@@ -9,7 +9,6 @@ import 'package:random_string/random_string.dart';
 
 import '../../services/database_service.dart';
 import '../../utils/constants.dart';
-import '../../widgets/banner_widget.dart';
 
 class EditQuestion extends StatefulWidget {
   final String quizId,
@@ -361,7 +360,6 @@ class _EditQuestionState extends State<EditQuestion> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  const AdBannerWidget(),
                   SizedBox(
                     height: size.height * 0.05,
                   ),

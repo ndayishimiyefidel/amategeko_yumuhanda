@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:amategeko/widgets/fcmWidget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -29,23 +31,53 @@ class _SignUpState extends State<SignUp> {
   String name = "", phoneNumber = "", id = "", address = "";
   late SharedPreferences preferences;
   bool isloading = false;
-
+  String email="";
+  late String photo;
+  String? userRole;
+  String? adminPhone;
+  late String phone;
+  String? currentuserid;
+  late String currentusername;
+  String userToken = "";
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   @override
   void initState() {
     super.initState();
     getCurrUserId();
+      _messaging.getToken().then((value) {
+    });
+    //check code//get login data
+    requestPermission(); //request permission
+    loadFCM(); //load fcm
+    listenFCM(); //list fcm
+    getToken(); //get admin token
+    FirebaseMessaging.instance;
+
   }
 
-  String? currentuserid;
+  getToken() async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .where("role", isEqualTo: "Admin")
+        .get()
+        .then((value) {
+      if (value.size == 1) {
+        Map<String, dynamic> adminData = value.docs.first.data();
+        userToken = adminData["fcmToken"];
+        adminPhone = adminData["phone"];
+      }
+    });
+  }
 
   getCurrUserId() async {
     preferences = await SharedPreferences.getInstance();
     setState(() {
       currentuserid = preferences.getString("uid")!;
-      // ignore: avoid_print
-      print("current user id");
-      // ignore: avoid_print
-      print(currentuserid);
+      currentusername = preferences.getString("name")!;
+      userRole = preferences.getString("role")!;
+      photo = preferences.getString("photo")!;
+      phone = preferences.getString("phone")!;
+      email = preferences.getString("email")!;
     });
   }
 
@@ -86,6 +118,107 @@ class _SignUpState extends State<SignUp> {
         Navigator.pop(context);
       }
     }
+  }
+
+Future<void> requestCode(String userToken, String currentUserId,
+      String senderName, String title) async {
+    String body =
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
+        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
+    String notificationTitle = "Requesting Quiz Code";
+
+    //make sure that request is not already sent
+    await FirebaseFirestore.instance
+        .collection("Quiz-codes")
+        .where("userId", isEqualTo: currentUserId)
+        .where("isQuiz", isEqualTo: true)
+        .get()
+        .then((value) {
+      if (value.size != 0) {
+        setState(() {
+          isloading = false;
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text(
+                      "Your request have been already sent,Please wait the team is processing it."),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Close"))
+                  ],
+                );
+              });
+        });
+      } else {
+        Map<String, dynamic> checkCode = {
+          "userId": currentUserId,
+          "name": senderName,
+          "email": email,
+          "phone": phone,
+          "photoUrl": photo,
+          "quizId": "gM34wj99547j4895",
+          "quizTitle": title,
+          "code": "",
+          "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
+          "isOpen": false,
+          "isQuiz": true,
+        };
+        FirebaseFirestore.instance
+            .collection("Quiz-codes")
+            .add(checkCode)
+            .then((value) {
+          //send push notification
+          sendPushMessage(userToken, body, notificationTitle);
+          setState(() {
+            isloading = false;
+            Size size = MediaQuery.of(context).size;
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: const Text(
+                        "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
+                    actions: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        width: size.width * 0.7,
+                        height: size.height * 0.07,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor),
+                            onPressed: () async {
+                              //direct phone call
+                              await FlutterPhoneDirectCaller.callNumber(
+                                  "*182*8*1*329494*1500#");
+                            },
+                            child: const Text(
+                              "Ishyura 1500 Rwf.",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Close"))
+                    ],
+                  );
+                });
+          });
+        });
+      }
+    });
   }
 
   @override
@@ -308,20 +441,44 @@ class _SignUpState extends State<SignUp> {
                   height: size.height * 0.06,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor),
-                      onPressed: () {
-                        _registerUser();
-                      },
-                      child: const Text(
-                        "Ishyura 1000 Rwf",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    child:
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor),
+                          onPressed: () {
+                            _registerUser();
+                          },
+                          child: const Text(
+                            "Ishyura 1000 Rwf",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                  ),
+                ),
+                  Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  width: size.width * 0.7,
+                  height: size.height * 0.06,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child:
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor),
+                          onPressed: () {
+                            requestCode(userToken, currentuserid.toString(), currentusername, "Exams");
+                          },
+                          child: const Text(
+                            "Saba Code ifungura exam",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
                   ),
                 ),
                 isloading

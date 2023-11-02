@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -44,7 +45,9 @@ class _CourseContentState extends State<CourseContent> {
       if (pickedFiles != null) {
         pickedFile = File(pickedFiles.path);
         _isLoading = false;
-        print(pickedFile);
+        if (kDebugMode) {
+          print(pickedFile);
+        }
       }
     });
     if (pickedFile != null) {
@@ -52,7 +55,9 @@ class _CourseContentState extends State<CourseContent> {
       uploadTask = refs.putFile(pickedFile!);
       final snapshot = await uploadTask!.whenComplete(() {});
       final downloadlink = await snapshot.ref.getDownloadURL();
-      print("download link $downloadlink");
+      if (kDebugMode) {
+        print("download link $downloadlink");
+      }
       downloadImgUrl = downloadlink.toString();
       Map<String, String> courseMap = {
         "courseId": widget.courseId,
@@ -95,7 +100,9 @@ Future<void> uploadFilesToFirebaseStorage() async {
 
     setState(() {
       uploadedUrl=downloadUrl.toString();
-      print(downloadUrl);
+      if (kDebugMode) {
+        print(downloadUrl);
+      }
     });
 
     // Save the audio file to Firestore after uploading

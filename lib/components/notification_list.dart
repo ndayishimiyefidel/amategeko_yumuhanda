@@ -1,10 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,8 +23,8 @@ class UsersNotificationList extends StatefulWidget {
   final String email;
   final String phone;
   final String code, docId;
-  final isQuiz;
-  final endTime;
+  final bool? isQuiz;
+  final String? endTime;
 
   const UsersNotificationList({
     super.key,
@@ -44,7 +43,7 @@ class UsersNotificationList extends StatefulWidget {
   });
 
   @override
-  _UsersNotificationListState createState() => _UsersNotificationListState();
+  State createState() => _UsersNotificationListState();
 }
 
 class _UsersNotificationListState extends State<UsersNotificationList> {
@@ -57,37 +56,10 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
   late SharedPreferences preferences;
   bool _isLoading = false;
 
-  InterstitialAd? _interstitialAd;
-  Timer? interstitialTimer;
-
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    } else {
-      print('InterstitialAd is not loaded yet.');
-    }
-  }
-
+ 
   @override
   void initState() {
     super.initState();
-    loadInterstitialAd();
     getCurrUser(); //get login data
     requestPermission(); //request permission
     loadFCM(); //load fcm
@@ -114,7 +86,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     var dateTimeFormat =
         DateFormat('dd/MM/yyyy, hh:mm a').format(date); // 12/31/2000, 10:00 PM
-    int timestamp1 = int.parse(widget.endTime);
+    int timestamp1 = (widget.endTime==null||widget.endTime!.isEmpty ) ? 1692260163454:int.parse(widget.endTime.toString());
     var date1 = DateTime.fromMillisecondsSinceEpoch(timestamp1);
     var dateTimeFormat1 = DateFormat('dd/MM/yyyy, hh:mm a').format(date1);
     return InkWell(
@@ -272,13 +244,13 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         ),
       ),
       onTap: () {
-        //gen
-        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });
         _generateCode(widget.docId);
-        print("document id :${widget.docId}");
+        if (kDebugMode) {
+          print("document id :${widget.docId}");
+        }
       },
     );
   }
@@ -296,12 +268,13 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         ),
       ),
       onTap: () {
-        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });
         _pickDate();
-        print("document id :${widget.docId}");
+        if (kDebugMode) {
+          print("document id :${widget.docId}");
+        }
 
         //date picker
       },
@@ -341,7 +314,9 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
       });
     } catch (e) {
       // Handle error if any
-      print('Error updating endTime: $e');
+      if (kDebugMode) {
+        print('Error updating endTime: $e');
+      }
       setState(() {
         _isLoading = false;
       });
@@ -390,7 +365,9 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         if (value.size == 1) {
           Map<String, dynamic> fcmToken = value.docs.first.data();
           userToken = fcmToken["fcmToken"];
-          print("user device fcm Token is  $userToken");
+          if (kDebugMode) {
+            print("user device fcm Token is  $userToken");
+          }
           //send push notification to user
           String body =
               "Mwiriwe neza ${widget.name}, ubu ngubu wemerewe gukora ibizamini byose ntankomyi kuko wamaze kwishyura.\n Murakoze mukomeze kwiga neza";
@@ -413,7 +390,6 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         ),
       ),
       onTap: () {
-        showInterstitialAd();
         setState(() {
           _isLoading = true;
         });

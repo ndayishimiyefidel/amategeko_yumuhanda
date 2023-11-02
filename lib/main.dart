@@ -1,4 +1,3 @@
-import 'package:amategeko/screens/Signup/signup_screen.dart';
 import 'package:amategeko/screens/SplashScreen.dart';
 import 'package:amategeko/utils/constants.dart';
 import 'package:amategeko/utils/utils.dart';
@@ -8,17 +7,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:uni_links/uni_links.dart';
 import 'package:upgrader/upgrader.dart';
 import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-      if (kDebugMode) {
-        print('Handling a background message ${message.messageId}');
-      }
+  if (kDebugMode) {
+    print('Handling a background message ${message.messageId}');
   }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +23,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // Initialize deep linking
-  final initialLink = await getInitialLink();
-  MobileAds.instance.initialize();
   try {
     // Enable Firestore offline persistence (only for web)
     if (kIsWeb) {
@@ -40,87 +34,13 @@ void main() async {
     }
   }
 
-  // loadInterstitialAd();
-  runApp(MyApp(
-    initialLink: Uri.parse(initialLink.toString()),
-  ));
-}
-Future<void> handleDeepLink(Uri? link) async {
-  try {
-    if (link != null && link.queryParameters.containsKey("referral")) {
-      String? referralCode = link.queryParameters["referral"];
-      if (referralCode != null && referralCode.isNotEmpty) {
-        // Navigate to the SignUpScreen with the referral code
-        if (kDebugMode) {
-          print("my referral");
-          print(referralCode);
-        }
-        navigatorKey.currentState?.pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => SignUpScreen(referralCode: referralCode),
-          ),
-        );
-      }
-    }
-  } catch (e) {
-    if (kDebugMode) {
-      print("Error handling deep link: $e");
-    }
-  }
-}
-
-InterstitialAd? _interstitialAd;
-
-void loadInterstitialAd() {
-  InterstitialAd.load(
-    adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-    request: const AdRequest(),
-    adLoadCallback: InterstitialAdLoadCallback(
-      onAdLoaded: (ad) {
-        _interstitialAd = ad;
-      },
-      onAdFailedToLoad: (error) {
-        if (kDebugMode) {
-          print('InterstitialAd failed to load: $error');
-        }
-      },
-    ),
-  );
-}
-
-void showInterstitialAd() {
-  if (_interstitialAd != null) {
-    _interstitialAd!.show();
-    _interstitialAd = null;
-  } else {
-    if (kDebugMode) {
-      print('InterstitialAd is not loaded yet.');
-    }
-  }
+  runApp(const MyApp());
 }
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key, required this.initialLink});
-
-  final Uri? initialLink;
-
-  @override
-  State createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isAdShown = false;
-
-  @override
-  void initState() {
-    super.initState();
-    handleDeepLink(widget.initialLink); // Handle deep link here
-    // Load the interstitial ad when the app opens
-    loadInterstitialAd();
-  }
-
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -144,14 +64,7 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Colors.white,
       ),
       home: UpgradeAlert(
-        child: SplashScreen(
-          onAdShown: () {
-            if (!_isAdShown) {
-              showInterstitialAd();
-              _isAdShown = true;
-            }
-          },
-        ),
+        child: const SplashScreen(),
       ),
     );
   }

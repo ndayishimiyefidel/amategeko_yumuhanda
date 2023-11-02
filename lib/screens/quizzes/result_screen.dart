@@ -1,12 +1,8 @@
-import 'dart:async';
-
-import 'package:amategeko/screens/quizzes/quizzes.dart';
+import 'package:amategeko/screens/quizzes/exams.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../utils/constants.dart';
-import '../../widgets/banner_widget.dart';
 import '../homepages/notificationtab.dart';
 
 class Results extends StatefulWidget {
@@ -22,36 +18,7 @@ class Results extends StatefulWidget {
 class _ResultsState extends State<Results> {
   //check whether the person is failed or not
   String status = "";
-  Timer? interstitialTimer;
-  InterstitialAd? _interstitialAd;
-
-  void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId: 'ca-app-pub-2864387622629553/2309153588',
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          if (kDebugMode) {
-            print('InterstitialAd failed to load: $error');
-          }
-        },
-      ),
-    );
-  }
-
-  void showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-    } else {
-      if (kDebugMode) {
-        print('InterstitialAd is not loaded yet.');
-      }
-    }
-  }
+  
 
   _checkFailed() {
     // double pass = (widget.correct + widget.incorrect) / 2 + 2;
@@ -72,7 +39,6 @@ class _ResultsState extends State<Results> {
   void initState() {
     super.initState();
     _checkFailed();
-    loadInterstitialAd();
   }
 
   @override
@@ -120,7 +86,6 @@ class _ResultsState extends State<Results> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const AdBannerWidget(),
               Text(
                 "You have $status ",
                 style: const TextStyle(
@@ -155,9 +120,8 @@ class _ResultsState extends State<Results> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  showInterstitialAd();
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const Quizzes()));
+                      MaterialPageRoute(builder: (context) => const Exams()));
                 },
                 child: const Text("Go Home"),
               )

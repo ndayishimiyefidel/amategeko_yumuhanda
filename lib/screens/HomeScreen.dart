@@ -25,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 
   @override
   State createState() =>
+      // ignore: no_logic_in_create_state
       _HomeScreenState(currentuserid: currentuserid, userRole: userRole);
 }
 
@@ -38,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       UserStateMethods().setUserState(
           userId: currentuserid,
-          userState: UserState.Online,
+          userState: UserState.onLine,
           userRole: widget.userRole);
     });
 
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         currentuserid != null
             ? UserStateMethods().setUserState(
                 userId: currentuserid,
-                userState: UserState.Online,
+                userState: UserState.onLine,
                 userRole: widget.userRole)
             : print("Resumed State");
         break;
@@ -115,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         currentuserid != null
             ? UserStateMethods().setUserState(
                 userId: currentuserid,
-                userState: UserState.Offline,
+                userState: UserState.offLine,
                 userRole: widget.userRole)
             : print("Inactive State");
         break;
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         currentuserid != null
             ? UserStateMethods().setUserState(
                 userId: currentuserid,
-                userState: UserState.Waiting,
+                userState: UserState.waiting,
                 userRole: widget.userRole)
             : print("Paused State");
         break;
@@ -131,12 +132,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         currentuserid != null
             ? UserStateMethods().setUserState(
                 userId: currentuserid,
-                userState: UserState.Offline,
+                userState: UserState.offLine,
                 userRole: widget.userRole)
             : print("Detached State");
         break;
-      case AppLifecycleState.hidden:
-        // TODO: Handle this case.
+      case AppLifecycleState.paused:
+    
         break;
     }
   }
