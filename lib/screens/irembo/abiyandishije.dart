@@ -46,7 +46,6 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
       userRole = preferences.getString("role")!;
     });
   }

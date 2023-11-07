@@ -1,9 +1,6 @@
-import 'dart:async';
 import 'package:amategeko/enume/models/question_model.dart';
 import 'package:amategeko/screens/quizzes/result_screen.dart';
 import 'package:amategeko/widgets/play_quiz_widget.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
@@ -55,6 +52,7 @@ class _OpenQuizState extends State<OpenQuiz>
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       userRole = preferences.getString("role")!;
     });
@@ -107,11 +105,11 @@ class _OpenQuizState extends State<OpenQuiz>
     _correct = 0;
     _incorrect = 0;
 
-    if (kDebugMode) {
-      print(" total question are:${widget.questions.length}");
+    // if (kDebugMode) {
+    //   print(" total question are:${widget.questions.length}");
 
-      ///print("question are:${widget.questions}");
-    }
+    //   ///print("question are:${widget.questions}");
+    // }
 
     //initiliaze controller
     _controller1 = PageController(initialPage: 0);
@@ -145,6 +143,7 @@ class _OpenQuizState extends State<OpenQuiz>
   }
 
   void handleScreenshot() {
+    if (!mounted) return;
     setState(() {
       isQuizVisible = false;
     });
@@ -238,19 +237,18 @@ class _OpenQuizState extends State<OpenQuiz>
     if (currentPageIndex < (widget.questions.length) - 1) {
       // If there are more questions, move to the next question.
       currentPageIndex++;
-      if (kDebugMode) {
-        print("current page $currentPageIndex");
-      }
       _controller1.animateToPage(
         currentPageIndex, // Use the updated index
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInExpo,
       );
       if (currentPageIndex == (widget.questions.length) - 1) {
+        if (!mounted) return;
         setState(() {
           btnText = "Soza Exam";
         });
       }
+      if (!mounted) return;
       setState(() {
         btnPressed = false;
       });
@@ -271,16 +269,18 @@ class _OpenQuizState extends State<OpenQuiz>
   // Modify the onPressed callback for the "Previous" button.
   void onPreviousPressed() {
     if (currentPageIndex > 0) {
+      if (!mounted) return;
       setState(() {
         btnText = "Next";
       });
       // If there are previous questions, move to the previous question.
-      currentPageIndex--; // Decrement the current page index
+      currentPageIndex--; //
       _controller1.animateToPage(
         currentPageIndex, // Use the updated index
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInExpo,
       );
+      if (!mounted) return;
       setState(() {
         btnPressed = false;
       });
@@ -452,16 +452,6 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
   @override
   void initState() {
     super.initState();
-    checkInternetConnection();
-  }
-
-  Future<void> checkInternetConnection() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult == ConnectivityResult.none) {
-      setState(() {
-        hasInternetConnection = false;
-      });
-    }
   }
 
   @override
@@ -539,11 +529,12 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
+                  if (!mounted) return;
                   setState(() {
                     isInCorrectOption = true;
                   });
                 }
-
+                if (!mounted) return;
                 setState(() {
                   // Set the background color of the OptionTile
                   backgroundColor =
@@ -579,10 +570,12 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
+                  if (!mounted) return;
                   setState(() {
                     isInCorrectOption = true;
                   });
                 }
+                if (!mounted) return;
                 setState(() {
                   // Set the background color of the OptionTile
                   backgroundColor =
@@ -618,10 +611,12 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
+                  if (!mounted) return;
                   setState(() {
                     isInCorrectOption = true;
                   });
                 }
+                if (!mounted) return;
                 setState(() {
                   // Set the background color of the OptionTile
                   backgroundColor =
@@ -650,12 +645,12 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option4;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
+                  if (!mounted) return;
                   setState(() {
                     isInCorrectOption = true;
                   });

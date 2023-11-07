@@ -1,14 +1,18 @@
+import 'dart:convert';
+
 import 'package:amategeko/screens/homepages/usernotification.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
+import '../../utils/generate_code.dart';
 import '../../widgets/MainDrawer.dart';
 import 'UserList.dart';
 import 'UserList100.dart';
+import 'package:http/http.dart' as http;
 
 class AllUsers extends StatefulWidget {
   const AllUsers({super.key});
@@ -19,14 +23,10 @@ class AllUsers extends StatefulWidget {
 
 class _AllUsersState extends State<AllUsers>
     with SingleTickerProviderStateMixin {
-  var allUsersList;
+  var allUsersList = [];
   String? currentuserid;
   String? currentusername;
-  String? currentuserphoto;
   String? userRole;
-  String? phoneNumber;
-  String? code;
-  String? quizTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +70,6 @@ class _AllUsersState extends State<AllUsers>
                 delegate: DataSearch(
                   allUsersList: allUsersList,
                   currentuserid: currentuserid.toString(),
-                  currentusername: currentusername.toString(),
-                  currentuserphoto: currentuserphoto.toString(),
-                  phoneNumber: phoneNumber.toString(),
-                  code: code.toString(),
-                  quizTitle: quizTitle.toString(),
                 ),
               );
             },
@@ -100,8 +95,8 @@ class _AllUsersState extends State<AllUsers>
                             unselectedLabelColor: Colors.black26,
                             indicatorColor: Colors.black,
                             tabs: [
-                              Tab(text: 'New users'),
-                              Tab(text: 'All Users'),
+                              Tab(text: 'New Users'),
+                              Tab(text: 'Old Users'),
                             ],
                           ),
                         ),
@@ -113,45 +108,13 @@ class _AllUsersState extends State<AllUsers>
                           ),
                           child: const TabBarView(
                             children: <Widget>[
-                              UserList100(),
                               UserList(),
+                              UserList100(),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection("Users")
-                        .orderBy("createdAt", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData ||
-                          snapshot.data == null ||
-                          snapshot.data!.size == 0) {
-                        return const Center(
-                          child: Text("No data available"),
-                        );
-                      } else if (snapshot.hasError) {
-                        if (kDebugMode) {
-                          print("Firestore Error: ${snapshot.error}");
-                        }
-                        return Center(
-                            child:
-                                Text("the has occurred due ${snapshot.error}"));
-                      } else {
-                        snapshot.data!.docs
-                            .removeWhere((i) => i["uid"] == currentuserid);
-                        allUsersList = snapshot.data!.docs;
-
-                        if (kDebugMode) {
-                          print(" all users ${allUsersList.length}");
-                        }
-
-                        return Container();
-                      }
-                    },
                   ),
                 ],
               ),
@@ -162,27 +125,49 @@ class _AllUsersState extends State<AllUsers>
 
   //shared preferences
   late SharedPreferences preferences;
-  late String email;
-  late String photo;
   late String phone;
-  String userToken = "";
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
     });
+  }
+
+  Future<void> fetchUserData() async {
+    final apiUrl = API.searchUser;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // print("response body $data");
+        if (data['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+          });
+        } else {
+          print("Failed to execute query");
+        }
+      } else {
+        print("Failed to connect to api");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   @override
   void initState() {
     super.initState();
     getCurrUserData();
+    fetchUserData();
   }
 }
 
@@ -190,20 +175,9 @@ class DataSearch extends SearchDelegate {
   DataSearch({
     this.allUsersList,
     required this.currentuserid,
-    required this.currentusername,
-    required this.currentuserphoto,
-    required this.phoneNumber,
-    required this.code,
-    required this.quizTitle,
   });
-
   var allUsersList;
   String currentuserid;
-  String quizTitle;
-  String currentusername;
-  String currentuserphoto;
-  String phoneNumber;
-  String code;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -241,24 +215,27 @@ class DataSearch extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     // Show when someone searches for something
-    if (allUsersList == null) {
-      // Handle the case where allUsersList is null, perhaps show a loading indicator.
-      return const CircularProgressIndicator(); // Replace with your loading widget.
-    }
     var userList = [];
-
     allUsersList.forEach((e) {
       userList.add(e);
     });
-
     var suggestionList = userList;
 
     if (query.isNotEmpty) {
       suggestionList = [];
       for (var element in userList) {
-        if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["password"].toLowerCase().startsWith(query.toLowerCase())) {
+        if (element["name"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["phone"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["uid"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["addedToClass"]
+                    ?.toLowerCase()
+                    ?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["code"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true) {
           suggestionList.add(element);
         }
       }
@@ -296,29 +273,33 @@ class DataSearch extends SearchDelegate {
                 ],
               ),
             ),
-            RichText(
-              text: TextSpan(
-                text: suggestionList[index]["password"]
-                    .toLowerCase()
-                    .substring(0, query.length),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-                children: [
-                  TextSpan(
-                    text: suggestionList[index]["password"]
-                        .toLowerCase()
-                        .substring(query.length),
-                    style: const TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 16,
+
+            suggestionList[index]["code"] != ""
+                ? RichText(
+                    text: TextSpan(
+                      text: suggestionList[index]["code"]
+                          .toLowerCase()
+                          .substring(0, query.length),
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: suggestionList[index]["code"]
+                              .toLowerCase()
+                              .substring(query.length),
+                          style: const TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  )
+                : const SizedBox(),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -364,23 +345,85 @@ class DataSearch extends SearchDelegate {
             ),
 
             //row for delete,add to class,generate code
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(),
-                IconButton(
-                  onPressed: () {
-                    deleteDocumentByPhoneNumber(
-                        context, suggestionList[index]["phone"].toString());
-                  },
-                  icon: const Icon(
-                    Icons.close_outlined,
-                    size: 30,
-                    color: Colors.redAccent,
-                  ),
-                ),
-              ],
-            ),
+            (suggestionList[index]["userId"] != null ||
+                    suggestionList[index]["userId"] != "")
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () async {
+                          final url = API.addedToClass;
+                          if (suggestionList[index]["addedToClass"] == null ||
+                              suggestionList[index]["addedToClass"] == "") {
+                            GenerateUser.addedRemoveToClass(
+                                context,
+                                suggestionList[index]["uid"].toString(),
+                                url,
+                                "Success added to class",
+                                "Added");
+                          } else {
+                            GenerateUser.addedRemoveToClass(
+                                context,
+                                suggestionList[index]["uid"].toString(),
+                                url,
+                                "Remove from  class successfully",
+                                "");
+                          }
+                        },
+                        icon: Icon(
+                          (suggestionList[index]["addedToClass"] == "" ||
+                                  suggestionList[index]["addedToClass"] == null)
+                              ? Icons.add_outlined
+                              : Icons.remove,
+                          size: 30,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          final code = suggestionList[index]["code"];
+                          bool hasKey = code != "" ? true : false;
+                          final confirmed =
+                              await _showConfirmationDialog(context, hasKey);
+                          if (confirmed == true) {
+                            // Perform the delete operation
+                            String generatedCode = randomNumeric(6);
+                            if (hasKey) {
+                              GenerateUser.generateCodeAndNotify(
+                                  context,
+                                  suggestionList[index]["uid"],
+                                  "",
+                                  suggestionList[index]["name"],
+                                  "code deleted successfully of ",
+                                  0);
+                            } else {
+                              GenerateUser.generateCodeAndNotify(
+                                  context,
+                                  suggestionList[index]["uid"].toString(),
+                                  generatedCode,
+                                  suggestionList[index]["name"].toString(),
+                                  "Generate code is $generatedCode of ",
+                                  1);
+                            }
+                          } else {
+                            final url = API.deleteCode;
+                            GenerateUser.deleteUserCode(
+                                context,
+                                suggestionList[index]["uid"],
+                                url,
+                                suggestionList[index]["name"].toString(),
+                                "Deleted successfully");
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.close_outlined,
+                          size: 30,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ],
+                  )
+                : SizedBox(),
           ],
         ),
       ),
@@ -388,67 +431,27 @@ class DataSearch extends SearchDelegate {
     );
   }
 
-  Future<void> deleteDocumentByPhoneNumber(
-      BuildContext context, String phoneNumber) async {
-    final firestoreInstance = FirebaseFirestore.instance;
-    try {
-      final querySnapshot = await firestoreInstance
-          .collection('Quiz-codes')
-          .where('phone', isEqualTo: phoneNumber)
-          .get();
-      // ignore: use_build_context_synchronously, unnecessary_null_comparison
-      final bool? confirmed =
-          // ignore: use_build_context_synchronously
-          await _showConfirmationDialog(context);
-      // Loop through the query results and delete each matching document
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-        if (confirmed == true) {
-          await firestoreInstance
-              .collection('users')
-              .doc(doc.id)
-              .delete()
-              .then((value) => {
-                    // ignore: avoid_print
-                    print("delete success"),
-                    showSnackbar(context, 'user has been deleted success'),
-                  });
-        }
-      }
-    } catch (e) {
-      // ignore: use_build_context_synchronously
-      showSnackbar(context, 'error happenning');
-    }
-  }
-
-  void showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2), // Adjust the duration as needed
-      ),
-    );
-  }
-
   Future<bool?> _showConfirmationDialog(
-    BuildContext context,
-  ) async {
+      BuildContext context, bool hasCode) async {
     return await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text('Are you sure you want to delete?'),
+          title: const Text('Confirm Remove/Deletion'),
+          content: const Text('Are you sure you want to delete or remove ?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: hasCode
+                  ? const Text('Remove Code')
+                  : const Text('Activate Code'),
               onPressed: () {
-                Navigator.of(context).pop(false);
+                Navigator.of(context).pop(true);
               },
             ),
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(false);
               },
             ),
           ],

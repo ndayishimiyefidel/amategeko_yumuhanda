@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 
 class OptionTile extends StatefulWidget {
   final String description, correctAnswer, optionSelected;
-   final Icon option;
-   final VoidCallback? onPressed; // Add this callback
+  final Icon option;
+  final VoidCallback? onPressed; // Add this callback
 
   const OptionTile(
-      {super.key, required this.optionSelected,
+      {super.key,
+      required this.optionSelected,
       required this.option,
       required this.correctAnswer,
-      required this.description, this.onPressed, Color? backgroundColor});
+      required this.description,
+      this.onPressed,
+      Color? backgroundColor});
 
   @override
   State<OptionTile> createState() => _OptionTileState();
@@ -46,8 +49,7 @@ class _OptionTileState extends State<OptionTile> {
                       : Colors.red
                   : Colors.grey,
               onPressed: () {
-                print("printed hello");
-                 if (widget.onPressed != null) {
+                if (widget.onPressed != null) {
                   widget.onPressed!(); // Call the onPressed callback
                 }
               },

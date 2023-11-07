@@ -75,9 +75,7 @@ class _SignUpState extends State<SignUp> {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
     });
   }
 

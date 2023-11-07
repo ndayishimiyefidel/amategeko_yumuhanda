@@ -1,7 +1,6 @@
 import 'package:amategeko/screens/SplashScreen.dart';
 import 'package:amategeko/utils/constants.dart';
 import 'package:amategeko/utils/utils.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +10,6 @@ import 'package:upgrader/upgrader.dart';
 import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
   if (kDebugMode) {
     print('Handling a background message ${message.messageId}');
   }
@@ -23,16 +21,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  try {
-    // Enable Firestore offline persistence (only for web)
-    if (kIsWeb) {
-      await FirebaseFirestore.instance.enablePersistence();
-    }
-  } catch (e) {
-    if (kDebugMode) {
-      print("Error enabling persistence on web: $e");
-    }
-  }
 
   runApp(const MyApp());
 }
@@ -44,7 +32,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rwanda Traffic Rules',
+      title: 'Rwanda Traffic Rule',
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: messengerKey,

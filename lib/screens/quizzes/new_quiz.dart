@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:amategeko/components/text_field_container.dart';
-import 'package:amategeko/services/auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
 import '../../widgets/fcmWidget.dart';
@@ -24,114 +21,23 @@ class NewQuiz extends StatefulWidget {
 
 class _NewQuizState extends State<NewQuiz> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Stream<dynamic>? quizStream;
   bool isLoading = false;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  AuthService authService = AuthService();
-  final user = FirebaseAuth.instance.currentUser;
-    final FirebaseFirestore _firebaseFirestore =FirebaseFirestore.instance;
 
   //shared preferences
   late SharedPreferences preferences;
   late String currentuserid;
   late String currentusername;
-  late String email;
-  late String photo;
   String? userRole;
   String? adminPhone;
-  int examno = 0;
 
   late String phone;
   String userToken = "";
-  late int totalQuestion = 0;
   bool hasCode = false;
-
-  getCurrUserData() async {
-    preferences = await SharedPreferences.getInstance();
-    setState(() {
-      currentuserid = preferences.getString("uid")!;
-      currentusername = preferences.getString("name")!;
-      userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
-      phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
-    });
-    _firebaseFirestore.collection("Quiz-codes")
-        .where("userId", isEqualTo: currentuserid.toString())
-        .where("isOpen", isEqualTo: true)
-        .get()
-        .then((value) {
-          if(mounted){
-   if (value.size == 1) {
-        setState(() {
-          hasCode = true;
-        });
-      }
-          }
-    });
-  }
-
-  getToken() async {
-    await _firebaseFirestore.collection("Users")
-        .where("role", isEqualTo: "Admin")
-        .get()
-        .then((value) {
-      if (value.size == 1) {
-        Map<String, dynamic> adminData = value.docs.first.data();
-        userToken = adminData["fcmToken"];
-        adminPhone = adminData["phone"];
-      }
-    });
-  }
-
-  Widget quizList() {
-  return FutureBuilder(
-    future: DefaultAssetBundle.of(context).loadString('assets/files/data.json'),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      } else if (!snapshot.hasData) {
-        return const Text('No data available.');
-      } else {
-        final jsonData = json.decode(snapshot.data.toString());
-        final exams = jsonData['exams'];
-        return  SizedBox(height: MediaQuery.of(context).size.height*0.79,
-          child: ListView.builder(
-              itemCount: exams.length,
-              itemBuilder: (context, index) {
-                final exam = exams[index];
-                return QuizTile(
-                  index: index,
-                  quizId: exam['quizId'],
-                  imgurl: exam['examImgUrl'],
-                  title: exam['title'],
-                  quizType: exam['examType'],
-                  totalQuestion:20, // You may need to update this
-                  userRole: userRole.toString(),
-                  userToken: userToken,
-                  senderName: currentusername,
-                  currentUserId: currentuserid,
-                  phone: phone,
-                  email: email,
-                  photoUrl: photo,
-                  adminPhone: adminPhone.toString(),
-                  questions: List<Map<String, dynamic>>.from(exam['questions']),
-                );
-              },
-            ),
-        );
-      }
-    },
-  );
-}
-
   @override
   void initState() {
-    _messaging.getToken().then((value) {
-    });
-   
+    _messaging.getToken().then((value) {});
+
     //check code
     getCurrUserData(); //get login data
     requestPermission(); //request permission
@@ -145,6 +51,126 @@ class _NewQuizState extends State<NewQuiz> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  getCurrUserData() async {
+    preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      currentuserid = preferences.getString("uid")!;
+      currentusername = preferences.getString("name")!;
+      userRole = preferences.getString("role")!;
+      phone = preferences.getString("phone")!;
+      userToken = preferences.getString("fcmToken")!;
+    });
+    print(currentuserid);
+    print(userRole);
+    checkQuizCode(currentuserid);
+  }
+
+  Future<void> checkQuizCode(String userId) async {
+    final url = API.checkCode; // Replace with your PHP script URL
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'userId': userId},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print(data);
+        if (data['success'] == true) {
+          if (data['hasCode'] == true) {
+            if (!mounted) return;
+            setState(() {
+              hasCode = true;
+            });
+          } else {
+            if (!mounted) return;
+            setState(() {
+              hasCode = false;
+            });
+          }
+        } else {
+          // Handle other error cases
+        }
+      } else {
+        // Handle HTTP request errors
+      }
+    } catch (e) {
+      // Handle exceptions
+      print("Error: $e");
+      // You can show an error message or perform other error handling as needed
+    }
+  }
+
+  Future<void> getToken() async {
+    final url = API.getToken; // Replace with your PHP script URL
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          final adminData = data['data'];
+          userToken = adminData['fcmToken'];
+          adminPhone = adminData['phone'];
+          print(adminPhone);
+        } else {
+          // Handle the case when there is no admin or other errors
+        }
+      } else {
+        // Handle HTTP request errors
+        print("failed to connect to server");
+      }
+    } catch (e) {
+      // Handle exceptions
+      print("Error: $e");
+    }
+  }
+
+  Widget quizList() {
+    return FutureBuilder(
+      future:
+          DefaultAssetBundle.of(context).loadString('assets/files/data.json'),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (!snapshot.hasData) {
+          return const Text('No data available.');
+        } else {
+          final jsonData = json.decode(snapshot.data.toString());
+          final exams = jsonData['exams'];
+          return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.79,
+            child: ListView.builder(
+              itemCount: exams.length,
+              itemBuilder: (context, index) {
+                final exam = exams[index];
+                return QuizTile(
+                  index: index,
+                  quizId: exam['quizId'],
+                  imgurl: exam['examImgUrl'],
+                  title: exam['title'],
+                  quizType: exam['examType'],
+                  totalQuestion: 20, // You may need to update this
+                  userRole: userRole.toString(),
+                  userToken: userToken,
+                  senderName: currentusername,
+                  currentUserId: currentuserid,
+                  phone: phone,
+                  adminPhone: adminPhone.toString(),
+                  questions: List<Map<String, dynamic>>.from(exam['questions']),
+                );
+              },
+            ),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -276,88 +302,25 @@ class _NewQuizState extends State<NewQuiz> {
             : null);
   }
 
-  Future<void> requestCode(String userToken, String currentUserId,
-      String senderName, String title) async {
+  Future<void> requestCode(
+      String userId, String quizId, String senderName, String title) async {
+    final url = API.requestCode;
+    final sabaCodeUrl = API.sabaCode;
     String body =
         "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
-    //make sure that request is not already sent
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: currentUserId)
-        .where("isQuiz", isEqualTo: true)
-        .get()
-        .then((value) {
-          if(mounted){
-            if (value.size == 0) {
-        Map<String, dynamic> checkCode = {
-          "userId": currentUserId,
-          "name": senderName,
-          "email": email,
-          "phone": phone,
-          "photoUrl": photo,
-          "quizId": "gM34wj99547j4895",
-          "quizTitle": title,
-          "code": "",
-          "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-          "isOpen": false,
-          "isQuiz": true,
-        };
-        FirebaseFirestore.instance
-            .collection("Quiz-codes")
-            .add(checkCode)
-            .then((value) {
-          //send push notification
-          sendPushMessage(userToken, body, notificationTitle);
-          setState(() {
-            isLoading = false;
-            Size size = MediaQuery.of(context).size;
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text(
-                        "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                    actions: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        width: size.width * 0.7,
-                        height: size.height * 0.07,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor),
-                            onPressed: () async {
-                              //direct phone call
-                              await FlutterPhoneDirectCaller.callNumber(
-                                  "*182*8*1*329494*1500#");
-                            },
-                            child: const Text(
-                              "Ishyura 1500 Rwf.",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Okay"))
-                    ],
-                  );
-                });
-          });
-        });
-      } else {
-        setState(() {
-          isLoading = false;
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'userId': currentuserid},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        //print('Response Body: $data');
+        if (data['success'] == true) {
           showDialog(
               context: context,
               builder: (context) {
@@ -373,13 +336,101 @@ class _NewQuizState extends State<NewQuiz> {
                   ],
                 );
               });
-        });
-      }
+        } else {
+          try {
+            final res = await http.post(
+              Uri.parse(sabaCodeUrl),
+              body: {
+                'userId': currentuserid.toString(),
+                'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
+                "phone": phone.toString(),
+                "name": currentusername
+              },
+            );
+            print(res.body);
+
+            if (res.statusCode == 200) {
+              final data = json.decode(res.body);
+              print('Response Body: $data');
+              if (data['requestSent'] == true) {
+                //handle if not sent
+                sendPushMessage(userToken, body, notificationTitle);
+                isLoading = false;
+                Size size = MediaQuery.of(context).size;
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: const Text(
+                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
+                        actions: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            width: size.width * 0.7,
+                            height: size.height * 0.07,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryColor),
+                                onPressed: () async {
+                                  //direct phone call
+                                  await FlutterPhoneDirectCaller.callNumber(
+                                      "*182*8*1*329494*1500#");
+                                },
+                                child: const Text(
+                                  "Ishyura 1500 Rwf.",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Okay"))
+                        ],
+                      );
+                    });
+              } else {
+                Fluttertoast.showToast(
+                  msg: "Faild to request code",
+                  textColor: Colors.red,
+                  fontSize: 14,
+                );
+              }
+            } else {
+              Fluttertoast.showToast(
+                msg: "Faild to connect to api",
+                textColor: Colors.red,
+                fontSize: 14,
+              );
+            }
+          } catch (e) {
+            // Handle exceptions
+            print("Error: $e");
+            // You can show an error message or perform other error handling as needed
           }
-      
-    });
+        }
+      } else {
+        Fluttertoast.showToast(
+          msg: "Faild to connect to api",
+          textColor: Colors.red,
+          fontSize: 14,
+        );
+      }
+    } catch (e) {
+      // Handle exceptions
+      print("Error: $e");
+      // You can show an error message or perform other error handling as needed
+    }
   }
 }
+
 class QuizTile extends StatefulWidget {
   final List<Map<String, dynamic>> questions;
   final String imgurl;
@@ -394,7 +445,6 @@ class QuizTile extends StatefulWidget {
   final String phone;
   final bool isNew = false;
   final String currentUserId;
-  final String email, photoUrl;
   final int index;
 
   const QuizTile({
@@ -408,11 +458,10 @@ class QuizTile extends StatefulWidget {
     required this.senderName,
     required this.phone,
     required this.currentUserId,
-    required this.email,
-    required this.photoUrl,
     required this.userRole,
     required this.adminPhone,
-    required this.index, required this.questions,
+    required this.index,
+    required this.questions,
   }) : super(key: key);
 
   @override
@@ -421,7 +470,6 @@ class QuizTile extends StatefulWidget {
 
 class _QuizTileState extends State<QuizTile> {
   bool _isLoading = false;
-  final _formkey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -450,7 +498,8 @@ class _QuizTileState extends State<QuizTile> {
                       SizedBox(
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(widget.imgurl,
+                          child: Image.asset(
+                            widget.imgurl,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -467,42 +516,43 @@ class _QuizTileState extends State<QuizTile> {
                           : Container(
                               child: null,
                             ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor,
-                              side: const BorderSide(
-                                  color: Colors.green, width: 1),
-                            ),
-                            onPressed: () {
-                              if (widget.quizType == "Free" || widget.userRole=="Admin") {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return OpenQuiz(
-                                        quizId: widget.quizId,
-                                        title: widget.title,
-                                        quizNumber: widget.index + 1,
-                                        questions: widget.questions,
-                                        quizType: widget.quizType,
-                                      );
-                                    },
-                                  ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor,
+                            side:
+                                const BorderSide(color: Colors.green, width: 1),
+                          ),
+                          onPressed: () async {
+                            if (widget.quizType == "Free" ||
+                                widget.userRole == "Admin") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return OpenQuiz(
+                                      quizId: widget.quizId,
+                                      title: widget.title,
+                                      quizNumber: widget.index + 1,
+                                      questions: widget.questions,
+                                      quizType: widget.quizType,
+                                    );
+                                  },
+                                ),
+                              );
+                            } else {
+                              ///check whether you already have code.
+                              final isOpenUrl = API.isQuizOpen;
+                              try {
+                                final response = await http.post(
+                                  Uri.parse(isOpenUrl),
+                                  body: {'userId': widget.currentUserId},
                                 );
-                              } else {
-                                ///check whether you already have code.
-                                FirebaseFirestore.instance
-                                    .collection("Quiz-codes")
-                                    .where("userId",
-                                        isEqualTo: widget.currentUserId)
-                                    .where("isOpen", isEqualTo: true)
-                                    .where("isQuiz", isEqualTo: true)
-                                    .get()
-                                    .then((value) {
-                                  if (value.size == 1) {
-                                    //open quiz without code.
+                                if (response.statusCode == 200) {
+                                  final data = json.decode(response.body);
+                                  if (data['isOpen'] == true) {
+                                    // Request already sent
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -518,29 +568,18 @@ class _QuizTileState extends State<QuizTile> {
                                       ),
                                     );
                                   } else {
-                                    ///display dialogue to enter exam code.
-
-                                    final TextEditingController codeController =
-                                        TextEditingController();
-                                    String code = "";
+                                    // Request not sent
                                     showDialog(
                                         context: context,
                                         builder: (context) {
                                           return AlertDialog(
                                             title: const Column(
                                               children: [
-                                                Text(
-                                                  "CODE VERIFICATION",
-                                                  style: TextStyle(
-                                                    fontSize: 22,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "Shyiramo code wahawe umaze kwishyura application niba nta kode ufite kanda hepfo mwibara ry'ubururu uyisabe.",
+                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'ubururu uyisabe code ark urbe niba ufite connection.",
                                                   style: TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 16,
                                                     fontWeight:
                                                         FontWeight.normal,
                                                     color: Colors.red,
@@ -549,105 +588,43 @@ class _QuizTileState extends State<QuizTile> {
                                                 SizedBox(height: 5),
                                               ],
                                             ),
-                                            content: Form(
-                                              key: _formkey,
-                                              child: TextFieldContainer(
-                                                child: TextFormField(
-                                                  autofocus: false,
-                                                  controller: codeController,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  onSaved: (value) {
-                                                    codeController.text =
-                                                        value!;
-                                                  },
-                                                  textInputAction:
-                                                      TextInputAction.done,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    icon: Icon(
-                                                      Icons.code_off_outlined,
-                                                      color: kPrimaryColor,
-                                                    ),
-                                                    hintText:
-                                                        "Shyiramo kode ya appplication ",
-                                                    border: InputBorder.none,
-                                                  ),
-                                                  onChanged: (val) {
-                                                    code = val;
-                                                  },
-                                                  autovalidateMode:
-                                                      AutovalidateMode.disabled,
-                                                  validator: (input) => input!
-                                                          .isEmpty
-                                                      ? 'Gukomeza bisaba Kode'
-                                                      : null,
-                                                ),
-                                              ),
-                                            ),
-                                            actions: [
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        kPrimaryColor,
-                                                    elevation: 3),
-                                                onPressed: () async {
-                                                  if (_formkey.currentState!
-                                                      .validate()) {
-                                                if(mounted){
-                                                    setState(() {
-                                                      _isLoading = true;
-                                                    });
-                                                }
-                                                    checkValidCode(
-                                                      widget.currentUserId,
-                                                      code,
-                                                      widget.quizId,
-                                                    );
-                                                  }
-                                                },
-                                                child: const Text(
-                                                  "Emeza",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                              TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text("Close"))
-                                            ],
                                           );
                                         });
                                   }
-                                });
+                                } else {
+                                  // Handle HTTP request errors
+                                }
+                              } catch (e) {
+                                // Handle exceptions
+                                print("Error: $e");
+                                // You can show an error message or perform other error handling as needed
                               }
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text( widget.userRole=="Admin" ?"Fungur Exam":"Tangira Exam",
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      letterSpacing: 2,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  width: size.width * 0.02,
-                                ),
-                                const Icon(
-                                  Icons.start,
-                                  size: 30,
-                                )
-                              ],
-                            ),
+                            }
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                widget.userRole == "Admin"
+                                    ? "Fungur Exam"
+                                    : "Tangira Exam",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    letterSpacing: 2,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                width: size.width * 0.02,
+                              ),
+                              const Icon(
+                                Icons.start,
+                                size: 30,
+                              )
+                            ],
                           ),
-                        )
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -657,174 +634,5 @@ class _QuizTileState extends State<QuizTile> {
         ],
       ),
     );
-  }
-
-
-  Future<void> checkValidCode(
-      String currentUserId, String code, String quizId) async {
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: currentUserId)
-        .where("code", isEqualTo: code)
-        .where("isQuiz", isEqualTo: true)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        if (kDebugMode) {
-          print(doc.reference.id);
-        }
-        FirebaseFirestore.instance
-            .collection("Quiz-codes")
-            .doc(doc.reference.id)
-            .update({"isOpen": true}).then((value) {
-          if (querySnapshot.size == 1) {
-          if(mounted){
-              setState(() {
-              _isLoading = false;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return OpenQuiz(
-                      quizId: widget.quizId,
-                      title: widget.title,
-                      quizNumber: widget.index + 1,
-                      questions: widget.questions,
-                      quizType: widget.quizType,
-                    );
-                  },
-                ),
-              );
-            });
-          }
-          } else {
-            if(mounted){
-              setState(() {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: const Text(
-                          "Invalid code for this quiz,Double check and try again"),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Close"))
-                      ],
-                    );
-                  });
-            });
-            }
-          }
-        });
-      }
-    });
-  }
-
-//request code
-  Future<void> requestCode(String userToken, String currentUserId,
-      String senderName, String title) async {
-    String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName  naho nimero ya telefoni ni ${widget.phone} .\n  Namaze kwishyura amafaranga 1500 frw kuri nimero ${widget.adminPhone.isEmpty ? 0788659575 : widget.adminPhone} yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-    String notificationTitle = "Requesting Quiz Code";
-
-    //make sure that request is not already sent
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: currentUserId)
-        .where("isQuiz", isEqualTo: true)
-        .get()
-        .then((value) {
-      if(mounted){
-        if(value.size != 0) {
-        setState(() {
-          _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Your request have been already sent,Please wait the team is processing it."),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
-        });
-      } else {
-        Map<String, dynamic> checkCode = {
-          "userId": currentUserId,
-          "name": senderName,
-          "email": widget.email,
-          "phone": widget.phone,
-          "photoUrl": widget.photoUrl,
-          "quizId": widget.quizId,
-          "quizTitle": title,
-          "code": "",
-          "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-          "isOpen": false,
-          "isQuiz": true,
-        };
-        FirebaseFirestore.instance
-            .collection("Quiz-codes")
-            .add(checkCode)
-            .then((value) {
-          //send push notification
-          sendPushMessage(userToken, body, notificationTitle);
-          setState(() {
-            _isLoading = false;
-            Size size = MediaQuery.of(context).size;
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text(
-                        "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                    actions: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        width: size.width * 0.7,
-                        height: size.height * 0.07,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor),
-                            onPressed: () async {
-                              //direct phone call
-                              await FlutterPhoneDirectCaller.callNumber(
-                                  "*182*8*1*329494*1500#");
-                            },
-                            child: const Text(
-                              "Ishyura 1500 Rwf.",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Close"))
-                    ],
-                  );
-                });
-          });
-        });
-      }
-      }
-  
-    });
   }
 }

@@ -1,11 +1,6 @@
-import 'dart:async';
-
 import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/ambassador/view_referrals.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,38 +28,36 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late Animation animation, delayedAnimation, muchDelayedAnimation, leftCurve;
   late AnimationController animationController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  bool _isConnected = true;
   //shared preferences
   late SharedPreferences preferences;
   late String currentuserid;
   late String currentusername;
   String userRole = "";
-  late String photo;
+
   late String phone;
   String? referralCode;
 
-  Future<String?> _getReferralCode() async {
-    try {
-      var querySnapshot = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("role", isEqualTo: "Ambassador")
-          .where("uid", isEqualTo: currentuserid)
-          .get();
+  // Future<String?> _getReferralCode() async {
+  //   try {
+  //     var querySnapshot = await FirebaseFirestore.instance
+  //         .collection("Users")
+  //         .where("role", isEqualTo: "Ambassador")
+  //         .where("uid", isEqualTo: currentuserid)
+  //         .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        var userDoc = querySnapshot.docs[0];
-        return userDoc["referralCode"];
-      } else {
-        return null;
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error getting referral code: $e");
-      }
-      return null;
-    }
-  }
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       var userDoc = querySnapshot.docs[0];
+  //       return userDoc["referralCode"];
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print("Error getting referral code: $e");
+  //     }
+  //     return null;
+  //   }
+  // }
 
   void getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
@@ -73,11 +66,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      _getReferralCode().then((code) {
-        referralCode = code;
-      });
+      // _getReferralCode().then((code) {
+      //   referralCode = code;
+      // });
     });
   }
 
@@ -85,7 +77,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     getCurrUserData();
-    checkInternetConnection();
+   
 
     animationController =
         AnimationController(duration: const Duration(seconds: 3), vsync: this);
@@ -105,13 +97,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         curve: const Interval(0.5, 1.0, curve: Curves.easeInOut)));
   }
 
-  Future<void> checkInternetConnection() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    setState(() {
-      _isConnected = connectivityResult != ConnectivityResult.none;
-    });
-    if (_isConnected) {}
-  }
+ 
 
   @override
   void dispose() {
@@ -156,18 +142,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ),
             ),
             actions: [
-                CustomButton(
-                  text: "Amabwiriza",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => AmabwirizaList(),
-                      ),
-                    );
-                  },
-                )
-
+              CustomButton(
+                text: "Amabwiriza",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => AmabwirizaList(),
+                    ),
+                  );
+                },
+              )
             ],
             centerTitle: true,
             backgroundColor: kPrimaryColor,
@@ -399,8 +384,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     imgpath: "irembo.jpg",
                                   ),
                                 ),
-                              )
-,                            Transform(
+                              ),
+                              Transform(
                                 transform: Matrix4.translationValues(
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
@@ -444,16 +429,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            ViewReferrals(
-                                                referralCode:
-                                                    referralCode.toString(),
-                                                refUid: currentuserid),
-                                      ),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (BuildContext context) =>
+                                    //         ViewReferrals(
+                                    //             referralCode:
+                                    //                 referralCode.toString(),
+                                    //             refUid: currentuserid),
+                                    //   ),
+                                    // );
                                   },
                                   child: const DashboardCard(
                                     name: "My Referrals",

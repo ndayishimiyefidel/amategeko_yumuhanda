@@ -50,9 +50,7 @@ class _GroupListState extends State<GroupList> {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
     });
   }
 
@@ -178,17 +176,17 @@ class _GroupListState extends State<GroupList> {
           ),
         ),
         actions: [
-         CustomButton(
-          text: "Amabwiriza",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => AmabwirizaList(),
-              ),
-            );
-          },
-        )
+          CustomButton(
+            text: "Amabwiriza",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,

@@ -45,7 +45,6 @@ class _ViewReferralsState extends State<ViewReferrals> {
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
       userRole = preferences.getString("role")!;
     });
   }

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,18 +27,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // precachePicture(
-    //     ExactAssetPicture(
-    //         SvgPicture.svgStringDecoderBuilder, 'assets/icons/signup.svg'),
-    //     null);
-    // precachePicture(
-    //     ExactAssetPicture(
-    //         SvgPicture.svgStringDecoderBuilder, 'assets/icons/chat.svg'),
-    //     null);
-    // precachePicture(
-    //     ExactAssetPicture(
-    //         SvgPicture.svgStringDecoderBuilder, 'assets/icons/login.svg'),
-    //     null);
     WidgetsBinding.instance.addObserver(this);
 
     navigateUser();
@@ -53,12 +40,10 @@ class _SplashScreenState extends State<SplashScreen>
     fcmToken = await _messaging.getToken();
 
     if (currentuserid != null) {
-      FirebaseFirestore.instance
-          .collection("Users")
-          .doc(preferences.getString("uid"))
-          .update({"fcmToken": fcmToken});
-      setState(() {
+  
+      setState(()  {
         isAlreadyLoggedIn = true;
+          preferences.setString("fcmToken", fcmToken!);
       });
     } else {
       setState(() {

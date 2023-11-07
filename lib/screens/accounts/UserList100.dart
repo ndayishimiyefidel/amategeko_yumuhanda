@@ -1,187 +1,158 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
+import '../../backend/apis/db_connection.dart';
 import '../../components/chat_for_users_list.dart';
-import '../../utils/constants.dart';
 
 class UserList100 extends StatefulWidget {
-  const UserList100({Key? key}) : super(key: key);
+  const UserList100({super.key});
 
   @override
   State createState() => _UserList100State();
 }
 
 class _UserList100State extends State<UserList100> {
-  late String currentUserId;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<DocumentSnapshot> loadedUsers = [];
-  int initialUserCount = 10;
-  int totalUserCount = 0;
-  bool isLoading = true;
-  bool hasError = false;
+  List<Map<String, dynamic>> allUsersList = [];
+  String? currentuserid;
+  String? currentusername;
+  late String currentuserphoto;
+  String? userRole;
+  String? phoneNumber;
+  String? code;
+  late String quizTitle;
+  late SharedPreferences preferences;
+  int itemsPerPage = 10;
+  int currentPage = 0;
+  bool isLoading = false;
+
+  int from = 0;
+  int totalRows = 0;
+  int to = 10; // Initial range, fetch the first 10 records
+
+  Future<void> fetchAllUsers() async {
+    final apiUrl = API.userWithNoCode + "?from=$from&to=$to";
+    isLoading = true;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            if (from == 0) {
+              // If it's the first load, clear the list
+              allUsersList.clear();
+            }
+            // Append the new data to the existing list
+            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+            if (!mounted) return;
+            setState(() {
+              isLoading = false;
+              totalRows = int.tryParse(data['total'])!.toInt();
+            });
+
+            // Update 'from' and 'to' for the next load
+            from = to;
+            to += 10; // Fetch the next 10 records
+          });
+        } else {
+          print("Failed to execute query");
+        }
+      } else {
+        throw Exception('Failed to load data from the API');
+      }
+    } catch (e) {
+      print("Error occurs: $e");
+    }
+  }
+
+  getCurrUserId() async {
+    preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      currentuserid = preferences.getString("uid")!;
+      currentusername = preferences.getString("name")!;
+      userRole = preferences.getString("role")!;
+      phoneNumber = preferences.getString("phone")!;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _initCurrentUser();
-    _loadInitialUsers();
+    getCurrUserId();
+    fetchAllUsers(); // Load the initial 10 records
   }
 
-  Future<void> _initCurrentUser() async {
-    final preferences = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        currentUserId = preferences.getString("uid")!;
-      });
-    }
-  }
-
-  Future<void> _loadInitialUsers() async {
-    try {
-      final querySnapshot = await _firestore
-          .collection("Users")
-          .orderBy("createdAt", descending: true)
-          .limit(initialUserCount)
-          .get();
-
-      totalUserCount = querySnapshot.size;
-      final initialUsers = querySnapshot.docs
-          .where((doc) => doc["uid"] != currentUserId)
-          .toList();
-      print("total rows user $totalUserCount");
-
-      if (mounted) {
-        setState(() {
-          loadedUsers.addAll(initialUsers);
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Firestore Error: $e");
-      }
-
-      if (mounted) {
-        setState(() {
-          hasError = true;
-          isLoading = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          if (isLoading)
-            Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(kPrimaryLightColor),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: !isLoading
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 60),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (allUsersList.isEmpty)
+                      const Center(
+                        child: Text("No user with code"),
+                      )
+                    else
+                      Column(
+                        children: [
+                          ListView.builder(
+                            padding: const EdgeInsets.only(top: 16),
+                            itemCount: allUsersList.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final data = allUsersList[index];
+
+                              return ChatUsersList(
+                                name: data["name"] ?? '',
+                                time: data["createdAt"],
+                                userId: data["uid"],
+                                phone: data["phone"] ?? '',
+                                deviceId: data["deviceId"] ?? 'nodevice',
+                                role: data['role'],
+                                password: data['password'],
+                                quizCode: data['code'] ?? 'nocode',
+                              );
+                            },
+                          ),
+
+                          ///1000=totalrows
+                        ],
+                      ),
+                    if (to <=
+                        totalRows) // Show "Load More" button if there are more records
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            isLoading = true;
+                            fetchAllUsers(); // Load more records
+                          },
+                          child: const Text("Load More"),
+                        ),
+                      ),
+                  ],
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
               ),
-            )
-          else
-            Expanded(
-              child: ListView.builder(
-                itemCount: loadedUsers.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return FutureBuilder<String?>(
-                    future: _fetchQuizCode(loadedUsers[index]["uid"]),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Text("Error: ${snapshot.error}");
-                      } else {
-                        final quizCode = snapshot.data ?? "nocode";
-                        final deviceId = loadedUsers[index].get("deviceId") ??
-                            "No device captured";
-                        return ChatUsersList(
-                          name: loadedUsers[index].get("name"),
-                          time: loadedUsers[index].get("createdAt") ??
-                              "1696125054318",
-                          userId: loadedUsers[index].get("uid"),
-                          phone: loadedUsers[index].get("phone"),
-                          password: loadedUsers[index].get("password"),
-                          role: loadedUsers[index].get("role") ?? "User",
-                          deviceId: deviceId,
-                          quizCode: quizCode,
-                        );
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-          if (loadedUsers.length < totalUserCount)
-            ElevatedButton(
-              onPressed: _loadMoreUsers,
-              child: Text('Load MoreloadedUsers'),
-            ),
-          if (hasError) Text('An error has occurred.'),
-        ],
       ),
     );
-  }
-
-  Future<void> _loadMoreUsers() async {
-    if (mounted) {
-      setState(() {
-        isLoading = true;
-      });
-    }
-
-    try {
-      final querySnapshot = await _firestore
-          .collection("Users")
-          .orderBy("createdAt", descending: true)
-          .startAfterDocument(loadedUsers.last)
-          .limit(initialUserCount)
-          .get();
-
-      if (mounted) {
-        final moreUsers = querySnapshot.docs
-            .where((doc) => doc["uid"] != currentUserId)
-            .toList();
-
-        setState(() {
-          loadedUsers.addAll(moreUsers);
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Firestore Error: $e");
-      }
-
-      if (mounted) {
-        setState(() {
-          hasError = true;
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<String> _fetchQuizCode(String userId) async {
-    final querySnapshot = await _firestore
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: userId)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs[0]["code"].toString();
-    } else {
-      return "nocode";
-    }
-  }
-
-  @override
-  void dispose() {
-    // Dispose of any resources here.
-    super.dispose();
   }
 }

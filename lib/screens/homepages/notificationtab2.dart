@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
+import '../../backend/apis/db_connection.dart';
 import '../../components/notification_list.dart';
-import '../../utils/constants.dart';
 
 class NotificationTab2 extends StatefulWidget {
   const NotificationTab2({super.key});
@@ -14,7 +13,6 @@ class NotificationTab2 extends StatefulWidget {
 }
 
 class _NotificationTab2State extends State<NotificationTab2> {
-  // List allUsers = [];
   List<Map<String, dynamic>> allUsersList = [];
   String? currentuserid;
   String? currentusername;
@@ -24,28 +22,75 @@ class _NotificationTab2State extends State<NotificationTab2> {
   String? code;
   late String quizTitle;
   late SharedPreferences preferences;
+  int itemsPerPage = 10;
+  int currentPage = 0;
+  bool isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    getCurrUserId();
+  int from = 0;
+  int totalRows = 0;
+  int to = 10; // Initial range, fetch the first 10 records
+
+  Future<void> fetchAbadafiteCode() async {
+    final apiUrl = API.fetchAbadafiteCode + "?from=$from&to=$to";
+    isLoading = true;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            if (from == 0) {
+              // If it's the first load, clear the list
+              allUsersList.clear();
+            }
+
+            // Append the new data to the existing list
+            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+            if (!mounted) return;
+            setState(() {
+              isLoading = false;
+              totalRows = int.tryParse(data['total'])!.toInt();
+            });
+
+            // Update 'from' and 'to' for the next load
+            from = to;
+            to += 10; // Fetch the next 10 records
+          });
+        } else {
+          print("Failed to execute query");
+        }
+      } else {
+        throw Exception('Failed to load data from the API');
+      }
+    } catch (e) {
+      print("Error occurs: $e");
+    }
   }
-  
 
   getCurrUserId() async {
     preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
       userRole = preferences.getString("role")!;
       phoneNumber = preferences.getString("phone")!;
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    getCurrUserId();
+    fetchAbadafiteCode(); // Load the initial 10 records
+  }
+
+  @override
   void dispose() {
-    // Dispose the banner timer when the widget is disposed
     super.dispose();
   }
 
@@ -54,75 +99,58 @@ class _NotificationTab2State extends State<NotificationTab2> {
     return Scaffold(
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance
-                  .collection("Quiz-codes")
-                  .where("code", isEqualTo: "")
-                  .where("createdAt", isNotEqualTo: "")
-                  .orderBy("createdAt", descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(kPrimaryColor));
-                } else if (!snapshot.hasData ||
-                    snapshot.data == null ||
-                    snapshot.data!.size == 0) {
-                  return const Center(
-                    child: Text("No data available"),
-                  );
-                } else {
-                  final documents = snapshot.data!.docs;
-                  documents.removeWhere((doc) => doc["userId"] == currentuserid);
-                  allUsersList = documents.map((doc) {
-                    final data = doc.data();
-                    return {
-                      "name": data["name"],
-                      "time": data["createdAt"],
-                      "email": data["email"],
-                      "userId": data["userId"],
-                      "phone": data["phone"],
-                      "quizTitle": data["quizTitle"],
-                      "code": data["code"],
-                      "endTime": data.containsKey("endTime")
-                          ? data["endTime"]
-                          : "1684242113231",
-                      "docId": doc.reference.id.toString(),
-                    };
-                  }).toList();
-                  if (kDebugMode) {
-                    print("Abadafite code ${allUsersList.length}");
-                  }
-                  return ListView.builder(
-                    padding: const EdgeInsets.only(top: 16),
-                    itemCount: allUsersList.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                    final data = allUsersList[index];
-                      return UsersNotificationList(
-                        name: data["name"],
-                        time: data["time"],
-                        email: data["email"],
-                        userId: data["userId"],
-                        phone: data["phone"],
-                        quizTitle: data["quizTitle"],
-                        code: data["code"],
-                        endTime: data.containsKey("endTime")
-                            ? data["endTime"]
-                            : "1684242113231",
-                        docId: data['docId'],
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ],
-        ),
+        child: !isLoading
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 60),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (allUsersList.isEmpty)
+                      const Center(
+                        child: Text("Nta muntu udafite code"),
+                      )
+                    else
+                      Column(
+                        children: [
+                          ListView.builder(
+                            padding: const EdgeInsets.only(top: 16),
+                            itemCount: allUsersList.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              final data = allUsersList[index];
+                              return UsersNotificationList(
+                                name: data["name"] ?? '',
+                                time: data["createdAt"],
+                                userId: data["userId"],
+                                phone: data["phone"] ?? '',
+                                code: data["code"],
+                                endTime: data["endTime"] ?? "1684242113231",
+                                docId: data['id'],
+                              );
+                            },
+                          ),
+
+                          ///1000=totalrows
+                        ],
+                      ),
+                    if (to <=
+                        totalRows) // Show "Load More" button if there are more records
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            isLoading = true;
+                            fetchAbadafiteCode(); // Load more records
+                          },
+                          child: const Text("Load More"),
+                        ),
+                      ),
+                  ],
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
       ),
     );
   }

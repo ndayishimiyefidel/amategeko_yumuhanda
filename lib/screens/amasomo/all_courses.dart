@@ -52,9 +52,7 @@ class _AllCourseState extends State<AllCourse> {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
     });
   }
 
@@ -176,17 +174,17 @@ class _AllCourseState extends State<AllCourse> {
             ),
           ),
           actions: [
-          CustomButton(
-          text: "Amabwiriza",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => AmabwirizaList(),
-              ),
-            );
-          },
-        )
+            CustomButton(
+              text: "Amabwiriza",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => AmabwirizaList(),
+                  ),
+                );
+              },
+            )
           ],
           centerTitle: true,
           backgroundColor: kPrimaryColor,
@@ -403,22 +401,20 @@ class _CourseTileState extends State<CourseTile> {
                             GestureDetector(
                               onTap: () {
                                 //all
-                              if(widget.userRole=="Admin"){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return CourseContents(
-                                          courseId: widget.courseId,
-                                          courseTitle: widget.title);
-                                    },
-                                  ),
-                                );
+                                if (widget.userRole == "Admin") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return CourseContents(
+                                            courseId: widget.courseId,
+                                            courseTitle: widget.title);
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  navigateToIshuli(widget.currentUserId, true);
                                 }
-                                else{
-                                  navigateToIshuli(widget.currentUserId,true);
-                                }
-
                               },
                               child: const Icon(
                                 Icons.play_circle_fill_outlined,
@@ -548,48 +544,47 @@ class _CourseTileState extends State<CourseTile> {
     });
   }
 
-  Future<void> navigateToIshuli(
-      String currentUserId, bool hasAdded) async {
+  Future<void> navigateToIshuli(String currentUserId, bool hasAdded) async {
     await FirebaseFirestore.instance
         .collection("Quiz-codes")
         .where("userId", isEqualTo: currentUserId)
         .where("isOpen", isEqualTo: true)
         .where("addedToClass", isEqualTo: true)
-        .get().then((value) => {
+        .get()
+        .then((value) => {
+              // print("value of size ${value.size}"),
 
-         // print("value of size ${value.size}"),
-
-          if(value.size>=1){
-          Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return CourseContents(
-                  courseId: widget.courseId,
-                  courseTitle: widget.title);
-            },
-          ),
-        ),
-          }
-          else{
-         showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              })
-
-          }
-
-        });
+              if (value.size >= 1)
+                {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CourseContents(
+                            courseId: widget.courseId,
+                            courseTitle: widget.title);
+                      },
+                    ),
+                  ),
+                }
+              else
+                {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: const Text(
+                              "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Close"))
+                          ],
+                        );
+                      })
+                }
+            });
   }
 }

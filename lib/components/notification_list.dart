@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../backend/apis/db_connection.dart';
+import '../utils/generate_code.dart';
 import '../widgets/fcmWidget.dart';
 
 class UsersNotificationList extends StatefulWidget {
@@ -18,9 +18,7 @@ class UsersNotificationList extends StatefulWidget {
   final String time;
 
   // final String quizId;
-  final String quizTitle;
   final String userId;
-  final String email;
   final String phone;
   final String code, docId;
   final bool? isQuiz;
@@ -29,13 +27,9 @@ class UsersNotificationList extends StatefulWidget {
   const UsersNotificationList({
     super.key,
     required this.name,
-    // required this.image,
     required this.time,
-    required this.email,
     required this.userId,
     required this.phone,
-    // required this.quizId,
-    required this.quizTitle,
     required this.code,
     required this.docId,
     this.isQuiz,
@@ -55,8 +49,8 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
   late String phoneNumber;
   late SharedPreferences preferences;
   bool _isLoading = false;
+  late String fcmToken;
 
- 
   @override
   void initState() {
     super.initState();
@@ -70,12 +64,13 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
 
   getCurrUser() async {
     preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
       currentUserPhone = preferences.getString("phone")!;
       userRole = preferences.getString("role");
+      fcmToken = preferences.getString("fcmToken")!;
     });
   }
 
@@ -86,7 +81,9 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     var dateTimeFormat =
         DateFormat('dd/MM/yyyy, hh:mm a').format(date); // 12/31/2000, 10:00 PM
-    int timestamp1 = (widget.endTime==null||widget.endTime!.isEmpty ) ? 1692260163454:int.parse(widget.endTime.toString());
+    int timestamp1 = (widget.endTime == null || widget.endTime!.isEmpty)
+        ? 1692260163454
+        : int.parse(widget.endTime.toString());
     var date1 = DateTime.fromMillisecondsSinceEpoch(timestamp1);
     var dateTimeFormat1 = DateFormat('dd/MM/yyyy, hh:mm a').format(date1);
     return InkWell(
@@ -105,9 +102,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            userRole == "Admin"
-                                ? widget.name
-                                : "Title: ${widget.quizTitle}",
+                            userRole == "Admin" ? widget.name : "",
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -247,10 +242,11 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         setState(() {
           _isLoading = true;
         });
-        _generateCode(widget.docId);
-        if (kDebugMode) {
-          print("document id :${widget.docId}");
-        }
+        // _generateCode(widget.docId);
+        String generatedCode = randomNumeric(6);
+        GenerateUser.generateCodeAndNotify(context, widget.docId, generatedCode,
+                widget.name, "Generate code is $generatedCode of ", 1)
+            .then((value) => {_getToken(), _isLoading = false});
       },
     );
   }
@@ -272,9 +268,6 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
           _isLoading = true;
         });
         _pickDate();
-        if (kDebugMode) {
-          print("document id :${widget.docId}");
-        }
 
         //date picker
       },
@@ -291,91 +284,30 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
       lastDate: DateTime(2100),
     );
 
+    final url = API.setLimitTime;
+
     if (pickedDate != null && pickedDate != _selectedDate) {
+      if (!mounted) return;
       setState(() {
         _selectedDate = pickedDate;
-        _updateEndTimeInFirestore();
+        GenerateUser.setCodeLimit(
+                context,
+                widget.docId,
+                url,
+                "Gushyiraho igihe uzarangira kwiga byakunze",
+                _selectedDate!.millisecondsSinceEpoch.toString())
+            .then((value) => _isLoading = false);
+        //_updateEndTimeInFirestore();
       });
     }
-  }
-
-  Future<void> _updateEndTimeInFirestore() async {
-    try {
-      final CollectionReference collection = FirebaseFirestore.instance.collection(
-          'Quiz-codes'); // Replace 'your_collection' with the actual collection name in Firestore
-
-      await collection.doc(widget.docId).update({
-        'endTime': _selectedDate?.millisecondsSinceEpoch.toString(),
-      });
-
-      // Successfully updated the endTime in Firestore
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      // Handle error if any
-      if (kDebugMode) {
-        print('Error updating endTime: $e');
-      }
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  String generatedCode = randomNumeric(6);
-
-  Future<void> _generateCode(String docId) async {
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .doc(docId)
-        .update({"code": generatedCode, "isOpen": true}).then((value) {
-      setState(() {
-        _getToken();
-        _isLoading = false;
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                content: Text(
-                    "Generated code for ${widget.quizTitle} quiz  is $generatedCode. ${widget.name} get notified to his device"),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Close"))
-                ],
-              );
-            });
-      });
-    });
   }
 
   //get fcm token
   _getToken() async {
-    String userToken;
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .where("uid", isEqualTo: widget.userId)
-        .get()
-        .then((value) {
-      setState(() {
-        _isLoading = false;
-        if (value.size == 1) {
-          Map<String, dynamic> fcmToken = value.docs.first.data();
-          userToken = fcmToken["fcmToken"];
-          if (kDebugMode) {
-            print("user device fcm Token is  $userToken");
-          }
-          //send push notification to user
-          String body =
-              "Mwiriwe neza ${widget.name}, ubu ngubu wemerewe gukora ibizamini byose ntankomyi kuko wamaze kwishyura.\n Murakoze mukomeze kwiga neza";
-          String notificationTitle = "Quiz App Generating Code";
-          sendPushMessage(userToken, body, notificationTitle);
-        }
-      });
-    });
+    String body =
+        "Mwiriwe neza ${widget.name}, ubu ngubu wemerewe gukora ibizamini byose ntankomyi kuko wamaze kwishyura.\n Murakoze mukomeze kwiga neza";
+    String notificationTitle = "Quiz App Generating Code";
+    sendPushMessage(fcmToken, body, notificationTitle);
   }
 
   Widget _getDeleteIcon() {
@@ -390,47 +322,16 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         ),
       ),
       onTap: () {
+        if (!mounted) return;
         setState(() {
           _isLoading = true;
         });
-        deleteDoc(widget.docId);
+        final delUrl = API.deleteCode;
+        GenerateUser.deleteUserCode(context, widget.docId, delUrl, widget.name,
+                ",Code have been deleted succesfully")
+            .then((value) => _isLoading = false);
+        // deleteDoc(widget.docId);
       },
     );
-  }
-
-  Future<void> deleteDoc(String docId) async {
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .doc(docId)
-        .delete()
-        .then((value) async {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("uid", isEqualTo: docId)
-          .get();
-
-      List<DocumentSnapshot> documents = querySnapshot.docs;
-      for (DocumentSnapshot doc in documents) {
-        // Delete each document that matches the user's UID
-        await doc.reference.delete();
-      }
-      setState(() {
-        _isLoading = false;
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                content: const Text("Notification deleted successfully"),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Close"))
-                ],
-              );
-            });
-      });
-    });
   }
 }

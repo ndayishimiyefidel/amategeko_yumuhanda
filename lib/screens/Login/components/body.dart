@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:amategeko/screens/Login/components/background.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +14,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../backend/apis/db_connection.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
 import 'check_deviceid.dart';
+import 'package:http/http.dart' as http;
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -31,17 +33,12 @@ class _SignInState extends State<SignIn> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? fcmToken;
-  TextEditingController emailEditingController = TextEditingController();
   TextEditingController passwordEditingController = TextEditingController();
-  String emailAddress = "";
   String password = "";
 
   bool isLoading = false;
   String? deviceId;
   bool checkedValue = false;
-  bool isLoggedIn = false; // Track login state
-  
-
 
   @override
   void initState() {
@@ -54,10 +51,7 @@ class _SignInState extends State<SignIn> {
     });
 
     // Await the retrieveDeviceId() function here
-    retrieveDeviceId().then((_) {
-      // The device ID retrieval is completed, so now call checkLoginState()
-      checkLoginState();
-    });
+    retrieveDeviceId();
     getCurrUserId();
   }
 
@@ -90,12 +84,6 @@ class _SignInState extends State<SignIn> {
         },
       ),
     );
-  }
-
-  void checkLoginState() async {
-    preferences = await SharedPreferences.getInstance();
-    isLoggedIn = preferences.getBool('isLoggedIn') ?? false;
-    setState(() {});
   }
 
   @override
@@ -222,8 +210,7 @@ class _SignInState extends State<SignIn> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor),
-                    onPressed: (){
-                      // _renameFields();
+                    onPressed: () {
                       loginUser();
                     },
                     child: const Text(
@@ -321,101 +308,203 @@ class _SignInState extends State<SignIn> {
   }
 
   void loginUser() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-      preferences = await SharedPreferences.getInstance();
-      FirebaseFirestore.instance
-          .collection("Users")
-          .where("password", isEqualTo: password)
-          .get()
-          .then((QuerySnapshot querySnapshot) async {
-        if (querySnapshot.size > 0) {
-          var firstDoc = querySnapshot.docs.last;
-          if (firstDoc.data() != null) {
-            Map<String, dynamic> data = firstDoc.data() as Map<String, dynamic>;
+    try {
+      if (_formKey.currentState!.validate()) {
+        setState(() {
+          isLoading = true;
+        });
+        preferences = await SharedPreferences.getInstance();
+        final loginUrl = API.login; // Set the URL to your login.php script
 
-            String userRole = data['role'];
+        final response = await http.post(
+          Uri.parse(loginUrl),
+          body: {
+            'password': password.toString().trim(),
+          },
+        );
 
-            if (data.containsKey('role') &&
-                (data['role'] == "Admin" ||
-                    data['role'] == "Ambassador" ||
-                    data['role'] == "Caller")) {
-              await preferences.setString("uid", data["uid"]);
-              await preferences.setString("name", data["name"]);
-              await preferences.setString("photo", data["photoUrl"]);
-              await preferences.setString("email", data["userEmail"]);
-              await preferences.setString("role", data["role"]);
-              await preferences.setString("phone", data["phone"]);
+        if (response.statusCode == 200) {
+          final loginResult = json.decode(response.body);
+          print(loginResult);
+          if (loginResult['success'] == true) {
+            ///update fcm
+            // Successful login
+            final userData = loginResult;
+            final String userRole = userData['role'];
 
-              setState(() {
-                isLoading = false;
-                isLoggedIn = true; // Update login state
-              });
-              preferences.setBool('isLoggedIn', isLoggedIn);
-              Route route = MaterialPageRoute(
-                builder: (c) => HomeScreen(
-                  currentuserid: data["uid"],
-                  userRole: userRole,
-                ),
-              );
+            await preferences.setString("uid", userData["uid"]);
+            await preferences.setString("name", userData["name"]);
+            await preferences.setString("role", userData["role"]);
+            await preferences.setString("phone", userData["phone"]);
+            await preferences.setString("fcmToken", fcmToken!);
+
+            setState(() {
+              isLoading = false;
+            });
+
+            Route route = MaterialPageRoute(
+              builder: (c) => HomeScreen(
+                currentuserid: userData["uid"],
+                userRole: userRole,
+              ),
+            );
+
+            if (userRole == "Admin" ||
+                userRole == "Ambassador" ||
+                userRole == "Caller") {
               setState(() {
                 Navigator.push(context, route);
               });
             } else {
-              if (data.containsKey("deviceId") &&
-                  data["deviceId"] == deviceId) {
-                await preferences.setString("uid", data["uid"]);
-                await preferences.setString("name", data["name"]);
-                await preferences.setString("photo", data["photoUrl"]);
-                await preferences.setString("email", data["userEmail"]);
-                await preferences.setString("role", data["role"]);
-                await preferences.setString("phone", data["phone"]);
-                if (kDebugMode) {
-                  print("db device id");
-                                  print(data["deviceId"]);
-
+              if (userData.containsKey("deviceId") &&
+                  userData["deviceId"] != null) {
+                final String userDeviceId = userData['deviceId'];
+                if (userDeviceId == deviceId) {
+                  setState(() {
+                    Navigator.push(context, route);
+                  });
+                } else {
+                  Fluttertoast.showToast(
+                    msg:
+                        "Ntabwo mwiyandikishije mukoreshe iyi telephone, nimukoreshe telephone mwakoresheje mwiyandikisha",
+                    textColor: Colors.red,
+                    fontSize: 14,
+                  );
                 }
-
-                setState(() {
-                  isLoading = false;
-                  isLoggedIn = true; // Update login state
-                });
-                preferences.setBool('isLoggedIn', isLoggedIn);
-                Route route = MaterialPageRoute(
-                  builder: (c) => HomeScreen(
-                    currentuserid: data["uid"],
-                    userRole: userRole,
-                  ),
-                );
-                setState(() {
-                  Navigator.push(context, route);
-                });
               } else {
-                setState(() {
-                  isLoading = false;
-                });
                 Fluttertoast.showToast(
                   msg:
-                      "Not registered on this device, please use the device you have registered before.",
+                      "Ntabwo kwinjira bishoboka ongera wiyandikishe ukanze ahanditse iyandikishe!",
                   textColor: Colors.red,
-                  fontSize: 18,
+                  fontSize: 12,
                 );
               }
             }
+          } else {
+            // Login failed
+            setState(() {
+              isLoading = false;
+            });
+            Fluttertoast.showToast(
+              msg: loginResult['message'] ?? "Ntabwo mwiyandikishe",
+              textColor: Colors.red,
+              fontSize: 18,
+            );
           }
         } else {
+          // Failed to connect to login API
           setState(() {
             isLoading = false;
           });
           Fluttertoast.showToast(
-            msg: "Login Failed, No such user matching with your credentials",
             textColor: Colors.red,
             fontSize: 18,
+            msg: "Failed to connect to login API",
           );
         }
-      });
+      }
+    } catch (e) {
+      // Handle exceptions here
+      print("Login Error: $e");
+      // You can show an error message or perform other error handling as needed
     }
   }
+
+  // void loginUser() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       isLoading = true;
+  //     });
+  //     preferences = await SharedPreferences.getInstance();
+  //     FirebaseFirestore.instance
+  //         .collection("Users")
+  //         .where("password", isEqualTo: password)
+  //         .get()
+  //         .then((QuerySnapshot querySnapshot) async {
+  //       if (querySnapshot.size > 0) {
+  //         var firstDoc = querySnapshot.docs.last;
+  //         if (firstDoc.data() != null) {
+  //           Map<String, dynamic> data = firstDoc.data() as Map<String, dynamic>;
+
+  //           String userRole = data['role'];
+
+  //           if (data.containsKey('role') &&
+  //               (data['role'] == "Admin" ||
+  //                   data['role'] == "Ambassador" ||
+  //                   data['role'] == "Caller")) {
+  //             await preferences.setString("uid", data["uid"]);
+  //             await preferences.setString("name", data["name"]);
+  //             await preferences.setString("photo", data["photoUrl"]);
+  //             await preferences.setString("email", data["userEmail"]);
+  //             await preferences.setString("role", data["role"]);
+  //             await preferences.setString("phone", data["phone"]);
+
+  //             setState(() {
+  //               isLoading = false;
+  //               isLoggedIn = true; // Update login state
+  //             });
+  //             preferences.setBool('isLoggedIn', isLoggedIn);
+  //             Route route = MaterialPageRoute(
+  //               builder: (c) => HomeScreen(
+  //                 currentuserid: data["uid"],
+  //                 userRole: userRole,
+  //               ),
+  //             );
+  //             setState(() {
+  //               Navigator.push(context, route);
+  //             });
+  //           } else {
+  //             if (data.containsKey("deviceId") &&
+  //                 data["deviceId"] == deviceId) {
+  //               await preferences.setString("uid", data["uid"]);
+  //               await preferences.setString("name", data["name"]);
+  //               await preferences.setString("photo", data["photoUrl"]);
+  //               await preferences.setString("email", data["userEmail"]);
+  //               await preferences.setString("role", data["role"]);
+  //               await preferences.setString("phone", data["phone"]);
+  //               if (kDebugMode) {
+  //                 print("db device id");
+  //                 print(data["deviceId"]);
+  //               }
+
+  //               setState(() {
+  //                 isLoading = false;
+  //                 isLoggedIn = true; // Update login state
+  //               });
+  //               preferences.setBool('isLoggedIn', isLoggedIn);
+  //               Route route = MaterialPageRoute(
+  //                 builder: (c) => HomeScreen(
+  //                   currentuserid: data["uid"],
+  //                   userRole: userRole,
+  //                 ),
+  //               );
+  //               setState(() {
+  //                 Navigator.push(context, route);
+  //               });
+  //             } else {
+  //               setState(() {
+  //                 isLoading = false;
+  //               });
+  //               Fluttertoast.showToast(
+  //                 msg:
+  //                     "Not registered on this device, please use the device you have registered before.",
+  //                 textColor: Colors.red,
+  //                 fontSize: 18,
+  //               );
+  //             }
+  //           }
+  //         }
+  //       } else {
+  //         setState(() {
+  //           isLoading = false;
+  //         });
+  //         Fluttertoast.showToast(
+  //           msg: "Login Failed, No such user matching with your credentials",
+  //           textColor: Colors.red,
+  //           fontSize: 18,
+  //         );
+  //       }
+  //     });
+  //   }
+  // }
 }

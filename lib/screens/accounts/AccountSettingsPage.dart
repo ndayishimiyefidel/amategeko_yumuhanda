@@ -1,18 +1,13 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../backend/apis/db_connection.dart';
 import '../../resources/user_state_methods.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 import '../../widgets/ProgressWidget.dart';
+import 'package:http/http.dart' as http;
 
 class UserSettings extends StatelessWidget {
   UserSettings({super.key});
@@ -83,21 +78,15 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> {
   late SharedPreferences preferences;
   late TextEditingController nameTextEditingController;
-  late TextEditingController emailTextEditingController;
   late TextEditingController phoneTextEditingController;
   late TextEditingController passwordTextEditingController;
 
   String id = "";
   String name = "";
-  String email = "";
   String password = "";
-  String photoUrl = "";
   String phone = "";
-  File? imageFileAvatar;
-  final picker = ImagePicker();
   bool isLoading = false;
   final FocusNode nameFocusNode = FocusNode();
-  final FocusNode emailFocusNode = FocusNode();
   final FocusNode phoneFocusNode = FocusNode();
   final FocusNode passwordFocusNode = FocusNode();
   bool _status = true;
@@ -107,108 +96,121 @@ class SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // FirebaseFirestore.instance
-    //     .collection("Users")
-    //     .doc("1S2L04bN31U8SWk3AJjlUlWolp23")
-    //     .update({"role": "Ambassador"}).then(
-    //         (value) => {print("docs updated")});
+
     readDataFromLocal();
   }
 
-  Future<String> readDataFromLocal() async {
+  void readDataFromLocal() async {
     isInitialLoading = true;
     preferences = await SharedPreferences.getInstance();
-    id = preferences.getString("uid")!;
-    name = preferences.getString("name")!;
-    photoUrl = preferences.getString("photo")!;
-    email = preferences.getString("email")!;
-    phone = preferences.getString("phone")!;
+
+    setState(() {
+      id = preferences.getString("uid")!;
+      name = preferences.getString("name")!;
+      phone = preferences.getString("phone")!;
+    });
 
     nameTextEditingController = TextEditingController(text: name);
-    emailTextEditingController = TextEditingController(text: email);
     phoneTextEditingController = TextEditingController(text: phone);
     passwordTextEditingController = TextEditingController();
 
     isInitialLoading = false;
-    setState(() {});
-    // return Future.delayed(Duration(seconds: 2), () => "Hello");
-    return photoUrl;
   }
 
-  Future getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        imageFileAvatar = File(pickedFile.path);
-        isLoading = true;
-      }
-    });
-
-    if (pickedFile != null) {
-      // upload image to firebase storage
-      uploadImageToFirestoreAndStorage();
-    }
-  }
-
-  TaskSnapshot? taskSnapshot;
-
-  Future uploadImageToFirestoreAndStorage() async {
-    String mFileName = id;
-    Reference reference = FirebaseStorage.instance.ref().child(mFileName);
-    UploadTask uploadTask = reference.putFile(imageFileAvatar!);
-    taskSnapshot = await (await uploadTask).ref.getDownloadURL().then(
-        (newImageDownloadUrl) {
-      photoUrl = newImageDownloadUrl;
-      FirebaseFirestore.instance.collection("Users").doc(id).update({
-        "photoUrl": photoUrl,
-        "name": name,
-      }).then((data) async {
-        await preferences.setString("photo", photoUrl);
-
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(msg: "Profile Updated Successfully.");
-      });
-      return null;
-    }, onError: (errorMsg) {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }
-
-  void updateData() {
+  void updateData() async {
     nameFocusNode.unfocus();
-    emailFocusNode.unfocus();
     phoneFocusNode.unfocus();
     passwordFocusNode.unfocus();
     setState(() {
-      isLoading = false;
+      isLoading = true;
     });
 
     if (password != "") {
-      FirebaseFirestore.instance
-          .collection("Users")
-          .doc(id)
-          .update({"name": name, "phone": phone, "password": password}).then(
-              (data) async {
-        await preferences.setString("photo", photoUrl);
-        await preferences.setString("name", name);
-        await preferences.setString("phone", phone);
+      final String updateUrl = API.updateProfile;
 
+      // Create a map with the updated user data
+      Map<String, dynamic> updatedUserData = {
+        "uid": id,
+        "name": name,
+        "phone": phone,
+        "password": password,
+      };
+
+      try {
+        final response = await http.post(
+          Uri.parse(updateUrl),
+          body: updatedUserData,
+        );
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+
+          if (data['updated'] == true) {
+            await preferences.setString("name", name);
+            await preferences.setString("phone", phone);
+
+            setState(() {
+              isLoading = false;
+            });
+            Fluttertoast.showToast(msg: "Updated Successfully.");
+          } else {
+            setState(() {
+              isLoading = false;
+            });
+            Fluttertoast.showToast(
+                msg: data['message'] ?? "Failed to update user data");
+          }
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          Fluttertoast.showToast(msg: "Failed to connect to the server");
+        }
+      } catch (e) {
         setState(() {
           isLoading = false;
         });
-        Fluttertoast.showToast(msg: "Updated Successfully.");
-      });
+        print("Update Error: $e");
+        Fluttertoast.showToast(msg: "Failed to update user profile data");
+      }
     } else {
       setState(() {
         isLoading = false;
       });
-      Fluttertoast.showToast(msg: "key is required please");
+      Fluttertoast.showToast(msg: "Password is required.");
     }
   }
+
+  // void updateData() {
+  //   nameFocusNode.unfocus();
+  //   phoneFocusNode.unfocus();
+  //   passwordFocusNode.unfocus();
+  //   setState(() {
+  //     isLoading = false;
+  //   });
+
+  //   if (password != "") {
+  //     FirebaseFirestore.instance
+  //         .collection("Users")
+  //         .doc(id)
+  //         .update({"name": name, "phone": phone, "password": password}).then(
+  //             (data) async {
+  //       await preferences.setString("photo", photoUrl);
+  //       await preferences.setString("name", name);
+  //       await preferences.setString("phone", phone);
+
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //       Fluttertoast.showToast(msg: "Updated Successfully.");
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //     Fluttertoast.showToast(msg: "key is required please");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -220,71 +222,31 @@ class SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                 child: Column(
                   children: <Widget>[
-                    //Profile Image - Avatar
-                    //Profile Image - Avatar
                     Container(
                       width: double.infinity,
                       margin: const EdgeInsets.all(20.0),
                       child: Center(
                         child: Stack(
                           children: <Widget>[
-                            (imageFileAvatar == null)
-                                ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display already existing image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display already existing image
-                                          child: CachedNetworkImage(
-                                            placeholder: (context, url) =>
-                                                Container(
-                                              width: 200.0,
-                                              height: 200.0,
-                                              padding:
-                                                  const EdgeInsets.all(20.0),
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                strokeWidth: 2.0,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                            Color>(
-                                                        Colors.lightBlueAccent),
-                                              ),
-                                            ),
-                                            imageUrl: photoUrl,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  )
-                                // : Icon(
-                                //     Icons.account_circle,
-                                //     size: 90.0,
-                                //     color: Colors.grey,
-                                //   )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display new updated image
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display new updated image
-                                          child: Image.file(
-                                            imageFileAvatar!,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Material(
+                                    // display new updated image
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(125.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                    // display new updated image
+                                    child: Image.asset(
+                                      "assets/profile.png",
+                                      width: 200.0,
+                                      height: 200.0,
+                                      fit: BoxFit.cover,
+                                    )),
+                              ],
+                            ),
                             GestureDetector(
-                              onTap: getImage,
+                              onTap: () {},
                               child: const Padding(
                                   padding:
                                       EdgeInsets.only(top: 150.0, right: 120.0),
@@ -306,14 +268,12 @@ class SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                     ),
-
                     Column(children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.all(1.0),
                         child: isLoading ? oldcircularprogress() : Container(),
                       ),
                     ]),
-
                     Container(
                       color: const Color(0xFFFFFFFF),
                       child: Padding(
@@ -440,7 +400,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   ],
                                 )),
 
-                            //Email field
                             const Padding(
                                 padding: EdgeInsets.only(
                                     left: 25.0, right: 25.0, top: 25.0),
@@ -453,7 +412,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'Email ID',
+                                          'password',
                                           style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold),
@@ -471,48 +430,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                     Flexible(
                                       child: TextField(
                                         readOnly: true,
-                                        decoration: const InputDecoration(
-                                            hintText: "Enter Email ID"),
-                                        enabled: !_status,
-                                        controller: emailTextEditingController,
-                                        focusNode: emailFocusNode,
-                                      ),
-                                    ),
-                                  ],
-                                )),
-
-                            const Padding(
-                                padding: EdgeInsets.only(
-                                    left: 25.0, right: 25.0, top: 25.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Text(
-                                          'Change Role',
-                                          style: TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )),
-                            Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 25.0, right: 25.0, top: 2.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Flexible(
-                                      child: TextField(
-                                        readOnly: false,
-                                        decoration: const InputDecoration(
-                                          hintText: "Ambassador",
+                                        decoration: InputDecoration(
+                                          hintText: "Enter Password",
                                         ),
                                         controller:
                                             passwordTextEditingController,

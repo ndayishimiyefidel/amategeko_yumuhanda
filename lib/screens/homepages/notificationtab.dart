@@ -1,15 +1,15 @@
-import 'dart:math';
-
+import 'dart:convert';
 import 'package:amategeko/screens/homepages/usernotification.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:amategeko/utils/generate_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 import '../homepages/noficationtab1.dart';
+import 'package:http/http.dart' as http;
 import '../homepages/notificationtab2.dart';
 
 class Notifications extends StatefulWidget {
@@ -21,14 +21,9 @@ class Notifications extends StatefulWidget {
 
 class _NotificationsState extends State<Notifications>
     with SingleTickerProviderStateMixin {
-  var allUsersList=[];
+  var allUsersList = [];
   String? currentuserid;
-  String? currentusername;
-  String? currentuserphoto;
   String? userRole;
-  String? phoneNumber;
-  String? code;
-  String? quizTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +63,7 @@ class _NotificationsState extends State<Notifications>
               showSearch(
                 context: context,
                 delegate: DataSearch(
-                  allUsersList: allUsersList,
-                  currentuserid: currentuserid.toString(),
-                  currentusername: currentusername.toString(),
-                  currentuserphoto: currentuserphoto.toString(),
-                  phoneNumber: phoneNumber.toString(),
-                  code: code.toString(),
-                  quizTitle: quizTitle.toString(),
-                ),
+                    allUsersList: allUsersList, currentuserid: currentuserid!),
               );
             },
           )
@@ -121,55 +109,6 @@ class _NotificationsState extends State<Notifications>
                       ],
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("Quiz-codes")
-                            .orderBy("createdAt", descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return SizedBox(
-                              height: MediaQuery.of(context)
-                                      .copyWith()
-                                      .size
-                                      .height -
-                                  MediaQuery.of(context)
-                                          .copyWith()
-                                          .size
-                                          .height /
-                                      5,
-                              width:
-                                  MediaQuery.of(context).copyWith().size.width,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation(
-                                  kPrimaryColor,
-                                )),
-                              ),
-                            );
-                          } else {
-                            snapshot.data!.docs.removeWhere(
-                                (i) => i["userId"] == currentuserid);
-                            allUsersList = snapshot.data!.docs;
-                            return ListView.builder(
-                              padding: const EdgeInsets.only(top: 16, left: 20),
-                              itemCount: snapshot.data!.docs.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  child: null,
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
                 ],
               ),
             )
@@ -179,27 +118,49 @@ class _NotificationsState extends State<Notifications>
 
   //shared preferences
   late SharedPreferences preferences;
-  late String email;
   late String photo;
   late String phone;
-  String userToken = "";
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       currentuserid = preferences.getString("uid")!;
-      currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
     });
+  }
+
+  Future<void> fetchQuizData() async {
+    final apiUrl = API.fetchQuizData;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // print("response body $data");
+        if (data['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+          });
+        } else {
+          print("Failed to execute query");
+        }
+      } else {
+        print("Failed to connect to api");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   @override
   void initState() {
     super.initState();
     getCurrUserData();
+    fetchQuizData();
   }
 }
 
@@ -207,20 +168,9 @@ class DataSearch extends SearchDelegate {
   DataSearch({
     this.allUsersList,
     required this.currentuserid,
-    required this.currentusername,
-    required this.currentuserphoto,
-    required this.phoneNumber,
-    required this.code,
-    required this.quizTitle,
   });
-
   var allUsersList;
   String currentuserid;
-  String quizTitle;
-  String currentusername;
-  String currentuserphoto;
-  String phoneNumber;
-  String code;
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -267,15 +217,22 @@ class DataSearch extends SearchDelegate {
     if (query.isNotEmpty) {
       suggestionList = [];
       for (var element in userList) {
-        if (element["name"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["phone"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["email"].toLowerCase().startsWith(query.toLowerCase()) ||
-            element["code"].toLowerCase().startsWith(query.toLowerCase())) {
+        if (element["name"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["phone"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["id"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["addedToClass"]
+                    ?.toLowerCase()
+                    ?.startsWith(query.toLowerCase()) ==
+                true ||
+            element["code"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
+                true) {
           suggestionList.add(element);
         }
       }
     }
-
 
     return ListView.builder(
       shrinkWrap: true,
@@ -309,52 +266,32 @@ class DataSearch extends SearchDelegate {
                 ],
               ),
             ),
-            RichText(
-              text: TextSpan(
-                text: suggestionList[index]["email"]
-                    .toLowerCase()
-                    .substring(0, query.length),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-                children: [
-                  TextSpan(
-                    text: suggestionList[index]["email"]
-                        .toLowerCase()
-                        .substring(query.length),
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 16,
+
+            suggestionList[index]["code"] != ""
+                ? RichText(
+                    text: TextSpan(
+                      text: suggestionList[index]["code"]
+                          .toLowerCase()
+                          .substring(0, query.length),
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: suggestionList[index]["code"]
+                              .toLowerCase()
+                              .substring(query.length),
+                          style: const TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-          suggestionList[index]["code"]!=""? RichText(
-              text: TextSpan(
-                text: suggestionList[index]["code"]
-                    .toLowerCase()
-                    .substring(0, query.length),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-                children: [
-                  TextSpan(
-                    text: suggestionList[index]["code"]
-                        .toLowerCase()
-                        .substring(query.length),
-                    style: const TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ):const SizedBox(),
+                  )
+                : const SizedBox(),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -406,21 +343,68 @@ class DataSearch extends SearchDelegate {
               children: [
                 IconButton(
                   onPressed: () async {
-                    await toggleOrAddAddedToClassByPhoneNumber(
-                        context, suggestionList[index]["phone"].toString());
+                    final url = API.addedToClass;
+                    if (suggestionList[index]["addedToClass"] == null ||
+                        suggestionList[index]["addedToClass"] == "") {
+                      GenerateUser.addedRemoveToClass(
+                          context,
+                          suggestionList[index]["id"].toString(),
+                          url,
+                          "Success added to class",
+                          "Added");
+                    } else {
+                      GenerateUser.addedRemoveToClass(
+                          context,
+                          suggestionList[index]["id"].toString(),
+                          url,
+                          "Remove from  class successfully",
+                          "");
+                    }
                   },
                   icon: Icon(
-                    suggestionList[index]["code"].toString()==""?Icons.add_outlined:Icons.remove,
+                    (suggestionList[index]["addedToClass"] == "" ||
+                            suggestionList[index]["addedToClass"] == null)
+                        ? Icons.add_outlined
+                        : Icons.remove,
                     size: 30,
                     color: Colors.blueAccent,
                   ),
                 ),
                 IconButton(
-                  onPressed: () {
-                    deleteDocumentByPhoneNumber(
-                        context,
-                        suggestionList[index]["phone"].toString(),
-                        suggestionList[index]["code"].toString());
+                  onPressed: () async {
+                    final code = suggestionList[index]["code"];
+                    bool hasKey = code != "" ? true : false;
+                    final confirmed =
+                        await _showConfirmationDialog(context, hasKey);
+                    if (confirmed == true) {
+                      // Perform the delete operation
+                      String generatedCode = randomNumeric(6);
+                      if (hasKey) {
+                        GenerateUser.generateCodeAndNotify(
+                            context,
+                            suggestionList[index]["id"],
+                            "",
+                            suggestionList[index]["name"],
+                            "code deleted successfully of ",
+                            0);
+                      } else {
+                        GenerateUser.generateCodeAndNotify(
+                            context,
+                            suggestionList[index]["id"].toString(),
+                            generatedCode,
+                            suggestionList[index]["name"].toString(),
+                            "Generate code is $generatedCode of ",
+                            1);
+                      }
+                    } else {
+                      final url = API.deleteCode;
+                      GenerateUser.deleteUserCode(
+                          context,
+                          suggestionList[index]["id"],
+                          url,
+                          suggestionList[index]["name"].toString(),
+                          "Deleted successfully");
+                    }
                   },
                   icon: const Icon(
                     Icons.close_outlined,
@@ -434,97 +418,6 @@ class DataSearch extends SearchDelegate {
         ),
       ),
       itemCount: suggestionList.length,
-    );
-  }
-
-  Future<void> deleteDocumentByPhoneNumber(
-      BuildContext context, String phoneNumber, String code) async {
-    final firestoreInstance = FirebaseFirestore.instance;
-    try {
-final querySnapshot = await firestoreInstance
-        .collection('Quiz-codes')
-        .where('phone', isEqualTo: phoneNumber)
-        .get();
-    // ignore: use_build_context_synchronously, unnecessary_null_comparison
-    final bool? confirmed =
-        // ignore: use_build_context_synchronously
-        await _showConfirmationDialog(context, code != "" ? true : false);
-    // Loop through the query results and delete each matching document
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      if (confirmed == true) {
-        await firestoreInstance
-            .collection('Quiz-codes')
-            .doc(doc.id)
-            .delete()
-            .then((value) => {
-                  // ignore: avoid_print
-                  print("delete success"),
-                  showSnackbar(context, 'user has been deleted success'),
-                });
-      } else {
-        if (code != "") {
-          await firestoreInstance
-              .collection('Quiz-codes')
-              .doc(doc.id)
-              .update({"isOpen": false, "code": ""});
-          // ignore: use_build_context_synchronously
-          showSnackbar(context, 'Code have been remove successfully!');
-        } else {
-          final random = Random();
-
-          // Generate a random 6-digit number
-          final randomSixDigitNumber = random.nextInt(999999);
-
-          // Ensure the number is exactly 6 digits by padding with zeros if needed
-          final generatedCode = randomSixDigitNumber.toString().padLeft(6, '0');
-
-          await firestoreInstance
-              .collection('Quiz-codes')
-              .doc(doc.id)
-              .update({"isOpen": true, "code": generatedCode});
-          // ignore: use_build_context_synchronously
-          showSnackbar(context, 'User now has access to exam!');
-        }
-      }
-    }
-    } catch (e) {
-     // ignore: use_build_context_synchronously
-    showSnackbar(context, 'error happenning');
-    }
-  }
-
-  Future<void> toggleOrAddAddedToClassByPhoneNumber(
-      BuildContext context, String phoneNumber) async {
-    final firestoreInstance = FirebaseFirestore.instance;
-
-    try {
-      final querySnapshot = await firestoreInstance
-          .collection('Quiz-codes')
-          .where('phone', isEqualTo: phoneNumber)
-          .get();
-
-      for (final docSnapshot in querySnapshot.docs) {
-        final currentAddedToClass = docSnapshot.data()['addedToClass'] as bool?;
-        final updatedAddedToClass =
-            currentAddedToClass != null ? !currentAddedToClass : true;
-        await docSnapshot.reference.set(
-            {'addedToClass': updatedAddedToClass}, SetOptions(merge: true)).then((value) => {
-              showSnackbar(context, 'User successfully added to class'),
-            });
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error updating documents: $e');
-      }
-    }
-  }
-
-  void showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2), // Adjust the duration as needed
-      ),
     );
   }
 
@@ -542,13 +435,13 @@ final querySnapshot = await firestoreInstance
                   ? const Text('Remove Code')
                   : const Text('Activate Code'),
               onPressed: () {
-                Navigator.of(context).pop(false);
+                Navigator.of(context).pop(true);
               },
             ),
             TextButton(
               child: const Text('Delete'),
               onPressed: () {
-                Navigator.of(context).pop(true);
+                Navigator.of(context).pop(false);
               },
             ),
           ],

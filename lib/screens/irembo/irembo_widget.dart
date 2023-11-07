@@ -62,7 +62,6 @@ class _IremboUsersListState extends State<IremboUsersList> {
     setState(() {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
-      currentuserphoto = preferences.getString("photo")!;
       currentUserPhone = preferences.getString("phone")!;
       userRole = preferences.getString("role")!;
     });

@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:amategeko/backend/apis/db_connection.dart';
+import 'package:amategeko/enume/models/user_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,7 @@ import '../../HomeScreen.dart';
 import '../../Login/components/check_deviceid.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/components/background.dart';
+import 'package:http/http.dart' as http;
 
 class SignUp extends StatefulWidget {
   final String? referralCode;
@@ -28,57 +29,29 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final String defaultPhotoUrl =
-      "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg";
-  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? fcmToken;
   bool isRegistered = false;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController nameEditingController = TextEditingController();
-  TextEditingController emailEditingController = TextEditingController();
   TextEditingController passwordEditingController = TextEditingController();
   TextEditingController phoneNumberEditingController = TextEditingController();
-  String name = "", phoneNumber = "", emailAddress = "", password = "";
+  String name = "", phoneNumber = "", password = "";
 
   late SharedPreferences preferences;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isloading = false;
   final userRole = "User";
   String? deviceId;
-  String? deviceEmail;
-
-  List<dynamic> accounts = [];
-
-
- 
 
   @override
   void initState() {
     super.initState();
-
-    if (kDebugMode) {
-      print("Referral code");
-      print(widget.referralCode);
-    }
     _messaging.getToken().then((value) {
       fcmToken = value;
     });
-    //get device id
-    retrieveDeviceId().then((_) {
-      // The device ID retrieval is completed, so now call checkLoginState()
-      if (isRegistered == true) {
-        // If already registered, navigate to the login page
-        setState(() {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
-        });
-      }
-    });
 
-    // Check if user is registered
+    retrieveDeviceId();
   }
 
   String? currentuserid;
@@ -100,150 +73,137 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  String sanitizeName(String name) {
-    // Remove spaces and convert to lowercase
-    return name.replaceAll(' ', '').toLowerCase();
+  String generateUniqueUid() {
+    // Create a unique user ID using a timestamp and a random number
+    final int timestamp = DateTime.now().millisecondsSinceEpoch;
+    final int randomNum = (timestamp ~/ 1000) + Random().nextInt(9999);
+    return '$timestamp$randomNum';
   }
 
-  String generateRandomEmail(String name) {
-    // Sanitize the name
-    String sanitized = sanitizeName(name);
-    // Generate a random number for email uniqueness
-    int randomNum = Random().nextInt(9999);
-
-    // Create a random email using sanitized name and random number
-    return '$sanitized$randomNum@gmail.com';
-  }
-
-  void _registerUser() async {
-    if (deviceId == "") {
-      Fluttertoast.showToast(msg: "Error no device Id");
-    } else {
-      if (_formkey.currentState!.validate()) {
-        setState(() {
-          isloading = true;
-        });
-        preferences = await SharedPreferences.getInstance();
-        var firebaseUser = FirebaseAuth.instance.currentUser;
-        //
-        //showInterstitialAd();
-        final QuerySnapshot checkToken = await FirebaseFirestore.instance
-            .collection("Users")
-            .where("deviceId", isEqualTo: deviceId)
-            .where("password", isEqualTo: password.toString().trim())
-            .get();
-        final List<DocumentSnapshot> document = checkToken.docs;
-        // Generate a random email based on the user's name
-        String randomEmail =
-            generateRandomEmail(nameEditingController.text.toString().trim());
-
-        if (kDebugMode) {
-          print(randomEmail);
-        }
-
-        if (document.isEmpty) {
-          await _auth
-              .createUserWithEmailAndPassword(
-                  email: randomEmail, password: password.toString().trim())
-              .then((auth) async {
-            firebaseUser = auth.user;
-          }).catchError((err) {
-            setState(() {
-              isloading = false;
-            });
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(err.message)));
+  Future<void> _registerUser() async {
+    if (deviceId!.isNotEmpty || deviceId != "") {
+      try {
+        if (_formKey.currentState!.validate()) {
+          setState(() {
+            isloading = true;
           });
 
-          if (firebaseUser != null) {
-            final QuerySnapshot result = await FirebaseFirestore.instance
-                .collection("Users")
-                .where("uid", isEqualTo: firebaseUser!.uid)
-                .where("phone",isEqualTo: phoneNumber.trim())
-                .where("password",isEqualTo:password.trim())
-                .get();
+          final deviceValidationUrl = API.validate;
+          final registrationUrl = API.signUp;
+          final String uid = generateUniqueUid();
 
-            final List<DocumentSnapshot> documents = result.docs;
-            if (documents.isEmpty) {
-              FirebaseFirestore.instance
-                  .collection("Users")
-                  .doc(firebaseUser!.uid)
-                  .set({
-                "uid": firebaseUser!.uid,
-                "userEmail": firebaseUser!.email,
-                "name": name.toString().trim(),
-                "phone": phoneNumber.trim(),
-                "password": password.trim(),
-                "photoUrl": defaultPhotoUrl,
-                "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-                "state": 1,
-                "role": userRole,
-                "fcmToken": fcmToken,
-                "deviceId": deviceId,
-                "referralCode": widget.referralCode //1.emmy
-              });
-              setState(() {
-                isRegistered = true;
-              });
-              final currentuser = firebaseUser;
-              await preferences.setString("uid", currentuser!.uid);
-              await preferences.setString("name", name.toString().trim());
-              await preferences.setString("photo", defaultPhotoUrl);
-              await preferences.setString("phone", phoneNumber.trim());
-              await preferences.setString("role", userRole.toString().trim());
-              await preferences.setString(
-                  "email", currentuser.email.toString());
+          // Device validation
+          try {
+            final deviceValidationResponse = await http.post(
+              Uri.parse(deviceValidationUrl),
+              body: {"deviceId": deviceId, "phone": phoneNumber.toString()},
+            );
+
+            if (deviceValidationResponse.statusCode == 200) {
+              final deviceValidationResult =
+                  json.decode(deviceValidationResponse.body);
+              print(deviceValidationResult);
+
+              if (deviceValidationResult['success'] == false) {
+                // Continue with user registration
+                int dateF = DateTime.now().millisecondsSinceEpoch;
+
+                User userModel = User(
+                    uid: uid,
+                    createdAt: dateF.toString(),
+                    password: password.toString().trim(),
+                    role: userRole,
+                    phone: phoneNumber.toString().trim(),
+                    name: name.trim(),
+                    referralCode: "",
+                    state: 1,
+                    deviceId: deviceId.toString(),
+                    fcmToken: fcmToken.toString());
+
+                try {
+                  final registrationResponse = await http.post(
+                    Uri.parse(registrationUrl),
+                    body: userModel.toJson(),
+                  );
+
+                  if (registrationResponse.statusCode == 200) {
+                    final registrationResult =
+                        jsonDecode(registrationResponse.body);
+                    print(registrationResult);
+
+                    if (registrationResult['registered'] == true) {
+                      // Registration successful
+                      preferences = await SharedPreferences.getInstance();
+                      await preferences.setString("uid", uid);
+                      await preferences.setString("name", name);
+                      await preferences.setString(
+                          "phone", phoneNumber.toString().trim());
+                      await preferences.setString("role", userRole);
+                      await preferences.setString("fcmToken", fcmToken!);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(
+                            currentuserid: uid,
+                            userRole: userRole,
+                          ),
+                        ),
+                      );
+                    } else {
+                      Fluttertoast.showToast(
+                          textColor: Colors.red,
+                          fontSize: 18,
+                          msg: registrationResult['message'] ??
+                              "Registration Failed");
+                    }
+                  } else {
+                    Fluttertoast.showToast(
+                        textColor: Colors.red,
+                        fontSize: 18,
+                        msg: "Failed to connect to registration api");
+                  }
+                } catch (registrationError) {
+                  print("Registration Error: $registrationError");
+                  // Handle registration API call error
+                }
+              } else {
+                Fluttertoast.showToast(
+                    textColor: Colors.red,
+                    fontSize: 18,
+                    msg: deviceValidationResult['message'] ??
+                        "Device Already registered in the app, please contact the administrator");
+              }
             } else {
-              //get user detail for current user
-              await preferences.setString("uid", documents[0]["uid"]);
-              await preferences.setString("name", documents[0]["name"]);
-              await preferences.setString("photo", documents[0]["photoUrl"]);
-              await preferences.setString("phone", documents[0]["phone"]);
-              await preferences.setString("role", documents[0]["role"]);
-              await preferences.setString("email", documents[0]["userEmail"]);
-              setState(() {
-                isloading = false;
-              });
               Fluttertoast.showToast(
-                  msg: "Account with this credentials is already created");
+                  textColor: Colors.red,
+                  fontSize: 18,
+                  msg: "Failed to connect to API");
             }
-
-            setState(() {
-              isloading = false;
-            });
-            Route route = MaterialPageRoute(
-                builder: (c) => HomeScreen(
-                      currentuserid: firebaseUser!.uid,
-                      userRole: userRole,
-                    ));
-            // ignore: use_build_context_synchronously
-            Navigator.push(context, route);
-          } else {
-            setState(() {
-              isloading = false;
-            });
-            Fluttertoast.showToast(msg: "Sign up Failed");
+          } catch (deviceValidationError) {
+            print("Device Validation Error: $deviceValidationError");
+            // Handle device validation API call error
           }
-        } else {
-          ///device already exists
 
           setState(() {
             isloading = false;
           });
-          Fluttertoast.showToast(
-              textColor: Colors.red,
-              fontSize: 18,
-              msg:
-                  "Device Already registered in the app, please contact the administrator");
         }
+      } catch (e) {
+        // Handle exceptions here
+        print("Error: $e");
+        // You can show an error message or perform other error handling as needed
       }
+    } else {
+      Fluttertoast.showToast(
+          textColor: Colors.red,
+          fontSize: 18,
+          msg: "Reba niba ufite internet kugirango wiyandikishe");
     }
   }
 
   @override
   void dispose() {
     super.dispose();
-
   }
 
   @override
@@ -252,7 +212,7 @@ class _SignUpState extends State<SignUp> {
     return Background(
       child: SingleChildScrollView(
         child: Form(
-          key: _formkey,
+          key: _formKey,
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -366,41 +326,6 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                // TextFieldContainer(
-                //   child: TextFormField(
-                //     controller: emailEditingController,
-                //     keyboardType: TextInputType.emailAddress,
-                //     textInputAction: TextInputAction.next,
-                //     onChanged: (val) {
-                //       emailAddress = val;
-                //       print(emailAddress);
-                //     },
-                //     validator: (emailValue) {
-                //       if (emailValue!.isEmpty) {
-                //         return 'This field is mandatory';
-                //       }
-                //       String p =
-                //           "[a-zA-Z0-9\+\.\_\%\-\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
-                //       RegExp regExp = new RegExp(p);
-                //
-                //       if (regExp.hasMatch(emailValue)) {
-                //         // So, the email is valid
-                //         return null;
-                //       }
-                //
-                //       return 'This is not a valid email';
-                //     },
-                //     cursorColor: kPrimaryColor,
-                //     decoration: const InputDecoration(
-                //       icon: Icon(
-                //         Icons.email,
-                //         color: kPrimaryColor,
-                //       ),
-                //       hintText: "Andika imeli yawe",
-                //       border: InputBorder.none,
-                //     ),
-                //   ),
-                // ),
                 TextFieldContainer(
                   child: TextFormField(
                     controller: phoneNumberEditingController,
@@ -446,16 +371,6 @@ class _SignUpState extends State<SignUp> {
                     onChanged: (val) {
                       password = val;
                     },
-                    // validator: (pwValue) {
-                    //   if (pwValue!.isEmpty) {
-                    //     return 'This field is mandatory';
-                    //   }
-                    //   if (pwValue.length < 6) {
-                    //     return 'Password must be at least 6 characters';
-                    //   }
-                    //
-                    //   return null;
-                    // },
                     validator: (pwValue) {
                       if (pwValue!.isEmpty) {
                         return 'This field is mandatory';
@@ -478,19 +393,6 @@ class _SignUpState extends State<SignUp> {
                         Icons.phone,
                         color: kPrimaryColor,
                       ),
-                      // suffixIcon: IconButton(
-                      //   icon: Icon(
-                      //     _passwordVisible
-                      //         ? Icons.visibility_off
-                      //         : Icons.visibility,
-                      //     color: kPrimaryColor,
-                      //   ),
-                      //   onPressed: () {
-                      //     setState(() {
-                      //       _passwordVisible = !_passwordVisible;
-                      //     });
-                      //   },
-                      // ),
                       border: InputBorder.none,
                     ),
                   ),

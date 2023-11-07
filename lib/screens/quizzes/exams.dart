@@ -87,11 +87,8 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
   late SharedPreferences preferences;
   late String currentuserid;
   late String currentusername;
-  late String email;
-  late String photo;
   String? userRole;
   late String phone;
-  String userToken = "";
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
@@ -99,9 +96,8 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
       currentuserid = preferences.getString("uid")!;
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
-      photo = preferences.getString("photo")!;
       phone = preferences.getString("phone")!;
-      email = preferences.getString("email")!;
+    
     });
   }
 
