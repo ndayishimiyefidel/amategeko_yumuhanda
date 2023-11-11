@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
+import '../../utils/insttruction.dart';
 import '../../widgets/ProgressWidget.dart';
 import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
@@ -204,26 +205,26 @@ class _NewQuizState extends State<NewQuiz> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return AlertDialog(
-                          title: const Column(
-                            children: [
-                              Text(
-                                "REQUEST CODE",
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
+                        return SingleChildScrollView(
+                          child: AlertDialog(
+                            title: Column(
+                              children: [
+                                Text(
+                                  "REQUEST CODE",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 10),
-                              SingleChildScrollView(
-                                child: Column(
+                                SizedBox(height: 10),
+                                Column(
                                   children: [
                                     Column(
                                       children: [
                                         Text(
-                                          "1.Saba code igufasha gufungura application,kugirango uhabwe kode ubanza kwishyura 1500 rwf ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay",
+                                          "1.Saba code igufasha gufungura application, kugirango uhabwe kode ubanza kwishyura 1500 rwf kuri 0788659575/0728877442  cyangwa ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay ibaruye kuri ALEXIS",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 10,
                                             fontWeight: FontWeight.normal,
                                             color: Colors.blueAccent,
                                           ),
@@ -232,16 +233,16 @@ class _NewQuizState extends State<NewQuiz> {
                                         Text(
                                           "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umuhondo ibi byose ubikora wafunguye connection",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 10,
                                             fontWeight: FontWeight.normal,
                                             color: Colors.redAccent,
                                           ),
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam ",
+                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam",
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 10,
                                             fontWeight: FontWeight.normal,
                                             color: Colors.blueAccent,
                                           ),
@@ -249,52 +250,61 @@ class _NewQuizState extends State<NewQuiz> {
                                         ),
                                       ],
                                     ),
+                                    InstructionItems(
+                                      title:
+                                          '4. Iyo wishyuye ukoresheje nimero itari muri application cg ukanze uhanditse saba code  utafunguye connection uhamagara kuri izi nimero tugufungurira: ',
+                                      phoneNumbers: [
+                                        '0788659575',
+                                        '0728877442'
+                                      ],
+                                    ),
                                   ],
                                 ),
-                              ),
-                              SizedBox(height: 5),
-                            ],
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.yellow, elevation: 3),
-                              onPressed: () async {
-                                //saba code
-                                requestCode(userToken, currentuserid,
-                                    currentusername, "Exam");
-                              },
-                              child: const Text(
-                                "Saba Code",
-                                style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              ],
                             ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 10),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green),
-                                  onPressed: () async {
-                                    //direct phone call
-                                    await FlutterPhoneDirectCaller.callNumber(
-                                        "*182*8*1*329494*1500#");
-                                  },
-                                  child: const Text(
-                                    "Kanda hano *182*8*1*329494*1500# wishyure",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold),
+                            actions: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.yellow,
+                                    elevation: 3),
+                                onPressed: () async {
+                                  //saba code
+                                  requestCode(userToken, currentuserid,
+                                      currentusername, "Exam");
+                                },
+                                child: const Text(
+                                  "Saba Code",
+                                  style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green),
+                                    onPressed: () async {
+                                      //direct phone call
+                                      await FlutterPhoneDirectCaller.callNumber(
+                                          "*182*8*1*329494*1500#");
+                                    },
+                                    child: const Text(
+                                      "Kanda hano *182*8*1*329494*1500# wishyure",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         );
                       });
                 },
@@ -400,14 +410,14 @@ class _NewQuizState extends State<NewQuiz> {
                 Fluttertoast.showToast(
                   msg: "Faild to request code",
                   textColor: Colors.red,
-                  fontSize: 14,
+                  fontSize: 10,
                 );
               }
             } else {
               Fluttertoast.showToast(
                 msg: "Faild to connect to api",
                 textColor: Colors.red,
-                fontSize: 14,
+                fontSize: 10,
               );
             }
           } catch (e) {
@@ -420,7 +430,7 @@ class _NewQuizState extends State<NewQuiz> {
         Fluttertoast.showToast(
           msg: "Faild to connect to api",
           textColor: Colors.red,
-          fontSize: 14,
+          fontSize: 10,
         );
       }
     } catch (e) {

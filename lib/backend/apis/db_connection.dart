@@ -1,7 +1,6 @@
 class API {
-  static const baseUrl = 'http://192.168.1.66/apis';
+  static const baseUrl = 'https://rwandatraffic.com/apis';
   static const hostUser = "$baseUrl/user";
-
   static const validate = "$hostUser/validate.php";
 
   //sign up
