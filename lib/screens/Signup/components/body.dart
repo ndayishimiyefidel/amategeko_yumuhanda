@@ -102,7 +102,7 @@ class _SignUpState extends State<SignUp> {
             if (deviceValidationResponse.statusCode == 200) {
               final deviceValidationResult =
                   json.decode(deviceValidationResponse.body);
-              print(deviceValidationResult);
+              print("REg w:$deviceValidationResult ");
 
               if (deviceValidationResult['success'] == false) {
                 // Continue with user registration
@@ -129,7 +129,7 @@ class _SignUpState extends State<SignUp> {
                   if (registrationResponse.statusCode == 200) {
                     final registrationResult =
                         jsonDecode(registrationResponse.body);
-                    print(registrationResult);
+                    print("REg Error: $registrationResult ");
 
                     if (registrationResult['registered'] == true) {
                       // Registration successful
@@ -358,7 +358,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.phone_outlined,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika Telefoni yawe",
+                      hintText: "Andika Nimero ya Telefoni yawe",
                       border: InputBorder.none,
                     ),
                   ),
@@ -388,7 +388,7 @@ class _SignUpState extends State<SignUp> {
                     },
                     cursorColor: kPrimaryColor,
                     decoration: const InputDecoration(
-                      hintText: "Andika telephone nanone",
+                      hintText: "Andika Nimero ya Telephone Yawe",
                       icon: Icon(
                         Icons.phone,
                         color: kPrimaryColor,

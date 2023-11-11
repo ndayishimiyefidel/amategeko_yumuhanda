@@ -192,7 +192,7 @@ class _SignInState extends State<SignIn> {
                   },
                   cursorColor: kPrimaryColor,
                   decoration: const InputDecoration(
-                    hintText: "Andika telefoni yawe",
+                    hintText: "Andika nimero yawe",
                     icon: Icon(
                       Icons.call,
                       color: kPrimaryColor,
