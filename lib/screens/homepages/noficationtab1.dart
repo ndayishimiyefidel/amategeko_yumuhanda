@@ -123,7 +123,7 @@ class _NotificationTab1State extends State<NotificationTab1> {
                                 time: data["createdAt"],
                                 userId: data["userId"],
                                 phone: data["phone"] ?? '',
-                                code: data["code"],
+                                code: data["code"] ?? '',
                                 endTime: data["endTime"] ?? "1684242113231",
                                 docId: data['id'],
                               );

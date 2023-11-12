@@ -655,10 +655,13 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                     isInCorrectOption = true;
                   });
                 }
-                backgroundColor =
+              if (!mounted) return;
+              setState(() {
+              backgroundColor =
                     optionSelected == widget.questionModel.correctOption
                         ? Colors.green.withOpacity(0.7)
                         : Colors.red.withOpacity(0.7);
+                });
               }
             },
             description: widget.questionModel.option4,

@@ -131,48 +131,50 @@ class _NewQuizState extends State<NewQuiz> {
     }
   }
 
-  Widget quizList() {
-    return FutureBuilder(
-      future:
-          DefaultAssetBundle.of(context).loadString('assets/files/data.json'),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (!snapshot.hasData) {
-          return const Text('No data available.');
-        } else {
-          final jsonData = json.decode(snapshot.data.toString());
-          final exams = jsonData['exams'];
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.79,
-            child: ListView.builder(
-              itemCount: exams.length,
-              itemBuilder: (context, index) {
-                final exam = exams[index];
-                return QuizTile(
-                  index: index,
-                  quizId: exam['quizId'],
-                  imgurl: exam['examImgUrl'],
-                  title: exam['title'],
-                  quizType: exam['examType'],
-                  totalQuestion: 20, // You may need to update this
-                  userRole: userRole.toString(),
-                  userToken: userToken,
-                  senderName: currentusername,
-                  currentUserId: currentuserid,
-                  phone: phone,
-                  adminPhone: adminPhone.toString(),
-                  questions: List<Map<String, dynamic>>.from(exam['questions']),
-                );
-              },
-            ),
-          );
-        }
-      },
-    );
-  }
+Widget quizList() {
+  return FutureBuilder(
+    future: DefaultAssetBundle.of(context).loadString('assets/files/data.json'),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      } else if (!snapshot.hasData) {
+        return const Text('No data available.');
+      } else {
+        final String jsonData = snapshot.data as String;
+        final exams = json.decode(jsonData)['exams'];
+
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.79,
+          child: ListView.builder(
+            itemCount: exams.length,
+            itemBuilder: (context, index) {
+              final exam = exams[index];
+              return QuizTile(
+                index: index,
+                quizId: exam['quizId'],
+                imgurl: exam['examImgUrl'],
+                title: exam['title'],
+                quizType: exam['examType'],
+                totalQuestion: 20, // You may need to update this
+                userRole: userRole.toString(),
+                userToken: userToken,
+                senderName: currentusername,
+                currentUserId: currentuserid,
+                phone: phone,
+                adminPhone: adminPhone.toString(),
+                questions: List<Map<String, dynamic>>.from(exam['questions']),
+              );
+            },
+          ),
+        );
+      }
+    },
+  );
+}
+
+
 
   @override
   Widget build(BuildContext context) {

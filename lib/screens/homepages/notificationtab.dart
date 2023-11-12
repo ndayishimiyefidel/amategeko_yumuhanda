@@ -270,25 +270,13 @@ class DataSearch extends SearchDelegate {
             suggestionList[index]["code"] != ""
                 ? RichText(
                     text: TextSpan(
-                      text: suggestionList[index]["code"]
-                          .toLowerCase()
+                      text: suggestionList[index]["code"] ?? ''
                           .substring(0, query.length),
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
                       ),
-                      children: [
-                        TextSpan(
-                          text: suggestionList[index]["code"]
-                              .toLowerCase()
-                              .substring(query.length),
-                          style: const TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
                     ),
                   )
                 : const SizedBox(),

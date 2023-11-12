@@ -77,6 +77,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    print("time stamp :${widget.time}");
     int timestamp = int.parse(widget.time);
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     var dateTimeFormat =

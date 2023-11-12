@@ -122,11 +122,11 @@ class _NotificationTab2State extends State<NotificationTab2> {
                               return UsersNotificationList(
                                 name: data["name"] ?? '',
                                 time: data["createdAt"],
-                                userId: data["userId"],
+                                userId: data["userId"] ?? '',
                                 phone: data["phone"] ?? '',
-                                code: data["code"],
+                                code: data["code"] ?? '',
                                 endTime: data["endTime"] ?? "1684242113231",
-                                docId: data['id'],
+                                docId: data['id']?? '',
                               );
                             },
                           ),
