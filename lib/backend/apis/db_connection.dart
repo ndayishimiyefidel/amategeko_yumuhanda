@@ -5,6 +5,7 @@ class API {
 
   //sign up
   static const signUp = "$hostUser/signup.php";
+  static const iyandikishe = "$hostUser/iyandikishe.php";
   static const login = "$hostUser/login.php";
   static const updateProfile = "$hostUser/updateProfile.php";
   static const getToken = "$hostUser/getToken.php";
@@ -19,11 +20,14 @@ class API {
   static const generatecode = "$hostUser/generateCode.php";
   static const deleteCode = "$hostUser/deleteCode.php";
   static const deleteUser = "$hostUser/deleteUser.php";
+  static const deleteIremboUser = "$hostUser/deleteIremboUser.php";
   static const setLimitTime = "$hostUser/setLimitTime.php";
   static const addedToClass = "$hostUser/addedToClass.php";
 
   static const searchUser = "$hostUser/searchUser.php";
   static const userWithCode = "$hostUser/userWithCode.php";
   static const userWithNoCode = "$hostUser/userWithNoCode.php";
+  static const abiyandikishije = "$hostUser/abiyandikishije.php";
+  static const notInIrembo = "$hostUser/notInIrembo.php";
   //addedToClass
 }

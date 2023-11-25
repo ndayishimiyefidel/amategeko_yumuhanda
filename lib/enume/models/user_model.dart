@@ -53,3 +53,51 @@ class User {
     };
   }
 }
+class IremboModel {
+  String uid;
+  String createdAt;
+  String phone;
+  String name;
+  String address;
+  String identity,type;
+  String? code,category;
+
+  IremboModel({
+    required this.uid,
+    required this.phone,
+    required this.identity,
+    required this.name,
+    required this.type,
+    required this.address,
+    required this.createdAt,
+  this.category, this.code,
+  });
+
+  factory IremboModel.fromJson(Map<String, dynamic> json) {
+    return IremboModel(
+      uid: json['uid'],
+      createdAt: json['createdAt'],
+      phone: json['phone'],
+      address: json['address'],
+      name: json['name'],
+      identity: json['identity'],
+      code: json['code'],
+      category: json['category'],
+      type:json['type'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'createdAt': createdAt,
+      'phone': phone,
+      'address': address,
+      'name': name,
+      'identity': identity,
+      'code': code,
+      'category': category,
+      'type': type,
+    };
+  }
+}

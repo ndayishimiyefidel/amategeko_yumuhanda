@@ -1,17 +1,17 @@
+import 'package:amategeko/backend/apis/db_connection.dart';
 import 'package:amategeko/utils/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
+import 'package:amategeko/utils/generate_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
-import '../../services/auth.dart';
 
 class IremboUsersList extends StatefulWidget {
   // final String secondaryText;
-  final String name, time, userId, myPhone, identity, myAddress;
+  final String name, time, userId, myPhone, identity, myAddress,type;
+  final String? code,category;
 
   const IremboUsersList(
       {super.key,
@@ -20,7 +20,7 @@ class IremboUsersList extends StatefulWidget {
       required this.identity,
       required this.userId,
       required this.myPhone,
-      required this.myAddress});
+      required this.myAddress, this.code, required this.type, this.category});
 
   @override
   State createState() => _IremboUsersListState();
@@ -48,12 +48,9 @@ class _IremboUsersListState extends State<IremboUsersList> {
     preferences.setBool("called_${widget.userId}", true);
   }
 
-  late FirebaseFirestore firestore;
-
   @override
   void initState() {
     super.initState();
-    firestore = FirebaseFirestore.instance;
     getCurrUser();
   }
 
@@ -68,12 +65,6 @@ class _IremboUsersListState extends State<IremboUsersList> {
   }
 
   Future<bool?> _showCallConfirmationDialog(BuildContext context) async {
-    // bool hasBeenCalled = await _hasUserBeenCalled();
-    // if (hasBeenCalled) {
-    //   // If user has already been called, show a message or perform any other action
-    //   // as needed and return null to prevent the call.
-    //   return null;
-    // }
     return await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -107,20 +98,20 @@ class _IremboUsersListState extends State<IremboUsersList> {
   }
 
   // Method to update the call status for a user in Firestore
-  Future<void> _setUserCalledStatus(bool called) async {
-    try {
-      await firestore
-          .collection('Users')
-          .doc(widget.userId)
-          // ignore: avoid_print
-          .update({'called': called}).then((value) => {print("Updated")});
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error updating user's call status: $e");
-      }
-      // Handle the error if needed
-    }
-  }
+  // Future<void> _setUserCalledStatus(bool called) async {
+  //   try {
+  //     await firestore
+  //         .collection('Users')
+  //         .doc(widget.userId)
+  //         // ignore: avoid_print
+  //         .update({'called': called}).then((value) => {print("Updated")});
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print("Error updating user's call status: $e");
+  //     }
+  //     // Handle the error if needed
+  //   }
+  // }
 
   void _copyToClipboard(String textToCopy) {
     Clipboard.setData(ClipboardData(text: textToCopy));
@@ -198,10 +189,10 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                             if (confirmed == true) {
                                               await FlutterPhoneDirectCaller
                                                   .callNumber(widget.myPhone);
-                                              await _setUserCalledStatus(
-                                                  true); // Set the user as called after the call is made
-                                              setState(
-                                                  () {}); // Update the state to reflect the change
+                                              // await _setUserCalledStatus(
+                                              //     true); // Set the user as called after the call is made
+                                              // setState(
+                                              //     () {}); // Update the state to reflect the change
                                             }
                                           }
                                         },
@@ -233,6 +224,20 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                       color: Colors.grey.shade500,
                                       fontStyle: FontStyle.italic),
                                 ),
+                                widget.type=="Permit" ? Text(
+                                  "Code: ${widget.code}",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ):SizedBox(),
+                                   widget.type=="Permit" ? Text(
+                                  "Category: ${widget.category}",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                      fontStyle: FontStyle.italic),
+                                ):SizedBox(),
                                   Text(
                                   "Joined date: $dateTimeFormat",
                                   style: TextStyle(
@@ -270,7 +275,10 @@ class _IremboUsersListState extends State<IremboUsersList> {
                           IconButton(
                             color: Colors.red,
                             onPressed: () async {
-                              AuthService().deleteIremboUser(widget.userId);
+                              //AuthService().deleteIremboUser(widget.userId);
+                               final url = API.deleteIremboUser;
+                          GenerateUser.deleteUserCode(context, widget.userId, url,
+                         widget.name, "deleted successfully!");
                             },
                             icon: const Icon(
                               Icons.delete,

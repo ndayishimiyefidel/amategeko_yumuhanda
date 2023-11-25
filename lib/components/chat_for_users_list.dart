@@ -137,9 +137,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
                     children: [
                       Text(widget.phone),
                       const SizedBox(width: 60),
-                      (widget.quizCode == "nocode")
-                          ? const SizedBox()
-                          : IconButton(
+                      IconButton(
                               onPressed: () async {
                                 bool hasBeenCalled = await _hasUserBeenCalled();
                                 bool? confirmed =

@@ -354,7 +354,7 @@ Widget quizList() {
               Uri.parse(sabaCodeUrl),
               body: {
                 'userId': currentuserid.toString(),
-                'createdAt': DateTime.now().microsecondsSinceEpoch.toString(),
+                'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
                 "phone": phone.toString(),
                 "name": currentusername
               },
@@ -368,6 +368,7 @@ Widget quizList() {
                 //handle if not sent
                 sendPushMessage(userToken, body, notificationTitle);
                 isLoading = false;
+
                 Size size = MediaQuery.of(context).size;
                 showDialog(
                     context: context,
@@ -458,8 +459,9 @@ class QuizTile extends StatefulWidget {
   final bool isNew = false;
   final String currentUserId;
   final int index;
+ 
 
-  const QuizTile({
+  QuizTile({
     Key? key,
     required this.imgurl,
     required this.title,
@@ -482,6 +484,8 @@ class QuizTile extends StatefulWidget {
 
 class _QuizTileState extends State<QuizTile> {
   bool _isLoading = false;
+  bool isAlreadyOpened=false;
+  late SharedPreferences preferences;
 
   @override
   Widget build(BuildContext context) {
@@ -553,8 +557,29 @@ class _QuizTileState extends State<QuizTile> {
                                   },
                                 ),
                               );
-                            } else {
-                              ///check whether you already have code.
+                            }
+                          else {
+                              //check if  whether has not  or already exists
+
+                              preferences = await SharedPreferences.getInstance();
+                              isAlreadyOpened=preferences.getBool("isOpened")!;
+                              print("isOpened $isAlreadyOpened");
+                              if(isAlreadyOpened==true) {
+                                Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return OpenQuiz(
+                                      quizId: widget.quizId,
+                                      title: widget.title,
+                                      quizNumber: widget.index + 1,
+                                      questions: widget.questions,
+                                      quizType: widget.quizType,
+                                    );
+                                  },
+                                ),
+                              );
+                              }
                               final isOpenUrl = API.isQuizOpen;
                               try {
                                 final response = await http.post(
@@ -563,8 +588,14 @@ class _QuizTileState extends State<QuizTile> {
                                 );
                                 if (response.statusCode == 200) {
                                   final data = json.decode(response.body);
+                                  // print("Response Data ${data.isOpen}");
                                   if (data['isOpen'] == true) {
-                                    // Request already sent
+
+                                
+                                      isAlreadyOpened=await preferences.setBool("isOpened", true);
+                                    
+                                     print("Response Data $isAlreadyOpened");
+
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

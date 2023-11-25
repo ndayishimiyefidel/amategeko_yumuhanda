@@ -59,7 +59,7 @@ class _OpenQuizState extends State<OpenQuiz>
   }
 
   bool isQuizVisible = true;
-  late ScreenshotCallback screenshotCallback;
+  ScreenshotCallback? screenshotCallback;
   late AnimationController _controller;
   final limitTime = 1200;
   int currentPageIndex = 0;
@@ -104,14 +104,6 @@ class _OpenQuizState extends State<OpenQuiz>
     _notAttempted = 0;
     _correct = 0;
     _incorrect = 0;
-
-    // if (kDebugMode) {
-    //   print(" total question are:${widget.questions.length}");
-
-    //   ///print("question are:${widget.questions}");
-    // }
-
-    //initiliaze controller
     _controller1 = PageController(initialPage: 0);
     //call current data
     getCurrUserData();
@@ -136,7 +128,7 @@ class _OpenQuizState extends State<OpenQuiz>
     _controller.forward();
     if (userRole != "Admin") {
       screenshotCallback = ScreenshotCallback();
-      screenshotCallback.addListener(handleScreenshot);
+      screenshotCallback!.addListener(handleScreenshot);
       // Disable screen recording
       FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
     }
@@ -155,7 +147,7 @@ class _OpenQuizState extends State<OpenQuiz>
       _controller.dispose();
     }
     if (userRole != "Admin") {
-      screenshotCallback.dispose();
+      screenshotCallback!.dispose();
     }
     _controller1.dispose();
     super.dispose();
