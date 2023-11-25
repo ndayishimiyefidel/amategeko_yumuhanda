@@ -89,9 +89,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
         break;
-      case AppLifecycleState.hidden:
-        // TODO: Handle this case.
-        break;
     }
   }
 
