@@ -332,6 +332,29 @@ class _SignInState extends State<SignIn> {
             final userData = loginResult;
             final String userRole = userData['role'];
 
+            //update in db.
+
+            print("Fcm Token :$fcmToken");
+
+            try {
+              final fcmTokenUrl = API.updateFcmToken;
+              final response = await http.post(
+                Uri.parse(fcmTokenUrl),
+                body: {'docId': userData["uid"], 'fcmToken': fcmToken},
+              );
+
+              if (response.statusCode == 200) {
+                // Your logic for a successful response
+                final fcmResult = json.decode(response.body);
+                if (fcmResult['success'] == true) {
+                } else {}
+              } else {
+                print("Error: Failed to connect to api");
+              }
+            } catch (e) {
+              print("Error: $e");
+            }
+
             await preferences.setString("uid", userData["uid"]);
             await preferences.setString("name", userData["name"]);
             await preferences.setString("role", userData["role"]);

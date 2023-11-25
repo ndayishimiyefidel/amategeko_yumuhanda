@@ -236,8 +236,8 @@ class _ModifiedUsersNotificationListState
         });
         // _generateCode(widget.docId);
         String generatedCode = randomNumeric(6);
-        GenerateUser.generateCodeAndNotify(
-                context, widget.docId, generatedCode, widget.name, "Generate code is $generatedCode of ",1)
+        GenerateUser.generateCodeAndNotify(context, widget.docId, generatedCode,
+                widget.name, "Generate code is $generatedCode of ", 1)
             .then((value) => {_getToken(), _isLoading = false});
       },
     );

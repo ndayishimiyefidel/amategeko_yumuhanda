@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../backend/apis/db_connection.dart';
 import '../../components/notification_list.dart';
 import '../../utils/constants.dart';
@@ -58,6 +57,7 @@ class _UserNotificationState extends State<UserNotification> {
       phone = preferences.getString("phone")!;
       userToken = preferences.getString("fcmToken")!;
     });
+    print("FCM TOKEN $userToken");
 
     checkQuizCode(currentuserid.toString());
   }

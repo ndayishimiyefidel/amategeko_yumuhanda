@@ -13,9 +13,9 @@ import '../amasomo/all_courses.dart';
 import '../groups/group_list.dart';
 import '../irembo/abiyandishije.dart';
 import '../irembo/irembo_iyandikishe.dart';
-import '../quizzes/exams.dart';
 import '../rules/amategeko_yose.dart';
 import 'notificationtab.dart';
+import 'open_exam.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -67,9 +67,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
       phone = preferences.getString("phone")!;
-      // _getReferralCode().then((code) {
-      //   referralCode = code;
-      // });
     });
   }
 
@@ -77,7 +74,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     getCurrUserData();
-   
 
     animationController =
         AnimationController(duration: const Duration(seconds: 3), vsync: this);
@@ -96,8 +92,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         parent: animationController,
         curve: const Interval(0.5, 1.0, curve: Curves.easeInOut)));
   }
-
- 
 
   @override
   void dispose() {
@@ -178,7 +172,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                 context,
                                 MaterialPageRoute(
                                   builder: (BuildContext context) =>
-                                      const Exams(),
+                                      const OpenExamPage(),
                                 ),
                               );
                             },

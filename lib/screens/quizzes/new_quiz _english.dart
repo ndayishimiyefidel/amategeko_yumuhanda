@@ -13,14 +13,14 @@ import '../../widgets/ProgressWidget.dart';
 import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
 
-class NewQuiz extends StatefulWidget {
-  const NewQuiz({Key? key}) : super(key: key);
+class NewQuizEnglish extends StatefulWidget {
+  const NewQuizEnglish({Key? key}) : super(key: key);
 
   @override
-  State<NewQuiz> createState() => _NewQuizState();
+  State<NewQuizEnglish> createState() => _NewQuizEnglishState();
 }
 
-class _NewQuizState extends State<NewQuiz> {
+class _NewQuizEnglishState extends State<NewQuizEnglish> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isLoading = false;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -134,7 +134,7 @@ class _NewQuizState extends State<NewQuiz> {
   Widget quizList() {
     return FutureBuilder(
       future:
-          DefaultAssetBundle.of(context).loadString('assets/files/data.json'),
+          DefaultAssetBundle.of(context).loadString('assets/files/endata.json'),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

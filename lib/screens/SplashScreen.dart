@@ -2,14 +2,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
-
+import 'dart:convert';
+import '../backend/apis/db_connection.dart';
 import '../utils/constants.dart';
 import 'HomeScreen.dart';
 import 'Welcome/welcome_screen.dart';
+import 'package:http/http.dart' as http;
 
-class SplashScreen extends StatefulWidget {  
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
 
   @override
   State createState() => _SplashScreenState();
@@ -40,10 +41,28 @@ class _SplashScreenState extends State<SplashScreen>
     fcmToken = await _messaging.getToken();
 
     if (currentuserid != null) {
-  
-      setState(()  {
+      try {
+        final fcmTokenUrl = API.updateFcmToken;
+        final response = await http.post(
+          Uri.parse(fcmTokenUrl),
+          body: {'docId': currentuserid, 'fcmToken': fcmToken},
+        );
+
+        if (response.statusCode == 200) {
+          // Your logic for a successful response
+          final fcmResult = json.decode(response.body);
+          if (fcmResult['success'] == true) {
+          } else {}
+        } else {
+          print("Error: Failed to connect to api");
+        }
+      } catch (e) {
+        print("Error: $e");
+      }
+
+      setState(() {
         isAlreadyLoggedIn = true;
-          preferences.setString("fcmToken", fcmToken!);
+        preferences.setString("fcmToken", fcmToken!);
       });
     } else {
       setState(() {

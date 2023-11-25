@@ -7,11 +7,10 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
-
 class IremboUsersList extends StatefulWidget {
   // final String secondaryText;
-  final String name, time, userId, myPhone, identity, myAddress,type;
-  final String? code,category;
+  final String name, time, userId, myPhone, identity, myAddress, type;
+  final String? code, category;
 
   const IremboUsersList(
       {super.key,
@@ -20,7 +19,10 @@ class IremboUsersList extends StatefulWidget {
       required this.identity,
       required this.userId,
       required this.myPhone,
-      required this.myAddress, this.code, required this.type, this.category});
+      required this.myAddress,
+      this.code,
+      required this.type,
+      this.category});
 
   @override
   State createState() => _IremboUsersListState();
@@ -129,7 +131,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
       splashColor: Colors.brown,
       onTap: () {},
       child: Container(
-        height: 150,
+        height: 200,
         padding:
             const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
         child: Row(
@@ -150,14 +152,15 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                 Text("Name: ${widget.name}"),
                                 Expanded(
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("Phone: ${widget.myPhone}"),
                                       IconButton(
                                         onPressed: () {
                                           _copyToClipboard(widget.myPhone);
                                         },
-                                        icon:const Icon(
+                                        icon: const Icon(
                                           Icons.copy,
                                           size: 25,
                                           color: kPrimaryColor,
@@ -217,28 +220,14 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                     ],
                                   ),
                                 ),
-                                  Text(
+                                Text(
                                   "Akarere: ${widget.myAddress}",
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
                                       fontStyle: FontStyle.italic),
                                 ),
-                                widget.type=="Permit" ? Text(
-                                  "Code: ${widget.code}",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade500,
-                                      fontStyle: FontStyle.italic),
-                                ):SizedBox(),
-                                   widget.type=="Permit" ? Text(
-                                  "Category: ${widget.category}",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade500,
-                                      fontStyle: FontStyle.italic),
-                                ):SizedBox(),
-                                  Text(
+                                Text(
                                   "Joined date: $dateTimeFormat",
                                   style: TextStyle(
                                       fontSize: 14,
@@ -246,8 +235,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                       fontStyle: FontStyle.italic),
                                 ),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       "ID: ${widget.identity}",
@@ -262,13 +250,44 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                         _copyToClipboard(widget.identity);
                                       },
                                       icon: const Icon(
-                                          Icons.copy,
-                                          size: 25,
-                                          color: kPrimaryColor,
+                                        Icons.copy,
+                                        size: 25,
+                                        color: kPrimaryColor,
                                       ),
                                     ),
                                   ],
                                 ),
+                                widget.type == "Permit"
+                                    ? Expanded(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Code: ${widget.code}"),
+                                            IconButton(
+                                              onPressed: () {
+                                                _copyToClipboard(
+                                                    widget.code.toString());
+                                              },
+                                              icon: const Icon(
+                                                Icons.copy,
+                                                size: 25,
+                                                color: kPrimaryColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : SizedBox(),
+                                widget.type == "Permit"
+                                    ? Text(
+                                        "Category: ${widget.category}",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade500,
+                                            fontStyle: FontStyle.italic),
+                                      )
+                                    : SizedBox(),
                               ],
                             ),
                           ),
@@ -276,9 +295,13 @@ class _IremboUsersListState extends State<IremboUsersList> {
                             color: Colors.red,
                             onPressed: () async {
                               //AuthService().deleteIremboUser(widget.userId);
-                               final url = API.deleteIremboUser;
-                          GenerateUser.deleteUserCode(context, widget.userId, url,
-                         widget.name, "deleted successfully!");
+                              final url = API.deleteIremboUser;
+                              GenerateUser.deleteUserCode(
+                                  context,
+                                  widget.userId,
+                                  url,
+                                  widget.name,
+                                  "deleted successfully!");
                             },
                             icon: const Icon(
                               Icons.delete,

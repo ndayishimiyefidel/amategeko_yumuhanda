@@ -72,6 +72,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
       userRole = preferences.getString("role");
       fcmToken = preferences.getString("fcmToken")!;
     });
+    print("Fcm Token:$fcmToken");
   }
 
   @override

@@ -35,7 +35,7 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
   int to = 10; // Initial range, fetch the first 10 records
 
   Future<void> fetchAllUsers() async {
-    final apiUrl = API.abiyandikishije+"?from=$from&to=$to";
+    final apiUrl = API.abiyandikishije + "?from=$from&to=$to";
     isLoading = true;
 
     try {
@@ -43,7 +43,7 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        //print(data);
+        print(data);
 
         if (data['success'] == true) {
           if (!mounted) return;
@@ -101,8 +101,8 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            key: _scaffoldKey,
-      drawer:const Drawer(
+      key: _scaffoldKey,
+      drawer: const Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),

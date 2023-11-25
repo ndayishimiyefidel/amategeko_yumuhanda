@@ -1,5 +1,7 @@
 class API {
-  static const baseUrl = 'https://rwandatraffic.com/apis';
+  // static const baseUrl = 'https://rwandatraffic.com/apis';
+  static const baseUrl = 'http://192.168.1.71/apis';
+  //192.168.1.71
   static const hostUser = "$baseUrl/user";
   static const validate = "$hostUser/validate.php";
 
@@ -29,5 +31,6 @@ class API {
   static const userWithNoCode = "$hostUser/userWithNoCode.php";
   static const abiyandikishije = "$hostUser/abiyandikishije.php";
   static const notInIrembo = "$hostUser/notInIrembo.php";
+  static const updateFcmToken = "$hostUser/updateFcm.php";
   //addedToClass
 }
