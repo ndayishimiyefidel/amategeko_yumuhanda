@@ -224,18 +224,17 @@ class DataSearch extends SearchDelegate {
     if (query.isNotEmpty) {
       suggestionList = [];
       for (var element in userList) {
-        if (element["name"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
-                true ||
-            element["phone"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
-                true ||
-            element["uid"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
-                true ||
-            element["addedToClass"]
-                    ?.toLowerCase()
-                    ?.startsWith(query.toLowerCase()) ==
-                true ||
-            element["code"]?.toLowerCase()?.startsWith(query.toLowerCase()) ==
-                true) {
+        String name = element["name"] ?? "noname";
+        String phone = element["phone"] ?? "nophone";
+        String uid = element["uid"] ?? "nouid";
+        String addedToClass = element["addedToClass"] ?? "noclass";
+        String code = element["code"] ?? "nocode";
+
+        if (name.toLowerCase().startsWith(query.toLowerCase()) ||
+            phone.toLowerCase().startsWith(query.toLowerCase()) ||
+            uid.toLowerCase().startsWith(query.toLowerCase()) ||
+            addedToClass.toLowerCase().startsWith(query.toLowerCase()) ||
+            code.toLowerCase().startsWith(query.toLowerCase())) {
           suggestionList.add(element);
         }
       }
@@ -274,31 +273,23 @@ class DataSearch extends SearchDelegate {
               ),
             ),
 
-            suggestionList[index]["code"] != ""
-                ? RichText(
-                    text: TextSpan(
-                      text: suggestionList[index]["code"]
-                          .toLowerCase()
-                          .substring(0, query.length),
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: suggestionList[index]["code"]
-                              .toLowerCase()
-                              .substring(query.length),
-                          style: const TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: suggestionList[index]["code"] != null
+                        ? suggestionList[index]["code"]
+                            .toLowerCase()
+                            .substring(0, query.length)
+                        : "",
+                    style: const TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 16,
                     ),
-                  )
-                : const SizedBox(),
+                  ),
+                ],
+              ),
+            ),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

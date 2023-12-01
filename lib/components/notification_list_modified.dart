@@ -16,19 +16,19 @@ class ModifiedUsersNotificationList extends StatefulWidget {
   final String phone;
   final String code, docId;
   final bool? isQuiz;
-  final String? endTime;
+  final String? endTime, ex_type;
 
-  const ModifiedUsersNotificationList({
-    super.key,
-    required this.name,
-    required this.time,
-    required this.userId,
-    required this.phone,
-    required this.code,
-    required this.docId,
-    this.isQuiz,
-    this.endTime,
-  });
+  const ModifiedUsersNotificationList(
+      {super.key,
+      required this.name,
+      required this.time,
+      required this.userId,
+      required this.phone,
+      required this.code,
+      required this.docId,
+      this.isQuiz,
+      this.endTime,
+      this.ex_type});
 
   @override
   State createState() => _ModifiedUsersNotificationListState();
@@ -94,8 +94,23 @@ class _ModifiedUsersNotificationListState
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          widget.ex_type == "1"
+                              ? Text(
+                                  "English",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : Text(
+                                  "Kinyarwanda",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                           Text(
-                            userRole == "Admin" ? widget.name : "",
+                            widget.name,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

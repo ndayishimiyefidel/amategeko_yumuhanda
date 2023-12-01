@@ -15,6 +15,7 @@ class OpenQuiz extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables
   final quizNumber;
   final String? quizType;
+  final String? examType;
   final List<Map<String, dynamic>> questions;
 
   const OpenQuiz(
@@ -23,7 +24,8 @@ class OpenQuiz extends StatefulWidget {
       required this.title,
       this.quizNumber,
       required this.questions,
-      this.quizType});
+      this.quizType,
+      this.examType});
 
   @override
   State<OpenQuiz> createState() => _OpenQuizState();
@@ -165,8 +167,8 @@ class _OpenQuizState extends State<OpenQuiz>
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          "Gukora Ikizamini",
+        title: Text(
+          "${widget.examType == "English" ? 'Take the Test' : 'Gukora Ikizamini'}",
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
@@ -367,6 +369,7 @@ class _OpenQuizState extends State<OpenQuiz>
                       quizTitle: widget.title,
                       userRole: userRole.toString(),
                       quizType: widget.quizType,
+                      examType: widget.examType,
                     ),
                     const SizedBox(
                       height: 20.0,
@@ -420,7 +423,7 @@ class QuizPlayTile extends StatefulWidget {
   final String quizId;
   final String quizTitle;
   final String userRole;
-  final String? quizType;
+  final String? quizType, examType;
 
   const QuizPlayTile(
       {super.key,
@@ -429,7 +432,8 @@ class QuizPlayTile extends StatefulWidget {
       required this.quizId,
       required this.quizTitle,
       required this.userRole,
-      this.quizType});
+      this.quizType,
+      this.examType});
 
   @override
   State<QuizPlayTile> createState() => _QuizPlayTileState();
@@ -460,7 +464,7 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
               ? Padding(
                   padding: const EdgeInsets.only(left: 0),
                   child: Text(
-                    "NB:Guhitamo ukanda mu kavi nkuko muri exam ya provisoire kuri machine biba bimeze!",
+                    "${widget.examType == "English" ? 'NB: Choosing to press on the knee as in the provisoire exam on the machine happens!' : 'NB:Guhitamo ukanda mu kavi nkuko muri exam ya provisoire kuri machine biba bimeze!'}",
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontSize: 12,
@@ -647,12 +651,12 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                     isInCorrectOption = true;
                   });
                 }
-              if (!mounted) return;
-              setState(() {
-              backgroundColor =
-                    optionSelected == widget.questionModel.correctOption
-                        ? Colors.green.withOpacity(0.7)
-                        : Colors.red.withOpacity(0.7);
+                if (!mounted) return;
+                setState(() {
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
                 });
               }
             },

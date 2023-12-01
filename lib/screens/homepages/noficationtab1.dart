@@ -124,6 +124,7 @@ class _NotificationTab1State extends State<NotificationTab1> {
                                 userId: data["userId"],
                                 phone: data["phone"] ?? '',
                                 code: data["code"] ?? '',
+                                ex_type: data['ex_type'] ?? '',
                                 endTime: data["endTime"] ?? "1684242113231",
                                 docId: data['id'],
                               );

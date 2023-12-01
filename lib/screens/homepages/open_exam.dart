@@ -150,7 +150,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                             },
                             child: const DashboardCard(
                               name: "Kinyarwanda",
-                              imgpath: "exam.png",
+                              imgpath: "kinexam.jpg",
                             ),
                           ),
                         ),
@@ -169,7 +169,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                             },
                             child: const DashboardCard(
                               name: "English",
-                              imgpath: "exam.png",
+                              imgpath: "enexam.jpg",
                             ),
                           ),
                         )
@@ -202,7 +202,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                             },
                             child: const DashboardCard(
                               name: "Francais",
-                              imgpath: "exam.png",
+                              imgpath: "frexam.jpg",
                             ),
                           ),
                         ),

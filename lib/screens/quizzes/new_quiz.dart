@@ -317,6 +317,7 @@ class _NewQuizState extends State<NewQuiz> {
       String userId, String quizId, String senderName, String title) async {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
+    final int exam = 0;
     String body =
         "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
@@ -325,7 +326,7 @@ class _NewQuizState extends State<NewQuiz> {
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: {'userId': currentuserid},
+        body: {'userId': currentuserid, 'ex_type': exam.toString()},
       );
 
       if (response.statusCode == 200) {
@@ -355,7 +356,8 @@ class _NewQuizState extends State<NewQuiz> {
                 'userId': currentuserid.toString(),
                 'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
                 "phone": phone.toString(),
-                "name": currentusername
+                "name": currentusername,
+                "ex_type": exam.toString()
               },
             );
             print(res.body);
@@ -551,6 +553,7 @@ class _QuizTileState extends State<QuizTile> {
                                       quizNumber: widget.index + 1,
                                       questions: widget.questions,
                                       quizType: widget.quizType,
+                                      examType: "Kinyarwanda",
                                     );
                                   },
                                 ),
@@ -593,6 +596,7 @@ class _QuizTileState extends State<QuizTile> {
                                         quizNumber: widget.index + 1,
                                         questions: widget.questions,
                                         quizType: widget.quizType,
+                                        examType: "Kinyarwanda",
                                       );
                                     },
                                   ),
@@ -622,6 +626,7 @@ class _QuizTileState extends State<QuizTile> {
                                             quizNumber: widget.index + 1,
                                             questions: widget.questions,
                                             quizType: widget.quizType,
+                                            examType: "Kinyarwanda",
                                           );
                                         },
                                       ),

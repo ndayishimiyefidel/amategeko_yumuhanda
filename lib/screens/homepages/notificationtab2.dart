@@ -125,8 +125,9 @@ class _NotificationTab2State extends State<NotificationTab2> {
                                 userId: data["userId"] ?? '',
                                 phone: data["phone"] ?? '',
                                 code: data["code"] ?? '',
+                                ex_type: data['ex_type'] ?? '',
                                 endTime: data["endTime"] ?? "1684242113231",
-                                docId: data['id']?? '',
+                                docId: data['id'] ?? '',
                               );
                             },
                           ),

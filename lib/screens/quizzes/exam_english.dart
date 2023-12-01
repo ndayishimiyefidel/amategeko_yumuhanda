@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
-import 'create_quiz.dart';
 import 'new_quiz _english.dart';
 
 class ExamEnglish extends StatefulWidget {
@@ -48,7 +47,7 @@ class _ExamEnglishState extends State<ExamEnglish>
         ),
         actions: [
           CustomButton(
-            text: "Amabwiriza",
+            text: "Rules",
             onPressed: () {
               Navigator.push(
                 context,
@@ -64,23 +63,6 @@ class _ExamEnglishState extends State<ExamEnglish>
         elevation: 0.0,
       ),
       body: const NewQuizEnglish(),
-      //floating button
-
-      floatingActionButton: userRole == "Admin"
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return const CreateQuiz();
-                    },
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 

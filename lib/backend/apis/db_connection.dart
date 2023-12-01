@@ -1,10 +1,9 @@
 class API {
-  // static const baseUrl = 'https://rwandatraffic.com/apis';
-  static const baseUrl = 'http://192.168.1.71/apis';
+  static const baseUrl = 'https://rwandatraffic.com/apis';
+  // static const baseUrl = 'http://192.168.1.71/apis';
   //192.168.1.71
   static const hostUser = "$baseUrl/user";
   static const validate = "$hostUser/validate.php";
-
   //sign up
   static const signUp = "$hostUser/signup.php";
   static const iyandikishe = "$hostUser/iyandikishe.php";
@@ -15,6 +14,8 @@ class API {
   static const requestCode = "$hostUser/requestCode.php";
   static const sabaCode = "$hostUser/sabaCode.php";
   static const isQuizOpen = "$hostUser/isQuizOpen.php";
+  static const isEngQuizOpen = "$hostUser/isEngQuizOpen.php";
+
   static const fetchQuizData = "$hostUser/searchingCodes.php";
   static const fetchById = "$hostUser/displayUserCode.php";
   static const fetchAbafiteCode = "$hostUser/fetchAbafiteCode.php";

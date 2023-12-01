@@ -195,7 +195,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                 label: const Row(
                   children: [
                     Text(
-                      "Saba Code ya application",
+                      "Request code for application",
                       style: TextStyle(
                         fontSize: 18,
                       ),
@@ -223,7 +223,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                     Column(
                                       children: [
                                         Text(
-                                          "1.Kugirango examen zifunguke ubanza kwishyura 1500 rwf kuri 0788659575/0728877442  cyangwa ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay ibaruye kuri ALEXIS",
+                                          "1.For examen to open first pay 5000 Rwf at 0788659575/072887442 or click in green or click *182*8*1*329494*5000# on momo pay calculated on ALEXIS",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -232,7 +232,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umuhondo ibi byose ubikora wafunguye connection",
+                                          "2.When you finish to pay by clicking below it is written ask for code in yellow all this you do you open the connection",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -241,7 +241,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam",
+                                          "3.Then wait between 2 and 5 minutes and then go back and click on Start Exam",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -253,7 +253,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                     ),
                                     InstructionItems(
                                       title:
-                                          '4. Iyo wishyuye ukoresheje nimero itari muri application cg ukanze uhanditse saba code  utafunguye connection uhamagara kuri izi nimero tugufungurira: ',
+                                          '4. When you pay using a number that is not in the application or click on the text and ask for the code without opening the connection by calling these numbers and opening them:',
                                       phoneNumbers: [
                                         '0788659575',
                                         '0728877442'
@@ -274,7 +274,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                       currentusername, "Exam");
                                 },
                                 child: const Text(
-                                  "Saba Code",
+                                  "Ask Code",
                                   style: TextStyle(
                                       color: Colors.black87,
                                       fontSize: 20,
@@ -292,10 +292,10 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                     onPressed: () async {
                                       //direct phone call
                                       await FlutterPhoneDirectCaller.callNumber(
-                                          "*182*8*1*329494*1500#");
+                                          "*182*8*1*329494*5000#");
                                     },
                                     child: const Text(
-                                      "Kanda hano *182*8*1*329494*1500# wishyure",
+                                      "Click here *182*8*1*329494*5000# pay",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -317,19 +317,20 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
       String userId, String quizId, String senderName, String title) async {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
+    final int exam = 1;
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
+        "Well done, My name is ${senderName} and my phone number is I have already paid RWF 5000 for 0788659575 for testing.\n"
+        "“Now I was looking for an entry code. Thank you for abandoning me.";
     String notificationTitle = "Requesting Quiz Code";
 
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: {'userId': currentuserid},
+        body: {'userId': currentuserid, 'ex_type': exam.toString()},
       );
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print("respones:$data");
         //print('Response Body: $data');
         if (data['success'] == true) {
           showDialog(
@@ -355,7 +356,8 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                 'userId': currentuserid.toString(),
                 'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
                 "phone": phone.toString(),
-                "name": currentusername
+                "name": currentusername,
+                "ex_type": exam.toString()
               },
             );
             print(res.body);
@@ -374,7 +376,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                     builder: (context) {
                       return AlertDialog(
                         content: const Text(
-                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
+                            "Your request has been well received, In order to get the code to enter the exam first pay."),
                         actions: [
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 10),
@@ -388,10 +390,10 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
+                                      "*182*8*1*329494*5000#");
                                 },
                                 child: const Text(
-                                  "Ishyura 1500 Rwf.",
+                                  "Ishyura 5000 Rwf.",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,
@@ -551,12 +553,13 @@ class _QuizTileState extends State<QuizTile> {
                                       quizNumber: widget.index + 1,
                                       questions: widget.questions,
                                       quizType: widget.quizType,
+                                      examType: "English",
                                     );
                                   },
                                 ),
                               );
                             } else {
-                              final isOpenUrl = API.isQuizOpen;
+                              final isOpenUrl = API.isEngQuizOpen;
                               preferences =
                                   await SharedPreferences.getInstance();
                               isAlreadyOpened =
@@ -593,6 +596,7 @@ class _QuizTileState extends State<QuizTile> {
                                         quizNumber: widget.index + 1,
                                         questions: widget.questions,
                                         quizType: widget.quizType,
+                                        examType: "English",
                                       );
                                     },
                                   ),
@@ -622,6 +626,7 @@ class _QuizTileState extends State<QuizTile> {
                                             quizNumber: widget.index + 1,
                                             questions: widget.questions,
                                             quizType: widget.quizType,
+                                            examType: "English",
                                           );
                                         },
                                       ),
@@ -639,7 +644,7 @@ class _QuizTileState extends State<QuizTile> {
                                               children: [
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'ubururu uyisabe code ariko urebe niba ufite connection.",
+                                                  "for the exam to close click below in blue to request the code but see if you have a connection.",
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight:
@@ -667,8 +672,8 @@ class _QuizTileState extends State<QuizTile> {
                             children: [
                               Text(
                                 widget.userRole == "Admin"
-                                    ? "Fungur Exam"
-                                    : "Tangira Exam",
+                                    ? "Open Exam"
+                                    : "Start Exam",
                                 style: const TextStyle(
                                     color: Colors.white,
                                     letterSpacing: 2,

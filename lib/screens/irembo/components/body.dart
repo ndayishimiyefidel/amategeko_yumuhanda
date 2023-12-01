@@ -111,7 +111,7 @@ class _SignUpState extends State<SignUp> {
         isloading = true;
       });
       final iyandikisheUrl = API.iyandikishe;
-      final checkUrl=API.notInIrembo;
+      final checkUrl = API.notInIrembo;
       // Continue with user registration
       int dateF = DateTime.now().millisecondsSinceEpoch;
 
@@ -121,7 +121,9 @@ class _SignUpState extends State<SignUp> {
         phone: phoneNumber.toString().trim(),
         name: name.trim().toString(),
         identity: id.trim().toString(),
-        address: selectedRegion.trim().toString()+" " + selectedDistrict.trim().toString(),
+        address: selectedRegion.trim().toString() +
+            " " +
+            selectedDistrict.trim().toString(),
         code: codeP.trim().toString(),
         category: selectedValue != "Provisoire"
             ? selectedCategory.trim().toString()
@@ -132,55 +134,53 @@ class _SignUpState extends State<SignUp> {
       //check if not already registed.
 
       try {
-  final checkResponse= await http.post(
-    Uri.parse(checkUrl),
-    body: {
-      'userId':currentuserid.toString()
-    });
+        final checkResponse = await http.post(Uri.parse(checkUrl),
+            body: {'userId': currentuserid.toString()});
 
-    if(checkResponse.statusCode==200){
-      final resResult=jsonDecode(checkResponse.body);
-       if (resResult['alreadyRegistered'] == true) {
-         Fluttertoast.showToast(msg: "Wamaze kwiyandikisha! Tegereza Tugukorere ibijyanye no kukwandika");
-        Navigator.pop(context);
-       }
-       else{
-        //if not register.
-        try {
-        final registrationResponse = await http.post(
-          Uri.parse(iyandikisheUrl),
-          body: userModel.toJson(),
-        );
-
-        if (registrationResponse.statusCode == 200) {
-          final registrationResult = jsonDecode(registrationResponse.body);
-
-          if (registrationResult['registered'] == true) {
-            await FlutterPhoneDirectCaller.callNumber("*182*8*1*644209*1000#");
-            Fluttertoast.showToast(msg: "Ubusabe bwawe bwakiriwe neza");
-
+        if (checkResponse.statusCode == 200) {
+          final resResult = jsonDecode(checkResponse.body);
+          if (resResult['alreadyRegistered'] == true) {
+            Fluttertoast.showToast(
+                msg:
+                    "Wamaze kwiyandikisha! Tegereza Tugukorere ibijyanye no kukwandika");
             Navigator.pop(context);
           } else {
-            Fluttertoast.showToast(
-                textColor: Colors.red,
-                fontSize: 18,
-                msg: registrationResult['message'] ?? "Registration Failed");
+            //if not register.
+            try {
+              final registrationResponse = await http.post(
+                Uri.parse(iyandikisheUrl),
+                body: userModel.toJson(),
+              );
+
+              if (registrationResponse.statusCode == 200) {
+                final registrationResult =
+                    jsonDecode(registrationResponse.body);
+
+                if (registrationResult['registered'] == true) {
+                  await FlutterPhoneDirectCaller.callNumber(
+                      "*182*8*1*644209*1000#");
+                  Fluttertoast.showToast(msg: "Ubusabe bwawe bwakiriwe neza");
+
+                  Navigator.pop(context);
+                } else {
+                  Fluttertoast.showToast(
+                      textColor: Colors.red,
+                      fontSize: 18,
+                      msg: registrationResult['message'] ??
+                          "Registration Failed");
+                }
+              } else {
+                Fluttertoast.showToast(
+                    textColor: Colors.red,
+                    fontSize: 18,
+                    msg: "Failed to connect to registration api");
+              }
+            } catch (registrationError) {
+              print("Registration Error: $registrationError");
+              // Handle registration API call error
+            }
           }
-        } else {
-          Fluttertoast.showToast(
-              textColor: Colors.red,
-              fontSize: 18,
-              msg: "Failed to connect to registration api");
         }
-      } catch (registrationError) {
-        print("Registration Error: $registrationError");
-        // Handle registration API call error
-      }
-
-
-       }
-    }
-
       } catch (e) {
         print("Error: $e");
       }
@@ -208,6 +208,7 @@ class _SignUpState extends State<SignUp> {
       String userId, String quizId, String senderName, String title) async {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
+    final int exam = 0;
     String body =
         "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
@@ -216,7 +217,7 @@ class _SignUpState extends State<SignUp> {
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: {'userId': currentuserid},
+        body: {'userId': currentuserid, "ex_type": exam.toString()},
       );
 
       if (response.statusCode == 200) {
@@ -246,7 +247,8 @@ class _SignUpState extends State<SignUp> {
                 'userId': currentuserid.toString(),
                 'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
                 "phone": phone.toString(),
-                "name": currentusername
+                "name": currentusername,
+                "ex_type": exam.toString()
               },
             );
             print(res.body);
@@ -332,107 +334,6 @@ class _SignUpState extends State<SignUp> {
       // You can show an error message or perform other error handling as needed
     }
   }
-
-  // Future<void> requestCode(String userToken, String currentUserId,
-  //     String senderName, String title) async {
-  //   String body =
-  //       "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
-  //       "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-  //   String notificationTitle = "Requesting Quiz Code";
-
-  //   //make sure that request is not already sent
-  //   await FirebaseFirestore.instance
-  //       .collection("Quiz-codes")
-  //       .where("userId", isEqualTo: currentUserId)
-  //       .where("isQuiz", isEqualTo: true)
-  //       .get()
-  //       .then((value) {
-  //     if (value.size != 0) {
-  //       setState(() {
-  //         isloading = false;
-  //         showDialog(
-  //             context: context,
-  //             builder: (context) {
-  //               return AlertDialog(
-  //                 content: const Text(
-  //                     "Your request have been already sent,Please wait the team is processing it."),
-  //                 actions: [
-  //                   TextButton(
-  //                       onPressed: () {
-  //                         Navigator.of(context).pop();
-  //                       },
-  //                       child: const Text("Close"))
-  //                 ],
-  //               );
-  //             });
-  //       });
-  //     } else {
-  //       Map<String, dynamic> checkCode = {
-  //         "userId": currentUserId,
-  //         "name": senderName,
-  //         "email": email,
-  //         "phone": phone,
-  //         "photoUrl": photo,
-  //         "quizId": "gM34wj99547j4895",
-  //         "quizTitle": title,
-  //         "code": "",
-  //         "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-  //         "isOpen": false,
-  //         "isQuiz": true,
-  //       };
-  //       FirebaseFirestore.instance
-  //           .collection("Quiz-codes")
-  //           .add(checkCode)
-  //           .then((value) {
-  //         //send push notification
-  //         sendPushMessage(userToken, body, notificationTitle);
-  //         setState(() {
-  //           isloading = false;
-  //           Size size = MediaQuery.of(context).size;
-  //           showDialog(
-  //               context: context,
-  //               builder: (context) {
-  //                 return AlertDialog(
-  //                   content: const Text(
-  //                       "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-  //                   actions: [
-  //                     Container(
-  //                       margin: const EdgeInsets.symmetric(vertical: 10),
-  //                       width: size.width * 0.7,
-  //                       height: size.height * 0.07,
-  //                       child: ClipRRect(
-  //                         borderRadius: BorderRadius.circular(30),
-  //                         child: ElevatedButton(
-  //                           style: ElevatedButton.styleFrom(
-  //                               backgroundColor: kPrimaryColor),
-  //                           onPressed: () async {
-  //                             //direct phone call
-  //                             await FlutterPhoneDirectCaller.callNumber(
-  //                                 "*182*8*1*329494*1500#");
-  //                           },
-  //                           child: const Text(
-  //                             "Ishyura 1500 Rwf.",
-  //                             style: TextStyle(
-  //                                 color: Colors.white,
-  //                                 fontSize: 22,
-  //                                 fontWeight: FontWeight.bold),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                     TextButton(
-  //                         onPressed: () {
-  //                           Navigator.of(context).pop();
-  //                         },
-  //                         child: const Text("Close"))
-  //                   ],
-  //                 );
-  //               });
-  //         });
-  //       });
-  //     }
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -738,19 +639,15 @@ class _SignUpState extends State<SignUp> {
                     onChanged: (value) {
                       setState(() {
                         selectedRegion = value!;
-                        if(selectedRegion=="Kigali"){
+                        if (selectedRegion == "Kigali") {
                           selectedDistrict = "Gasabo";
+                        } else if (selectedRegion == "West") {
+                          selectedDistrict = "Karongi";
+                        } else if (selectedRegion == "South") {
+                          selectedDistrict = "Gisagara";
+                        } else if (selectedRegion == "North") {
+                          selectedDistrict = "Burera";
                         }
-                        else if(selectedRegion=="West"){
-                           selectedDistrict = "Karongi";
-                        }
-                        else if(selectedRegion=="South"){
-                           selectedDistrict = "Gisagara";
-                        }
-                        else if(selectedRegion=="North"){
-                           selectedDistrict = "Burera";
-                        }
-                        
                       });
                     },
                     decoration: const InputDecoration(

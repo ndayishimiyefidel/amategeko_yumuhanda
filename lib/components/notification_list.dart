@@ -22,7 +22,7 @@ class UsersNotificationList extends StatefulWidget {
   final String phone;
   final String code, docId;
   final bool? isQuiz;
-  final String? endTime;
+  final String? endTime, ex_type;
 
   const UsersNotificationList({
     super.key,
@@ -34,6 +34,7 @@ class UsersNotificationList extends StatefulWidget {
     required this.docId,
     this.isQuiz,
     this.endTime,
+    this.ex_type,
   });
 
   @override
@@ -78,7 +79,13 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    print("time stamp :${widget.time}");
+    //print("time stamp :${widget.time}");
+    // print('Debug: ex type before condition: ${widget.ex_type}');
+
+    // widget.ex_type == "0"
+    //     ? print('Debug: English condition met ${widget.ex_type}')
+    //     : print('Debug: Kinyarwanda condition met ${widget.ex_type}');
+
     int timestamp = int.parse(widget.time);
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     var dateTimeFormat =
@@ -103,8 +110,23 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
+                          widget.ex_type == "1"
+                              ? Text(
+                                  "English",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : Text(
+                                  "Kinyarwanda",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                           Text(
-                            userRole == "Admin" ? widget.name : "",
+                            widget.name,
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
