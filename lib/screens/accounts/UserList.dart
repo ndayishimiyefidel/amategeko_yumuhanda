@@ -118,7 +118,6 @@ class _UserListState extends State<UserList> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               final data = allUsersList[index];
-
                               return ChatUsersList(
                                 name: data["name"] ?? '',
                                 time: data["createdAt"],

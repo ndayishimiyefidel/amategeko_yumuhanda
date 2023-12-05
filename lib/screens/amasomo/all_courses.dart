@@ -2,8 +2,11 @@ import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/amasomo/course_contents.dart';
 import 'package:amategeko/services/auth.dart';
 import 'package:amategeko/services/database_service.dart';
+import 'package:amategeko/utils/generate_code.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
 import '../../widgets/fcmWidget.dart';
@@ -45,6 +49,55 @@ class _AllCourseState extends State<AllCourse> {
   late String phone;
   String userToken = "";
   late int totalQuestion = 0;
+  int itemsPerPage = 10;
+  int currentPage = 0;
+  List<Map<String, dynamic>> allCoursesList = [];
+
+  int from = 0;
+  int totalRows = 0;
+  int to = 10; // Initial range, fetch the first 10 records
+
+  Future<void> fetchAllCourses() async {
+    final apiUrl = API.courseList + "?from=$from&to=$to";
+    isLoading = true;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print(data);
+
+        if (data['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            if (from == 0) {
+              // If it's the first load, clear the list
+              allCoursesList.clear();
+            }
+            // Append the new data to the existing list
+            allCoursesList
+                .addAll(List<Map<String, dynamic>>.from(data['data']));
+            if (!mounted) return;
+            setState(() {
+              isLoading = false;
+              totalRows = int.tryParse(data['total'])!.toInt();
+            });
+
+            // Update 'from' and 'to' for the next load
+            from = to;
+            to += 10; // Fetch the next 10 records
+          });
+        } else {
+          print("Failed to execute query");
+        }
+      } else {
+        throw Exception('Failed to load data from the API');
+      }
+    } catch (e) {
+      print("Error occurs: $e");
+    }
+  }
 
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
@@ -56,73 +109,29 @@ class _AllCourseState extends State<AllCourse> {
     });
   }
 
-  getToken() async {
-    //delete quiz
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .where("role", isEqualTo: "Admin")
-        .get()
-        .then((value) {
-      if (value.size == 1) {
-        Map<String, dynamic> adminData = value.docs.first.data();
-        userToken = adminData["fcmToken"];
-        adminPhone = adminData["phone"];
-        print("Admin Token is  $userToken");
-      }
-    });
-  }
+  Future<void> getToken() async {
+    final url = API.getToken; // Replace with your PHP script URL
+    try {
+      final response = await http.get(Uri.parse(url));
 
-  Widget quizList() {
-    return StreamBuilder(
-      stream: courseStream,
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const CircularProgressIndicator();
-          case ConnectionState.none:
-            return const Text('Error,No internet');
-          default:
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return snapshot.data == null
-                  ? const Center(
-                      child: Text(
-                        "There is no available course at this time ",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          letterSpacing: 2,
-                          color: Colors.red,
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: snapshot.data.docs.length,
-                      itemBuilder: (context, index) {
-                        return CourseTile(
-                          index: index,
-                          courseId:
-                              snapshot.data!.docs[index].data()['courseId'],
-                          title:
-                              snapshot.data.docs[index].data()["courseTitle"],
-                          totalCourses: totalQuestion,
-                          userRole: userRole.toString(),
-                          userToken: userToken,
-                          senderName: currentusername,
-                          currentUserId: currentuserid,
-                          phone: phone,
-                          email: email,
-                          photoUrl: photo,
-                          coursePrice:
-                              snapshot.data.docs[index].data()["quizPrice"],
-                          adminPhone: adminPhone.toString(),
-                        );
-                      });
-            }
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true) {
+          final adminData = data['data'];
+          userToken = adminData['fcmToken'];
+          adminPhone = adminData['phone'];
+          print(adminPhone);
+        } else {
+          // Handle the case when there is no admin or other errors
         }
-      },
-    );
+      } else {
+        // Handle HTTP request errors
+        print("failed to connect to server");
+      }
+    } catch (e) {
+      // Handle exceptions
+      print("Error: $e");
+    }
   }
 
   @override
@@ -134,13 +143,10 @@ class _AllCourseState extends State<AllCourse> {
         print("My token is $value");
       }
     });
-    databaseService.getCoursesData().then((value) async {
-      setState(() {
-        courseStream = value;
-      });
-    });
+
     //check code
     getCurrUserData(); //get login data
+    fetchAllCourses();
     requestPermission(); //request permission
     loadFCM(); //load fcm
     listenFCM(); //list fcm
@@ -192,7 +198,65 @@ class _AllCourseState extends State<AllCourse> {
         ),
         //appbar
         key: _scaffoldKey,
-        body: quizList(),
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: !isLoading
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 60),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (allCoursesList.isEmpty)
+                        const Center(
+                          child: Text("no courses available right now!"),
+                        )
+                      else
+                        Column(
+                          children: [
+                            ListView.builder(
+                              padding: const EdgeInsets.only(top: 16),
+                              itemCount: allCoursesList.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final data = allCoursesList[index];
+                                return CourseTile(
+                                  index: index,
+                                  courseId: data['courseId'] ?? '',
+                                  title: data["courseTitle"] ?? '',
+                                  totalCourses: totalQuestion,
+                                  userRole: userRole.toString(),
+                                  userToken: userToken,
+                                  senderName: currentusername,
+                                  currentUserId: currentuserid,
+                                  phone: phone,
+                                  coursePrice: data["coursePrice"] ?? '',
+                                  adminPhone: adminPhone.toString(),
+                                  courseDesc: data['courseDesc'] ?? '',
+                                  courseType: data['courseType'] ?? '',
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      if (to <=
+                          totalRows) // Show "Load More" button if there are more records
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              isLoading = true;
+                              fetchAllCourses(); // Load more records
+                            },
+                            child: const Text("Load More"),
+                          ),
+                        ),
+                    ],
+                  ),
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
+                ),
+        ),
         floatingActionButton: (userRole == "Admin")
             ? FloatingActionButton.extended(
                 label: const Row(
@@ -217,23 +281,26 @@ class _AllCourseState extends State<AllCourse> {
             : null);
   }
 
-  Future<void> requestCode(String userToken, String currentUserId,
-      String senderName, String title) async {
+  Future<void> requestCode(
+      String userId, String quizId, String senderName, String title) async {
+    final url = API.requestCode;
+    final sabaCodeUrl = API.sabaCode;
+    final int exam = 0;
     String body =
         "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
-    //make sure that request is not already sent
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: currentUserId)
-        .where("isQuiz", isEqualTo: true)
-        .get()
-        .then((value) {
-      if (value.size != 0) {
-        setState(() {
-          isLoading = false;
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'userId': currentuserid, 'ex_type': exam.toString()},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        //print('Response Body: $data');
+        if (data['success'] == true) {
           showDialog(
               context: context,
               builder: (context) {
@@ -249,73 +316,100 @@ class _AllCourseState extends State<AllCourse> {
                   ],
                 );
               });
-        });
-      } else {
-        Map<String, dynamic> checkCode = {
-          "userId": currentUserId,
-          "name": senderName,
-          "email": email,
-          "phone": phone,
-          "photoUrl": photo,
-          "quizId": "gM34wj99547j4895",
-          "quizTitle": title,
-          "code": "",
-          "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-          "isOpen": false,
-          "isQuiz": true,
-        };
-        FirebaseFirestore.instance
-            .collection("Quiz-codes")
-            .add(checkCode)
-            .then((value) {
-          //send push notification
-          sendPushMessage(userToken, body, notificationTitle);
-          setState(() {
-            isLoading = false;
-            Size size = MediaQuery.of(context).size;
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text(
-                        "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                    actions: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        width: size.width * 0.7,
-                        height: size.height * 0.07,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: kPrimaryColor),
-                            onPressed: () async {
-                              //direct phone call
-                              await FlutterPhoneDirectCaller.callNumber(
-                                  "*182*8*1*329494*1500#");
-                            },
-                            child: const Text(
-                              "Ishyura 1500 Rwf.",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold),
+        } else {
+          try {
+            final res = await http.post(
+              Uri.parse(sabaCodeUrl),
+              body: {
+                'userId': currentuserid.toString(),
+                'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+                "phone": phone.toString(),
+                "name": currentusername,
+                "ex_type": exam.toString()
+              },
+            );
+            print(res.body);
+
+            if (res.statusCode == 200) {
+              final data = json.decode(res.body);
+              print('Response Body: $data');
+              if (data['requestSent'] == true) {
+                //handle if not sent
+                sendPushMessage(userToken, body, notificationTitle);
+                isLoading = false;
+
+                Size size = MediaQuery.of(context).size;
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: const Text(
+                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
+                        actions: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            width: size.width * 0.7,
+                            height: size.height * 0.07,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: kPrimaryColor),
+                                onPressed: () async {
+                                  //direct phone call
+                                  await FlutterPhoneDirectCaller.callNumber(
+                                      "*182*8*1*329494*1500#");
+                                },
+                                child: const Text(
+                                  "Ishyura 1500 Rwf.",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Close"))
-                    ],
-                  );
-                });
-          });
-        });
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Okay"))
+                        ],
+                      );
+                    });
+              } else {
+                Fluttertoast.showToast(
+                  msg: "Faild to request code",
+                  textColor: Colors.red,
+                  fontSize: 10,
+                );
+              }
+            } else {
+              Fluttertoast.showToast(
+                msg: "Faild to connect to api",
+                textColor: Colors.red,
+                fontSize: 10,
+              );
+            }
+          } catch (e) {
+            // Handle exceptions
+            print("Error: $e");
+            // You can show an error message or perform other error handling as needed
+          }
+        }
+      } else {
+        Fluttertoast.showToast(
+          msg: "Faild to connect to api",
+          textColor: Colors.red,
+          fontSize: 10,
+        );
       }
-    });
+    } catch (e) {
+      // Handle exceptions
+      print("Error: $e");
+      // You can show an error message or perform other error handling as needed
+    }
   }
 }
 
@@ -329,8 +423,8 @@ class CourseTile extends StatefulWidget {
   final String senderName;
   final String phone;
   final String currentUserId;
-  final String coursePrice;
-  final String email, photoUrl;
+  final String coursePrice, courseType, courseDesc;
+
   final int index;
 
   const CourseTile({
@@ -342,12 +436,12 @@ class CourseTile extends StatefulWidget {
     required this.senderName,
     required this.phone,
     required this.currentUserId,
-    required this.email,
-    required this.photoUrl,
     required this.userRole,
     required this.coursePrice,
     required this.adminPhone,
     required this.index,
+    required this.courseType,
+    required this.courseDesc,
   }) : super(key: key);
 
   @override
@@ -401,7 +495,8 @@ class _CourseTileState extends State<CourseTile> {
                             GestureDetector(
                               onTap: () {
                                 //all
-                                if (widget.userRole == "Admin") {
+                                if (widget.userRole == "Admin" ||
+                                    widget.courseType == "Free") {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -413,11 +508,11 @@ class _CourseTileState extends State<CourseTile> {
                                     ),
                                   );
                                 } else {
-                                  navigateToIshuli(widget.currentUserId, true);
+                                  navigateToIshuli(widget.currentUserId);
                                 }
                               },
                               child: const Icon(
-                                Icons.play_circle_fill_outlined,
+                                Icons.next_plan_outlined,
                                 size: 40,
                                 color: Colors.blue,
                               ),
@@ -486,7 +581,13 @@ class _CourseTileState extends State<CourseTile> {
                                           setState(() {
                                             _isLoading = true;
                                           });
-                                          deleteQuiz(widget.courseId);
+                                          final deleteApiUrl = API.deleteCourse;
+                                          GenerateUser.deleteUserCode(
+                                              context,
+                                              widget.courseId,
+                                              deleteApiUrl,
+                                              widget.title,
+                                              "course deleted successfully!");
                                         },
                                         child: const Text(
                                           "Delete course",
@@ -517,74 +618,62 @@ class _CourseTileState extends State<CourseTile> {
     );
   }
 
-//delete quiz
-  Future<void> deleteQuiz(String docId) async {
-    FirebaseFirestore.instance
-        .collection("courses")
-        .doc(docId)
-        .delete()
-        .then((value) {
-      setState(() {
-        _isLoading = false;
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                content: const Text("course deleted successfully!"),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("Close"))
-                ],
+  Future<void> navigateToIshuli(String currentUserId) async {
+    final url = API.navigateToIshuri; // Replace with your PHP script URL
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: {'userId': widget.currentUserId.toString()},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print(data);
+        if (data['success'] == true) {
+          if (data['hasCode'] == true) {
+            if (!mounted) return;
+            setState(() {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return CourseContents(
+                        courseId: widget.courseId, courseTitle: widget.title);
+                  },
+                ),
               );
             });
-      });
-    });
-  }
-
-  Future<void> navigateToIshuli(String currentUserId, bool hasAdded) async {
-    await FirebaseFirestore.instance
-        .collection("Quiz-codes")
-        .where("userId", isEqualTo: currentUserId)
-        .where("isOpen", isEqualTo: true)
-        .where("addedToClass", isEqualTo: true)
-        .get()
-        .then((value) => {
-              // print("value of size ${value.size}"),
-
-              if (value.size >= 1)
-                {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CourseContents(
-                            courseId: widget.courseId,
-                            courseTitle: widget.title);
-                      },
-                    ),
-                  ),
-                }
-              else
-                {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: const Text(
-                              "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      })
-                }
+          } else {
+            if (!mounted) return;
+            setState(() {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: const Text(
+                          "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Close"))
+                      ],
+                    );
+                  });
             });
+          }
+        } else {
+          // Handle other error cases
+        }
+      } else {
+        // Handle HTTP request errors
+      }
+    } catch (e) {
+      // Handle exceptions
+      print("Error: $e");
+      // You can show an error message or perform other error handling as needed
+    }
   }
 }

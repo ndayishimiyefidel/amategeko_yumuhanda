@@ -11,6 +11,7 @@ class API {
   static const updateProfile = "$hostUser/updateProfile.php";
   static const getToken = "$hostUser/getToken.php";
   static const checkCode = "$hostUser/checkCode.php";
+  static const navigateToIshuri = "$hostUser/navigateToIshuri.php";
   static const requestCode = "$hostUser/requestCode.php";
   static const sabaCode = "$hostUser/sabaCode.php";
   static const isQuizOpen = "$hostUser/isQuizOpen.php";
@@ -34,4 +35,12 @@ class API {
   static const notInIrembo = "$hostUser/notInIrembo.php";
   static const updateFcmToken = "$hostUser/updateFcm.php";
   //addedToClass
+  static const createCourse = "$hostUser/createCourse.php";
+  static const deleteCourse = "$hostUser/deleteCourse.php";
+  static const courseList = "$hostUser/courseList.php";
+  static const uploadContent = "$hostUser/uploadContent.php";
+  static const openCourseContent = "$hostUser/openCourseContent.php";
+
+  //courseList
+  //openCourseContent
 }

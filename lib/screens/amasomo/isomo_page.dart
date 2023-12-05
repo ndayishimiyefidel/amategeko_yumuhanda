@@ -1,12 +1,15 @@
-import 'package:amategeko/screens/amasomo/course_content.dart';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../backend/apis/db_connection.dart';
 import '../../components/text_field_container.dart';
-import '../../services/database_service.dart';
 import '../../utils/constants.dart';
 import '../homepages/notificationtab.dart';
+import 'package:http/http.dart' as http;
+
+import 'course_content.dart';
 
 class IsomoPage extends StatefulWidget {
   const IsomoPage({Key? key}) : super(key: key);
@@ -19,43 +22,82 @@ class _IsomoPageState extends State<IsomoPage> {
   final _formkey = GlobalKey<FormState>();
   String courseTitle = "", quizDesc = "";
   String courseId = "";
+  String selectedCourseType = "Free";
 
   //adding controller
   final TextEditingController courseTitleController = TextEditingController();
   final TextEditingController coursePriceController = TextEditingController();
+  final TextEditingController courseDescController = TextEditingController();
+
   String coursePrice = "";
+  String courseDesc = "";
 
   //database service
   bool _isLoading = false;
   final bool isNew = true;
-  DatabaseService databaseService = DatabaseService();
 
   Future createCourse() async {
     if (_formkey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-      courseId = randomAlphaNumeric(16);
+      int dateFormat = DateTime.now().millisecondsSinceEpoch;
       Map<String, String> courseMap = {
-        "courseId": courseId,
-        "courseTitle": courseTitle,
-        "quizPrice": coursePrice
+        "courseTitle": courseTitle.trim().toString(),
+        "coursePrice": coursePrice.trim().toString(),
+        "courseType": selectedCourseType.toString(),
+        "courseDesc": courseDesc.trim().toString(),
+        "createdAt": dateFormat.toString()
       };
-      await databaseService.createCourseData(courseMap, courseId).then((value) {
+      final createCourseUrl = API.createCourse;
+      try {
+        final Response = await http.post(
+          Uri.parse(createCourseUrl),
+          body: courseMap,
+        );
+
+        if (Response.statusCode == 200) {
+          final Result = jsonDecode(Response.body);
+
+          if (Result['created'] == true) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return CourseContent(
+                    courseId: courseId,
+                  );
+                },
+              ),
+            );
+          } else {
+            if (!mounted) return;
+            setState(() {
+              _isLoading = false;
+            });
+            Fluttertoast.showToast(
+                textColor: Colors.red,
+                fontSize: 18,
+                msg: Result['message'] ?? " Failed");
+          }
+        } else {
+          if (!mounted) return;
+          setState(() {
+            _isLoading = false;
+          });
+          Fluttertoast.showToast(
+              textColor: Colors.red,
+              fontSize: 18,
+              msg: "Failed to connect to  api");
+        }
+      } catch (Error) {
+        print(" Error: $Error");
+        // Handle  API call error
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return CourseContent(
-                  courseId: courseId,
-                );
-              },
-            ),
-          );
         });
-      });
+      }
     }
   }
 
@@ -115,6 +157,55 @@ class _IsomoPageState extends State<IsomoPage> {
       ),
     );
     //quiz desc
+    //quiz title field
+    final quizDescField = TextFieldContainer(
+      child: TextFormField(
+        autofocus: false,
+        maxLines: 5,
+        controller: courseDescController,
+        onSaved: (value) {
+          courseDescController.text = value!;
+        },
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(
+          hintText: "Enter Course Descrition...",
+          border: InputBorder.none,
+        ),
+        onChanged: (val) {
+          courseDesc = val;
+        },
+      ),
+    );
+
+    //quiz type
+    final quizTypeField = TextFieldContainer(
+      child: DropdownButtonFormField(
+        value: selectedCourseType,
+        items: [
+          DropdownMenuItem(
+            value: "Free",
+            child: Text("Free"),
+          ),
+          DropdownMenuItem(
+            value: "Paid",
+            child: Text("Paid"),
+          ),
+        ],
+        onChanged: (value) {
+          setState(() {
+            selectedCourseType = value.toString();
+          });
+        },
+        decoration: InputDecoration(
+          labelText: "Course Type",
+          icon: Icon(
+            Icons.select_all_outlined,
+            color: kPrimaryColor,
+          ),
+          border: InputBorder.none,
+        ),
+      ),
+    );
 
     final createQuizBtn = Container(
       margin: const EdgeInsets.symmetric(vertical: 5.0),
@@ -199,11 +290,19 @@ class _IsomoPageState extends State<IsomoPage> {
                   SizedBox(
                     height: size.height * 0.03,
                   ),
+                  quizTypeField,
+                  SizedBox(
+                    height: size.height * 0.03,
+                  ),
                   quizTitleField,
                   SizedBox(
                     height: size.height * 0.03,
                   ),
-                  quizPriceField,
+                  quizDescField,
+                  SizedBox(
+                    height: size.height * 0.03,
+                  ),
+                  selectedCourseType == "Paid" ? quizPriceField : SizedBox(),
                   SizedBox(
                     height: size.height * 0.03,
                   ),

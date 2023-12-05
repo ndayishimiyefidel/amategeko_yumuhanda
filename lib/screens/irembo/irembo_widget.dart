@@ -99,22 +99,6 @@ class _IremboUsersListState extends State<IremboUsersList> {
     );
   }
 
-  // Method to update the call status for a user in Firestore
-  // Future<void> _setUserCalledStatus(bool called) async {
-  //   try {
-  //     await firestore
-  //         .collection('Users')
-  //         .doc(widget.userId)
-  //         // ignore: avoid_print
-  //         .update({'called': called}).then((value) => {print("Updated")});
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print("Error updating user's call status: $e");
-  //     }
-  //     // Handle the error if needed
-  //   }
-  // }
-
   void _copyToClipboard(String textToCopy) {
     Clipboard.setData(ClipboardData(text: textToCopy));
     ScaffoldMessenger.of(context).showSnackBar(

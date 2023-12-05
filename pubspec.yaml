@@ -31,20 +31,19 @@ dependencies:
   connectivity_plus: ^5.0.1
   firebase_core: ^2.7.1
   firebase_auth: ^4.0.2
-  file_picker: ^6.0.0
   shared_preferences: ^2.0.15
   image_network: ^2.5.2
   random_string: ^2.0.1
   image_picker: ^1.0.4
-  collection: ^1.15.0
   firebase_storage: ^11.0.6
   syncfusion_flutter_pdfviewer: ^20.4.51
   device_info_plus: ^9.0.1
   dbus: ^0.7.8
   upgrader: ^8.0.0
+  file_picker: ^6.1.1
   uuid: ^3.0.7
   flutter_phone_direct_caller: ^2.1.1
-  just_audio: ^0.9.11
+  just_audio: ^0.9.36
   visibility_detector: ^0.4.0+2
   screenshot_callback: ^3.0.1
   flutter_windowmanager: ^0.2.0

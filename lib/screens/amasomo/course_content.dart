@@ -1,16 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as path;
-import 'package:random_string/random_string.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../backend/apis/db_connection.dart';
 import '../../components/text_field_container.dart';
-import '../../services/database_service.dart';
 import '../../utils/constants.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:http/http.dart' as http;
 
 class CourseContent extends StatefulWidget {
   final String courseId;
@@ -25,91 +21,113 @@ class CourseContent extends StatefulWidget {
 
 class _CourseContentState extends State<CourseContent> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController courseController = TextEditingController();
-  String courseDesc = "";
-  DatabaseService databaseService = DatabaseService();
+  final TextEditingController _descriptionController = TextEditingController();
+  String _courseDescription = '';
+  List<File> _selectedAudioFiles = [];
+  List<File> _selectedImageFiles = [];
   bool _isLoading = false;
-  final picker = ImagePicker();
-  UploadTask? uploadTask;
-  File? pickedFile;
-  String downloadImgUrl = "";
-  String refId = randomAlphaNumeric(16);
 
-  Future selectsFile() async {
-    setState(() {
-      _isLoading = true;
-    });
-    String filepath = 'courseImages/$refId';
-    final pickedFiles = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFiles != null) {
-        pickedFile = File(pickedFiles.path);
-        _isLoading = false;
-        if (kDebugMode) {
-          print(pickedFile);
-        }
-      }
-    });
-    if (pickedFile != null) {
-      final refs = FirebaseStorage.instance.ref().child(filepath);
-      uploadTask = refs.putFile(pickedFile!);
-      final snapshot = await uploadTask!.whenComplete(() {});
-      final downloadlink = await snapshot.ref.getDownloadURL();
-      if (kDebugMode) {
-        print("download link $downloadlink");
-      }
-      downloadImgUrl = downloadlink.toString();
-      Map<String, String> courseMap = {
-        "courseId": widget.courseId,
-        "courseImgUrl": downloadImgUrl,
-      };
-      databaseService.addCourseImages(courseMap, widget.courseId).then((value) {
-        setState(() {
-          _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return const AlertDialog(
-                  content: Text("image uploaded"),
-                );
-              });
-        });
+  Future<void> pickAudioFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+      allowMultiple: true,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _selectedAudioFiles =
+            result.files.map((file) => File(file.path!)).toList();
       });
     }
   }
 
-  String uploadedUrl = "";
-  String downloadUrl = "";
-  late String fileName;
+  Future<void> pickImageFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+    );
 
-Future<void> uploadFilesToFirebaseStorage() async {
-  // Allow the user to select a single audio file
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-    type: FileType.audio,
-  );
+    if (result != null && result.files.isNotEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _selectedImageFiles =
+            result.files.map((file) => File(file.path!)).toList();
+      });
+    }
+  }
 
-  if (result != null && result.files.isNotEmpty) {
-    File file = File(result.files.single.path!);
-    fileName = 'audio/${path.basename(file.path)}';
-    final refs = FirebaseStorage.instance.ref().child(fileName);
-    uploadTask = refs.putFile(file);
-
-    await uploadTask!.whenComplete(() {});
-    final snapshot = await uploadTask!.whenComplete(() {});
-    final downloadUrl = await snapshot.ref.getDownloadURL();
-
+  Future<void> uploadFiles() async {
+    if (!mounted) return;
     setState(() {
-      uploadedUrl=downloadUrl.toString();
-      if (kDebugMode) {
-        print(downloadUrl);
-      }
+      _isLoading = true;
     });
 
-    // Save the audio file to Firestore after uploading
-    saveAudioFiles();
-  }
-}
+    final apiUrl = API.uploadContent; // Replace with your server URL
 
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+
+      // Check if there are selected audio files
+      if (_selectedAudioFiles.isNotEmpty) {
+        for (var audioFile in _selectedAudioFiles) {
+          request.files.add(
+            await http.MultipartFile.fromPath('audio[]', audioFile.path),
+          );
+        }
+      }
+
+      // Check if there are selected image files
+      if (_selectedImageFiles.isNotEmpty) {
+        for (var imageFile in _selectedImageFiles) {
+          request.files.add(
+            await http.MultipartFile.fromPath('image[]', imageFile.path),
+          );
+        }
+      }
+
+      request.fields['description'] = _courseDescription;
+      request.fields['courseId'] = widget.courseId;
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var jsonResponse = json.decode(responseData);
+
+        if (jsonResponse['created'] == true) {
+          // Handle successful creation
+          Fluttertoast.showToast(msg: 'Course content created successfully');
+          print('Course content created successfully');
+          setState(() {
+            _courseDescription = '';
+          });
+        } else {
+          // Handle failure to create course content
+          print('Failed to create course content');
+          Fluttertoast.showToast(msg: 'Failed to create course content');
+        }
+        if (!mounted) return;
+        setState(() {
+          _selectedAudioFiles = [];
+          _selectedImageFiles = [];
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to upload files. Status code: ${response.statusCode}');
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error uploading files: $e');
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,22 +137,21 @@ Future<void> uploadFilesToFirebaseStorage() async {
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
           autofocus: true,
-          maxLines: 10,
-          controller: courseController,
+          maxLines: 5,
+          controller: _descriptionController,
           keyboardType: TextInputType.text,
           onSaved: (value) {
-            courseController.text = value!;
+            _descriptionController.text = value!;
           },
           textInputAction: TextInputAction.next,
           decoration: const InputDecoration(
-            hintText: "---------Course Content------",
+            hintText: "Enter content",
             border: InputBorder.none,
           ),
           onChanged: (val) {
-            courseDesc = val;
-            print(courseDesc);
+            _courseDescription = val;
           },
-          autovalidateMode: AutovalidateMode.disabled,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (input) => input!.isEmpty ? 'Enter course content' : null,
         ),
       ),
@@ -149,10 +166,10 @@ Future<void> uploadFilesToFirebaseStorage() async {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            uploadCourseData();
+            uploadFiles();
           },
           child: const Text(
-            "Submit Data",
+            "Add Content",
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
@@ -170,7 +187,7 @@ Future<void> uploadFilesToFirebaseStorage() async {
           },
         ),
         title: const Text(
-          "Add course content",
+          "Course Content",
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,
@@ -206,56 +223,42 @@ Future<void> uploadFilesToFirebaseStorage() async {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  Text(
+                    "Create Course Content",
+                    style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
+                  ),
                   courseDescriptionField,
                   SizedBox(
                     height: size.height * 0.03,
                   ),
-                  Text(widget.courseId),
-                  const Text(
-                    "Please choose audio and image",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ElevatedButton(
+                    onPressed: pickAudioFiles,
+                    child: Text('Pick Audio Files'),
                   ),
-                  SizedBox(
-                    height: size.height * 0.03,
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: pickImageFiles,
+                    child: Text('Pick Image Files'),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              uploadFilesToFirebaseStorage();
-                            },
-                            child: const Icon(Icons.keyboard_voice_outlined)),
-                        ElevatedButton(
-                            onPressed: () {
-                              selectsFile();
-                            },
-                            child: const Icon(
-                                Icons.photo_size_select_actual_outlined)),
-                      ],
-                    ),
-                  ),
-                  _isLoading
-                      ? const CircularProgressIndicator()
-                      : Container(
-                          child: null,
-                        ),
-                  const SizedBox(height: 20),
-                  // Text('Uploaded URLs:$uploadedUrls'),
-                  _isLoading
-                      ? const CircularProgressIndicator()
-                      : Container(
-                          child: null,
-                        ),
+                  SizedBox(height: 16),
+                  if (_selectedAudioFiles.isNotEmpty ||
+                      _selectedImageFiles.isNotEmpty)
+                    Text(
+                        'Selected Files: ${_selectedAudioFiles.length + _selectedImageFiles.length}'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Expanded(
                           child: Column(
-                        children: [createCourse],
+                        children: [
+                          createCourse,
+                          _isLoading == true
+                              ? CircularProgressIndicator()
+                              : SizedBox(),
+                        ],
                       ))
                     ],
                   )
@@ -267,58 +270,4 @@ Future<void> uploadFilesToFirebaseStorage() async {
       ),
     );
   }
-
-  Future<void> uploadCourseData() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      Map<String, String> courseMap = {
-        "courseId": widget.courseId,
-        'courseDesc': courseDesc,
-        "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-      };
-      await databaseService
-          .addCourseData(courseMap, widget.courseId)
-          .then((value) {
-        setState(() {
-          _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return const AlertDialog(
-                  content: Text("Course successfully"),
-                );
-              });
-        });
-      });
-    }
-  }
-
-Future<void> saveAudioFiles() async {
-  setState(() {
-    _isLoading = true;
-  });
-
-  Map<String, dynamic> courseMap = {
-    "courseId": widget.courseId,
-    "fileName": fileName,
-    'downloadUrl': uploadedUrl,
-     "createdAt": DateTime.now().millisecondsSinceEpoch.toString(), // Save the list directly
-  };
-
-  await databaseService.addCourseAudio(courseMap, widget.courseId).then((value) {
-    setState(() {
-      _isLoading = false;
-      showDialog(
-          context: context,
-          builder: (context) {
-            return const AlertDialog(
-              content: Text("audio uploaded"),
-            );
-          });
-    });
-  });
-}
-
 }
