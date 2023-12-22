@@ -25,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -47,30 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAKBBoj4exwSJObrKViL13LhEnPTI3yzek',
-    appId: '1:922737655486:web:a6295a479fb1e53900e8ef',
-    messagingSenderId: '922737655486',
-    projectId: 'amategeko-75e59',
-    authDomain: 'amategeko-75e59.firebaseapp.com',
-    storageBucket: 'amategeko-75e59.appspot.com',
-    measurementId: 'G-DL7QT8DWN4',
+    apiKey: 'AIzaSyBqH8FYOCP-lWAJV7cDtIPG0Q6aIOTmNEA',
+    appId: '1:788538011169:web:db9714958a28426e58bd60',
+    messagingSenderId: '788538011169',
+    projectId: 'rwanda-traffic-rules',
+    authDomain: 'rwanda-traffic-rules.firebaseapp.com',
+    storageBucket: 'rwanda-traffic-rules.appspot.com',
+    measurementId: 'G-1E52QCDC3B',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBHUOH3OXVNc8VCZ3uWZEIulXktgeKMDEM',
-    appId: '1:922737655486:android:e8f04075bcd317d200e8ef',
-    messagingSenderId: '922737655486',
-    projectId: 'amategeko-75e59',
-    storageBucket: 'amategeko-75e59.appspot.com',
+    apiKey: 'AIzaSyBgdG442FjC40vr6P4eLa_-8Bj3_cDcFXA',
+    appId: '1:788538011169:android:71644dca4687eb7d58bd60',
+    messagingSenderId: '788538011169',
+    projectId: 'rwanda-traffic-rules',
+    storageBucket: 'rwanda-traffic-rules.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDKx37RNCHNJYTb0tic-Zv5OVWsESPaFbI',
-    appId: '1:922737655486:ios:6b68109df5d7d0ee00e8ef',
-    messagingSenderId: '922737655486',
-    projectId: 'amategeko-75e59',
-    storageBucket: 'amategeko-75e59.appspot.com',
-    iosClientId: '922737655486-mo3ohnn7fjguttntm15bt3ll5034p505.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDeovxbXwUv5tLVyX3kANZRomx20wgtIRU',
+    appId: '1:788538011169:ios:5bbf9c072fd9143258bd60',
+    messagingSenderId: '788538011169',
+    projectId: 'rwanda-traffic-rules',
+    storageBucket: 'rwanda-traffic-rules.appspot.com',
+    iosBundleId: 'com.amategeko.amategeko',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDeovxbXwUv5tLVyX3kANZRomx20wgtIRU',
+    appId: '1:788538011169:ios:5bbf9c072fd9143258bd60',
+    messagingSenderId: '788538011169',
+    projectId: 'rwanda-traffic-rules',
+    storageBucket: 'rwanda-traffic-rules.appspot.com',
     iosBundleId: 'com.amategeko.amategeko',
   );
 }

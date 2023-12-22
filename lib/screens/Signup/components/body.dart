@@ -67,6 +67,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> retrieveDeviceId() async {
+    if (kIsWeb) {}
     deviceId = await DeviceIdManager.getDeviceId();
     if (kDebugMode) {
       print("Device ID: $deviceId");
@@ -81,22 +82,87 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> _registerUser() async {
-    if (deviceId!.isNotEmpty || deviceId != "") {
-      try {
-        if (_formKey.currentState!.validate()) {
-          setState(() {
-            isloading = true;
-          });
+    print("device Ids:$deviceId");
+    // if (deviceId!.isNotEmpty || deviceId != "") {
+    try {
+      if (_formKey.currentState!.validate()) {
+        setState(() {
+          isloading = true;
+        });
 
-          final deviceValidationUrl = API.validate;
-          final registrationUrl = API.signUp;
-          final String uid = generateUniqueUid();
+        final deviceValidationUrl = API.validate;
+        final registrationUrl = API.signUp;
+        final String uid = generateUniqueUid();
 
-          // Device validation
+        // Device validation
+        if (kIsWeb) {
+          int dateF = DateTime.now().millisecondsSinceEpoch;
+
+          User userModel = User(
+              uid: uid,
+              createdAt: dateF.toString(),
+              password: password.toString().trim(),
+              role: userRole,
+              phone: phoneNumber.toString().trim(),
+              name: name.trim(),
+              referralCode: "",
+              state: 1,
+              deviceId: deviceId != null ? deviceId.toString() : "",
+              fcmToken: fcmToken != null ? fcmToken.toString() : "");
+
+          try {
+            final registrationResponse = await http.post(
+              Uri.parse(registrationUrl),
+              body: userModel.toJson(),
+            );
+
+            if (registrationResponse.statusCode == 200) {
+              final registrationResult = jsonDecode(registrationResponse.body);
+              print("REg Error: $registrationResult ");
+
+              if (registrationResult['registered'] == true) {
+                // Registration successful
+                preferences = await SharedPreferences.getInstance();
+                await preferences.setString("uid", uid);
+                await preferences.setString("name", name);
+                await preferences.setString(
+                    "phone", phoneNumber.toString().trim());
+                await preferences.setString("role", userRole);
+
+                if (fcmToken != null) {
+                  await preferences.setString("fcmToken", fcmToken!);
+                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomeScreen(
+                      currentuserid: uid,
+                      userRole: userRole,
+                    ),
+                  ),
+                );
+              } else {
+                Fluttertoast.showToast(
+                    textColor: Colors.red,
+                    fontSize: 18,
+                    msg:
+                        registrationResult['message'] ?? "Registration Failed");
+              }
+            } else {
+              Fluttertoast.showToast(
+                  textColor: Colors.red,
+                  fontSize: 18,
+                  msg: "Failed to connect to registration api");
+            }
+          } catch (registrationError) {
+            print("Registration Error: $registrationError");
+            // Handle registration API call error
+          }
+        } else {
           try {
             final deviceValidationResponse = await http.post(
               Uri.parse(deviceValidationUrl),
-              body: {"deviceId": deviceId, "phone": phoneNumber.toString()},
+              body: {"deviceId": deviceId, "phone": phoneNumber},
             );
 
             if (deviceValidationResponse.statusCode == 200) {
@@ -118,7 +184,7 @@ class _SignUpState extends State<SignUp> {
                     referralCode: "",
                     state: 1,
                     deviceId: deviceId.toString(),
-                    fcmToken: fcmToken.toString());
+                    fcmToken: fcmToken != null ? fcmToken.toString() : "");
 
                 try {
                   final registrationResponse = await http.post(
@@ -139,7 +205,10 @@ class _SignUpState extends State<SignUp> {
                       await preferences.setString(
                           "phone", phoneNumber.toString().trim());
                       await preferences.setString("role", userRole);
-                      await preferences.setString("fcmToken", fcmToken!);
+
+                      if (fcmToken != null) {
+                        await preferences.setString("fcmToken", fcmToken!);
+                      }
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -183,21 +252,16 @@ class _SignUpState extends State<SignUp> {
             print("Device Validation Error: $deviceValidationError");
             // Handle device validation API call error
           }
-
-          setState(() {
-            isloading = false;
-          });
         }
-      } catch (e) {
-        // Handle exceptions here
-        print("Error: $e");
-        // You can show an error message or perform other error handling as needed
+
+        setState(() {
+          isloading = false;
+        });
       }
-    } else {
-      Fluttertoast.showToast(
-          textColor: Colors.red,
-          fontSize: 18,
-          msg: "Reba niba ufite internet kugirango wiyandikishe");
+    } catch (e) {
+      // Handle exceptions here
+      print("Error: $e");
+      // You can show an error message or perform other error handling as needed
     }
   }
 

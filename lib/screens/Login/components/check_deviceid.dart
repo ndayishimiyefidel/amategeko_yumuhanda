@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'dart:io' show Platform;
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,11 +23,14 @@ class DeviceIdManager {
       uniqueId = await _getAndroidDeviceId();
     } else if (Platform.isIOS) {
       uniqueId = await _getIOSDeviceId();
+    } else if (Platform.isLinux ||
+        Platform.isWindows ||
+        Platform.isMacOS ||
+        kIsWeb) {
+      uniqueId = await _generateWebDeviceId();
     }
 
-    uniqueId ??=
-        const Uuid()
-            .v4();
+    uniqueId ??= const Uuid().v4();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_deviceIdKey, uniqueId);
@@ -53,11 +56,15 @@ class DeviceIdManager {
     try {
       iosDeviceInfo = await deviceInfo.iosInfo;
       // Concatenate multiple device identifiers for uniqueness
-      return "${iosDeviceInfo.identifierForVendor}${iosDeviceInfo
-          .localizedModel}${iosDeviceInfo.systemVersion}";
+      return "${iosDeviceInfo.identifierForVendor}${iosDeviceInfo.localizedModel}${iosDeviceInfo.systemVersion}";
     } catch (e) {
       // Print the error
       return null;
     }
+  }
+
+  static Future<String> _generateWebDeviceId() async {
+    // Simple UUID-based device ID for the web platform
+    return Uuid().v4();
   }
 }

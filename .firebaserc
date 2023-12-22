@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "amategeko-75e59",
-    "staging": "amategeko-75e59",
+    "default": "rwanda-traffic-rules",
+    "staging": "rwanda-traffic-rules",
     "storage": "amategeko-75e59"
   },
   "targets": {},

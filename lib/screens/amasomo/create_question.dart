@@ -12,7 +12,7 @@ import '../../utils/constants.dart';
 
 class CreateQuestion extends StatefulWidget {
   final String courseId;
-  final String ? courseTitle;
+  final String? courseTitle;
 
   const CreateQuestion({
     super.key,
@@ -30,12 +30,13 @@ class _CreateQuestionState extends State<CreateQuestion> {
   String option3 = "", option4 = "";
   String questionUrl = "";
   String correctAnswer = "";
-  String explainedText="";
+  String explainedText = "";
 
   //adding controller
   final TextEditingController questionController = TextEditingController();
   final TextEditingController correctController = TextEditingController();
-  final TextEditingController  questionExplainedController = TextEditingController();
+  final TextEditingController questionExplainedController =
+      TextEditingController();
   final TextEditingController option1Controller = TextEditingController();
   final TextEditingController option2Controller = TextEditingController();
   final TextEditingController option3Controller = TextEditingController();
@@ -94,7 +95,6 @@ class _CreateQuestionState extends State<CreateQuestion> {
         "option4": option4,
         "quizPhotoUrl": questionUrl,
         "correctAnswer": correctAnswer,
-        "explainedText":explainedText,
       };
       await databaseService
           .addCourseQuestionData(questionMap, widget.courseId)
@@ -391,22 +391,22 @@ class _CreateQuestionState extends State<CreateQuestion> {
                           (pickedFile == null)
                               ? Container()
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.file(
-                                        pickedFile!,
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.file(
+                                          pickedFile!,
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(

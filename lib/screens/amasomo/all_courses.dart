@@ -1,13 +1,11 @@
 import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/amasomo/course_contents.dart';
-import 'package:amategeko/services/auth.dart';
 import 'package:amategeko/services/database_service.dart';
 import 'package:amategeko/utils/generate_code.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,8 +32,6 @@ class _AllCourseState extends State<AllCourse> {
   bool isLoading = false;
   DatabaseService databaseService = DatabaseService();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  AuthService authService = AuthService();
-  final user = FirebaseAuth.instance.currentUser;
 
   //shared preferences
   late SharedPreferences preferences;

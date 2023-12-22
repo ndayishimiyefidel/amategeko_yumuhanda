@@ -333,33 +333,36 @@ class _SignInState extends State<SignIn> {
             final String userRole = userData['role'];
 
             //update in db.
+            if (fcmToken != null) {
+              print("Fcm Token :$fcmToken");
 
-            print("Fcm Token :$fcmToken");
+              try {
+                final fcmTokenUrl = API.updateFcmToken;
+                final response = await http.post(
+                  Uri.parse(fcmTokenUrl),
+                  body: {'docId': userData["uid"], 'fcmToken': fcmToken},
+                );
 
-            try {
-              final fcmTokenUrl = API.updateFcmToken;
-              final response = await http.post(
-                Uri.parse(fcmTokenUrl),
-                body: {'docId': userData["uid"], 'fcmToken': fcmToken},
-              );
-
-              if (response.statusCode == 200) {
-                // Your logic for a successful response
-                final fcmResult = json.decode(response.body);
-                if (fcmResult['success'] == true) {
-                } else {}
-              } else {
-                print("Error: Failed to connect to api");
+                if (response.statusCode == 200) {
+                  // Your logic for a successful response
+                  final fcmResult = json.decode(response.body);
+                  if (fcmResult['success'] == true) {
+                  } else {}
+                } else {
+                  print("Error: Failed to connect to api");
+                }
+              } catch (e) {
+                print("Error: $e");
               }
-            } catch (e) {
-              print("Error: $e");
             }
 
             await preferences.setString("uid", userData["uid"]);
             await preferences.setString("name", userData["name"]);
             await preferences.setString("role", userData["role"]);
             await preferences.setString("phone", userData["phone"]);
-            await preferences.setString("fcmToken", fcmToken!);
+            if (fcmToken != null) {
+              await preferences.setString("fcmToken", fcmToken!);
+            }
 
             setState(() {
               isLoading = false;
@@ -383,6 +386,10 @@ class _SignInState extends State<SignIn> {
                   userData["deviceId"] != null) {
                 final String userDeviceId = userData['deviceId'];
                 if (userDeviceId == deviceId) {
+                  setState(() {
+                    Navigator.push(context, route);
+                  });
+                } else if (kIsWeb) {
                   setState(() {
                     Navigator.push(context, route);
                   });

@@ -29,7 +29,8 @@ dependencies:
   url_launcher: ^6.1.9
   share_plus: any
   connectivity_plus: ^5.0.1
-  firebase_core: ^2.7.1
+  # firebase_core: ^2.7.1
+  firebase_core: ^2.24.0
   firebase_auth: ^4.0.2
   shared_preferences: ^2.0.15
   image_network: ^2.5.2
@@ -49,6 +50,7 @@ dependencies:
   flutter_windowmanager: ^0.2.0
   crypto: ^3.0.3
   intl: ^0.18.0
+  universal_html: ^2.2.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
