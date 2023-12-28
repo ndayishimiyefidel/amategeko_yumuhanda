@@ -3,6 +3,8 @@ import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../ads/interestial_ad.dart';
+import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
 import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
@@ -30,6 +32,7 @@ class _OpenExamPageState extends State<OpenExamPage>
 
   late String phone;
   String? referralCode;
+  final InterestialAds adManager = InterestialAds();
 
   void getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
@@ -46,6 +49,8 @@ class _OpenExamPageState extends State<OpenExamPage>
   void initState() {
     super.initState();
     getCurrUserData();
+    RewardedVideoAdManager.loadRewardAd();
+    adManager.loadInterstitialAd();
 
     animationController =
         AnimationController(duration: const Duration(seconds: 3), vsync: this);
@@ -65,9 +70,24 @@ class _OpenExamPageState extends State<OpenExamPage>
         curve: const Interval(0.5, 1.0, curve: Curves.easeInOut)));
   }
 
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  void _showInterstitialAd() {
+    // Show the interstitial ad when needed
+    adManager.showInterstitialAd();
+  }
+
   @override
   void dispose() {
     animationController.dispose();
+    RewardedVideoAdManager.dispose();
+    adManager.dispose();
     super.dispose();
   }
 
@@ -140,6 +160,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
+                              _showInterstitialAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -159,6 +180,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
+                              showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

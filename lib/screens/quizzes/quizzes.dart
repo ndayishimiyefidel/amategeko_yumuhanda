@@ -6,7 +6,7 @@ import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
-import 'old_quiz.dart';
+
 
 class Quizzes extends StatefulWidget {
   const Quizzes({super.key});
@@ -101,10 +101,10 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                     ),
-                    child: const TabBarView(
+                    child:  TabBarView(
                       children: <Widget>[
                         NewQuiz(),
-                        OldQuiz(),
+                       // OldQuiz(),
                       ],
                     ),
                   ),

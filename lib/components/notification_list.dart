@@ -125,6 +125,9 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                          SizedBox(
+                            height: size.height * 0.02,
+                          ),
                           Text(
                             widget.name,
                             style: const TextStyle(
@@ -241,6 +244,11 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                       : Container(
                           child: null,
                         ),
+                  Divider(
+                    thickness: 2.0,
+                    height: 1.5,
+                    color: Colors.black,
+                  )
                 ],
               ),
             ),

@@ -1,13 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/amasomo/all_courses.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
-
-import '../../services/database_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 
 class CreateQuestion extends StatefulWidget {
@@ -31,6 +30,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
   String questionUrl = "";
   String correctAnswer = "";
   String explainedText = "";
+  List<File> _selectedImageFiles = [];
 
   //adding controller
   final TextEditingController questionController = TextEditingController();
@@ -43,85 +43,93 @@ class _CreateQuestionState extends State<CreateQuestion> {
   final TextEditingController option4Controller = TextEditingController();
   bool _isLoading = false;
 
-  final picker = ImagePicker();
-  UploadTask? uploadTask;
-  File? pickedFile;
+  Future<void> pickImageFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+    );
 
-  Future selectsFile() async {
-    final pickedFiles = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFiles != null) {
-        pickedFile = File(pickedFiles.path);
-        _isLoading = false;
-      }
-    });
+    if (result != null && result.files.isNotEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _selectedImageFiles =
+            result.files.map((file) => File(file.path!)).toList();
+      });
+    }
   }
-
-  //database service
-  DatabaseService databaseService = DatabaseService();
-
-  ///saving quiz data inside quiz
-  ///creating map data
 
   @override
   void initState() {
     super.initState();
   }
 
-  uploadQuizData() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      String refId = randomAlphaNumeric(16);
-      String filepath = 'images/$refId';
+  Future<void> uploadCourseQuizData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
 
-      if (pickedFile == null) {
-        questionUrl = "";
-      } else {
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(pickedFile!);
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        questionUrl = downloadlink.toString();
+    final apiUrl = API.createCourseQuiz;
+
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+      // Check if there are selected image files
+      if (_selectedImageFiles.isNotEmpty) {
+        for (var imageFile in _selectedImageFiles) {
+          request.files.add(
+            await http.MultipartFile.fromPath('image[]', imageFile.path),
+          );
+        }
       }
-      Map<String, String> questionMap = {
-        "courseId": widget.courseId,
-        "question": question,
-        "option1": option1,
-        "option2": option2,
-        "option3": option3,
-        "option4": option4,
-        "quizPhotoUrl": questionUrl,
-        "correctAnswer": correctAnswer,
-      };
-      await databaseService
-          .addCourseQuestionData(questionMap, widget.courseId)
-          .then((value) {
+
+      request.fields['courseId'] = widget.courseId;
+      request.fields['question'] = question;
+      request.fields['option1'] = option1;
+      request.fields['option2'] = option2;
+      request.fields['option3'] = option3;
+      request.fields['option4'] = option4;
+      request.fields['correctAnswer'] = correctAnswer;
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var jsonResponse = json.decode(responseData);
+
+        if (jsonResponse['created'] == true) {
+          // Handle successful creation
+          Fluttertoast.showToast(msg: 'Quizcreated successfully');
+          print('Quiz created successfully');
+          setState(() {
+            _formkey.currentState!.reset();
+            questionController.clear();
+            option1Controller.clear();
+            option2Controller.clear();
+            option3Controller.clear();
+            option4Controller.clear();
+            correctController.clear();
+          });
+        } else {
+          // Handle failure to create course content
+          print('Failed to create course content');
+          Fluttertoast.showToast(msg: 'Failed to create course content');
+        }
+        if (!mounted) return;
+        setState(() {
+          _selectedImageFiles = [];
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to upload files. Status code: ${response.statusCode}');
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text("Question saved successfully"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          _formkey.currentState!.reset();
-                          questionController.clear();
-                          option1Controller.clear();
-                          option2Controller.clear();
-                          option3Controller.clear();
-                          option4Controller.clear();
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("ok"))
-                  ],
-                );
-              });
         });
+      }
+    } catch (e) {
+      print('Error uploading files: $e');
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -256,27 +264,27 @@ class _CreateQuestionState extends State<CreateQuestion> {
       ),
     );
 
-    final explaineField = TextFieldContainer(
-      child: TextFormField(
-        autofocus: false,
-        controller: questionExplainedController,
-        keyboardType: TextInputType.text,
-        onSaved: (value) {
-          correctController.text = value!;
-        },
-        textInputAction: TextInputAction.done,
-        decoration: const InputDecoration(
-          hintText: "Andika icyo igazeti ivuaga",
-          border: InputBorder.none,
-        ),
-        onChanged: (val) {
-          explainedText = val;
-        },
-        autovalidateMode: AutovalidateMode.disabled,
-        // validator: (input) =>
-        //     input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
-      ),
-    );
+    // final explaineField = TextFieldContainer(
+    //   child: TextFormField(
+    //     autofocus: false,
+    //     controller: questionExplainedController,
+    //     keyboardType: TextInputType.text,
+    //     onSaved: (value) {
+    //       correctController.text = value!;
+    //     },
+    //     textInputAction: TextInputAction.done,
+    //     decoration: const InputDecoration(
+    //       hintText: "Andika icyo igazeti ivuaga",
+    //       border: InputBorder.none,
+    //     ),
+    //     onChanged: (val) {
+    //       explainedText = val;
+    //     },
+    //     autovalidateMode: AutovalidateMode.disabled,
+    //     // validator: (input) =>
+    //     //     input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
+    //   ),
+    // );
     final addquestionBtn = SizedBox(
       width: size.width * 0.4,
       height: size.height * 0.05,
@@ -285,7 +293,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            uploadQuizData();
+            uploadCourseQuizData();
           },
           child: const Text(
             "Save Question",
@@ -388,7 +396,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
                     child: Center(
                       child: Stack(
                         children: <Widget>[
-                          (pickedFile == null)
+                          (_selectedImageFiles.isEmpty)
                               ? Container()
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -400,7 +408,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
                                         clipBehavior: Clip.hardEdge,
                                         // display new updated image
                                         child: Image.file(
-                                          pickedFile!,
+                                          _selectedImageFiles.first,
                                           width: 200.0,
                                           height: 200.0,
                                           fit: BoxFit.cover,
@@ -408,9 +416,9 @@ class _CreateQuestionState extends State<CreateQuestion> {
                                   ],
                                 ),
                           GestureDetector(
-                            onTap: selectsFile,
+                            onTap: pickImageFiles,
                             child: Padding(
-                                padding: (pickedFile == null)
+                                padding: (_selectedImageFiles.isEmpty)
                                     ? const EdgeInsets.only(
                                         top: 0.0, right: 170.0)
                                     : const EdgeInsets.only(
@@ -456,10 +464,10 @@ class _CreateQuestionState extends State<CreateQuestion> {
                   SizedBox(
                     height: size.height * 0.05,
                   ),
-                  explaineField,
-                  SizedBox(
-                    height: size.height * 0.05,
-                  ),
+                  // explaineField,
+                  // SizedBox(
+                  //   height: size.height * 0.05,
+                  // ),
                   _isLoading
                       ? const CircularProgressIndicator()
                       : Container(

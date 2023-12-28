@@ -2,16 +2,12 @@ import 'dart:io';
 
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/quizzes/quizzes.dart';
-import 'package:amategeko/services/database_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
 
 import '../../utils/constants.dart';
 import '../homepages/notificationtab.dart';
-import '../questions/add_question.dart';
 
 class CreateQuiz extends StatefulWidget {
   const CreateQuiz({Key? key}) : super(key: key);
@@ -35,7 +31,6 @@ class _CreateQuizState extends State<CreateQuiz> {
   //select file
   // PlatformFile? pickedFile;
   final picker = ImagePicker();
-  UploadTask? uploadTask;
   File? pickedFile;
 
   Future selectsFile() async {
@@ -60,57 +55,9 @@ class _CreateQuizState extends State<CreateQuiz> {
   //database service
   bool _isLoading = false;
   final bool isNew = true;
-  DatabaseService databaseService = DatabaseService();
-
-  Future createquizOnline() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      quizId = randomAlphaNumeric(16);
-      String filepath = 'images/$quizId';
-      // final file = File(pickedFile!.path!);
-
-      if (pickedFile == null) {
-        quizUrl =
-            "https://media.gettyimages.com/id/1311206139/vector/stop-sign.jpg?s=612x612&w=gi&k=20&c=LLieTSmvLgus4NJFlsiGoL3P7qTYO3WNMql0SF7uOZA=";
-      } else {
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(pickedFile!);
-
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        quizUrl = downloadlink.toString();
-      }
 
 
-      Map<String, String> quizMap = {
-        "quizId": quizId,
-        "quizTitle": quizTitle,
-        "quizImgUrl": quizUrl,
-        "quizType": _selectedType,
-        "quizDesc": quizDesc,
-        "quizPrice": quizPrice
-      };
-      await databaseService.addQuizData(quizMap, quizId).then((value) {
-        setState(() {
-          _isLoading = false;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return AddQuestion(
-                  quizId: quizId,
-                  quizTitle: quizTitle,
-                  isNew: isNew,
-                );
-              },
-            ),
-          );
-        });
-      });
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +169,7 @@ class _CreateQuizState extends State<CreateQuiz> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            createquizOnline();
+      
           },
           child: const Text(
             "CREATE QUIZ",

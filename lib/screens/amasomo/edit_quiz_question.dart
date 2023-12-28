@@ -1,17 +1,18 @@
 import 'dart:io';
-
 import 'package:amategeko/components/text_field_container.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
-
-import '../../services/database_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'open_modified_quiz.dart';
 
 class Edit1Question extends StatefulWidget {
-  final String quizId,
+  final String id,
+      courseId,
       question,
       questionUrl,
       option1,
@@ -22,7 +23,7 @@ class Edit1Question extends StatefulWidget {
 
   const Edit1Question({
     super.key,
-    required this.quizId,
+    required this.id,
     required this.question,
     required this.questionUrl,
     required this.option1,
@@ -30,6 +31,7 @@ class Edit1Question extends StatefulWidget {
     required this.option3,
     required this.option4,
     required this.correctOption,
+    required this.courseId,
   });
 
   @override
@@ -51,27 +53,23 @@ class _Edit1QuestionState extends State<Edit1Question> {
   late TextEditingController option3Controller;
   late TextEditingController option4Controller;
   bool _isLoading = false;
+  final apiUrl = API.hostUser;
+  List<File> _selectedImageFiles = [];
 
-  final picker = ImagePicker();
-  UploadTask? uploadTask;
-  File? pickedFile;
+  Future<void> pickImageFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+    );
 
-  Future selectsFile() async {
-    final pickedFiles = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFiles != null) {
-        pickedFile = File(pickedFiles.path);
-        _isLoading = false;
-      }
-    });
+    if (result != null && result.files.isNotEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _selectedImageFiles =
+            result.files.map((file) => File(file.path!)).toList();
+      });
+    }
   }
-
-  //database service
-  DatabaseService databaseService = DatabaseService();
-
-  ///saving quiz data inside quiz
-  ///creating map data
 
   @override
   void initState() {
@@ -81,71 +79,92 @@ class _Edit1QuestionState extends State<Edit1Question> {
     option3Controller = TextEditingController(text: widget.option4);
     option4Controller = TextEditingController(text: widget.option4);
     correctController = TextEditingController(text: widget.correctOption);
+
     super.initState();
   }
 
   uploadQuizData() async {
     if (_formkey.currentState!.validate()) {
+      if (!mounted) return;
       setState(() {
         _isLoading = true;
       });
-      String refId = randomAlphaNumeric(16);
-      String filepath = 'images/$refId';
 
-      if (pickedFile == null) {
-        questionUrl = "";
-      } else {
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(pickedFile!);
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        questionUrl = downloadlink.toString();
-      }
-      Map<String, String> questionMap = {
-        "question": question.isEmpty ? widget.question : question,
-        "option1": option1.isEmpty ? widget.option1 : option1,
-        "option2": option2.isEmpty ? widget.option2 : option2,
-        "option3": option3.isEmpty ? widget.option3 : option3,
-        "option4": option4.isEmpty ? widget.option4 : option4,
-        "quizPhotoUrl": questionUrl.isEmpty ? widget.questionUrl : questionUrl,
-        "correctAnswer":
-            correctAnswer.isEmpty ? widget.correctOption : correctAnswer,
-      };
+      final apiUrl = API.updateCourseQuestion;
 
-      ///check whether if the quiz is not filled
-      ///using collection group
-      await databaseService
-          .updateCourseQuestionData(questionMap, widget.quizId, widget.question)
-          .then((value) {
+      try {
+        var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+        // Check if there are selected image files
+
+        if (_selectedImageFiles.isNotEmpty) {
+          for (var imageFile in _selectedImageFiles) {
+            request.files.add(
+              await http.MultipartFile.fromPath('image[]', imageFile.path),
+            );
+          }
+        }
+
+        request.fields['id'] = widget.id;
+        request.fields['question'] =
+            question.isEmpty ? widget.question : question;
+        request.fields['option1'] = option1.isEmpty ? widget.option1 : option1;
+        request.fields['option2'] = option2.isEmpty ? widget.option2 : option2;
+        request.fields['option3'] = option3.isEmpty ? widget.option3 : option3;
+        request.fields['option4'] = option4.isEmpty ? widget.option4 : option4;
+        request.fields['correctAnswer'] =
+            correctAnswer.isEmpty ? widget.correctOption : correctAnswer;
+        var response = await request.send();
+
+        if (response.statusCode == 200) {
+          var responseData = await response.stream.bytesToString();
+          var jsonResponse = json.decode(responseData);
+
+          if (jsonResponse['created'] == true) {
+            // // Handle successful creation
+            // Fluttertoast.showToast(msg: 'Quizcreated successfully');
+            // print('Quiz created successfully');
+            // setState(() {
+            //   _formkey.currentState!.reset();
+            //   questionController.clear();
+            //   option1Controller.clear();
+            //   option2Controller.clear();
+            //   option3Controller.clear();
+            //   option4Controller.clear();
+            //   correctController.clear();
+            // });
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OpenModifiedQuiz(
+                  courseId: widget.courseId,
+                ),
+              ),
+            );
+          } else {
+            // Handle failure to create course content
+            print('Failed to create course content');
+            Fluttertoast.showToast(msg: 'Failed to create course content');
+          }
+          if (!mounted) return;
+          setState(() {
+            _selectedImageFiles = [];
+            _isLoading = false;
+          });
+        } else {
+          print('Failed to upload files. Status code: ${response.statusCode}');
+          if (!mounted) return;
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        print('Error uploading files: $e');
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text("Question changed successfully"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          _formkey.currentState!.reset();
-                          questionController.clear();
-                          option1Controller.clear();
-                          option2Controller.clear();
-                          option3Controller.clear();
-                          option4Controller.clear();
-                          Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (context) {
-                            return OpenModifiedQuiz(
-                              courseId: widget.quizId,
-                            );
-                          }));
-                        },
-                        child: const Text("ok"))
-                  ],
-                );
-              });
         });
-      });
+      }
     }
   }
 
@@ -166,8 +185,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
             Icons.question_answer_outlined,
             color: kPrimaryColor,
           ),
-          hintText:
-              widget.question.isEmpty ? "Type Question.. " : widget.question,
+          hintText: "Type Question.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -186,8 +204,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          hintText:
-              widget.option1.isEmpty ? "correct option.. " : widget.option1,
+          hintText: "correct option.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -207,7 +224,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          hintText: widget.option2.isEmpty ? "option 2.. " : widget.option2,
+          hintText: "option 2.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -226,7 +243,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          hintText: widget.option3.isEmpty ? "option 3.. " : widget.option3,
+          hintText: "option 3.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -245,7 +262,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
-          hintText: widget.option4.isEmpty ? "option 4.. " : widget.option4,
+          hintText: "option 4.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -264,9 +281,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
-          hintText: widget.correctOption.isEmpty
-              ? "correct answer.. "
-              : widget.correctOption,
+          hintText: "correct answer.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -376,48 +391,49 @@ class _Edit1QuestionState extends State<Edit1Question> {
                       child: Stack(
                         children: <Widget>[
                           (widget.questionUrl.isEmpty)
-                              ? (pickedFile == null)
+                              ? (_selectedImageFiles.isEmpty)
                                   ? Container()
                                   : Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display new updated image
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                                  Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display new updated image
-                                          child: Image.file(
-                                            pickedFile!,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  )
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Material(
+                                            // display new updated image
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(125.0)),
+                                            clipBehavior: Clip.hardEdge,
+                                            // display new updated image
+                                            child: Image.file(
+                                              _selectedImageFiles.first,
+                                              width: 200.0,
+                                              height: 200.0,
+                                              fit: BoxFit.cover,
+                                            )),
+                                      ],
+                                    )
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.network(
-                                        widget.questionUrl.toString(),
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.network(
+                                          apiUrl +
+                                              "/${widget.questionUrl.toString()}",
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
-                            onTap: selectsFile,
+                            onTap: pickImageFiles,
                             child: Padding(
-                                padding: (pickedFile == null)
+                                padding: (_selectedImageFiles.isEmpty)
                                     ? const EdgeInsets.only(
                                         top: 0.0, right: 170.0)
                                     : const EdgeInsets.only(

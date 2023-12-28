@@ -5,7 +5,7 @@ import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
-import 'old_quiz.dart';
+
 
 class OnlyQuiz extends StatefulWidget {
   const OnlyQuiz({super.key});
@@ -71,7 +71,7 @@ class _OnlyQuizState extends State<OnlyQuiz>
         backgroundColor: kPrimaryColor,
         elevation: 0.0,
       ),
-      body: const OldQuiz(),
+      body: const OnlyQuiz(),
       //floating button
 
       floatingActionButton: userRole == "Admin"

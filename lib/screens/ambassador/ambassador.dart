@@ -1,10 +1,7 @@
 import 'package:amategeko/screens/ambassador/register_ambassador.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../components/chat_for_users_list.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
 
@@ -80,146 +77,147 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
       ),
       body: userRole == "Admin"
           ? SingleChildScrollView(
-              child: Column(
-                //crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  FutureBuilder<QuerySnapshot>(
-                    future: FirebaseFirestore.instance
-                        .collection("Users")
-                        .where("role", whereIn: ['Ambassador', 'Caller'])
-                        .orderBy("createdAt", descending: true)
-                        .limit(100)
-                        .get(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return SizedBox(
-                          height: MediaQuery.of(context).size.height -
-                              MediaQuery.of(context).size.height / 5,
-                          width: MediaQuery.of(context).size.width,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(
-                                kPrimaryColor,
-                              ),
-                            ),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                            child: Text("Error unable to retrieve ambassador"));
-                      } else if (!snapshot.hasData) {
-                        return const Center(child: Text("No ambassador"));
-                      } else {
-                        snapshot.data!.docs.removeWhere(
-                            (i) => i["uid"] == currentuserid);
-                        allUsersList = snapshot.data!.docs;
+              child: Container()
+              // Column(
+              //   //crossAxisAlignment: CrossAxisAlignment.stretch,
+              //   children: <Widget>[
+              //     FutureBuilder<QuerySnapshot>(
+              //       future: FirebaseFirestore.instance
+              //           .collection("Users")
+              //           .where("role", whereIn: ['Ambassador', 'Caller'])
+              //           .orderBy("createdAt", descending: true)
+              //           .limit(100)
+              //           .get(),
+              //       builder: (context, snapshot) {
+              //         if (snapshot.connectionState == ConnectionState.waiting) {
+              //           return SizedBox(
+              //             height: MediaQuery.of(context).size.height -
+              //                 MediaQuery.of(context).size.height / 5,
+              //             width: MediaQuery.of(context).size.width,
+              //             child: const Center(
+              //               child: CircularProgressIndicator(
+              //                 valueColor: AlwaysStoppedAnimation(
+              //                   kPrimaryColor,
+              //                 ),
+              //               ),
+              //             ),
+              //           );
+              //         } else if (snapshot.hasError) {
+              //           return const Center(
+              //               child: Text("Error unable to retrieve ambassador"));
+              //         } else if (!snapshot.hasData) {
+              //           return const Center(child: Text("No ambassador"));
+              //         } else {
+              //           snapshot.data!.docs.removeWhere(
+              //               (i) => i["uid"] == currentuserid);
+              //           allUsersList = snapshot.data!.docs;
 
-                        return SizedBox(
-                          height: MediaQuery.of(context).size.height - 10,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.only(top: 16, left: 20),
-                            itemCount: snapshot.data!.docs.length,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection("Quiz-codes")
-                                    .where("userId",
-                                        isEqualTo: snapshot.data!.docs[index]
-                                            ["uid"])
-                                    .snapshots(),
-                                builder: (context, quizSnapshot) {
-                                  if (!quizSnapshot.hasData) {
-                                    return const SizedBox
-                                        .shrink(); // Return an empty widget if the quiz data is not available yet.
-                                  } else {
-                                    final quizData = quizSnapshot.data!.docs;
-                                    String? quizCode = quizData.isNotEmpty
-                                        ? quizData[0]["code"]
-                                        : "nocode"; // Get the quiz code from the first document in the quiz data.
+              //           return SizedBox(
+              //             height: MediaQuery.of(context).size.height - 10,
+              //             child: ListView.builder(
+              //               padding: const EdgeInsets.only(top: 16, left: 20),
+              //               itemCount: snapshot.data!.docs.length,
+              //               shrinkWrap: true,
+              //               physics: const NeverScrollableScrollPhysics(),
+              //               itemBuilder: (context, index) {
+              //                 return StreamBuilder(
+              //                   stream: FirebaseFirestore.instance
+              //                       .collection("Quiz-codes")
+              //                       .where("userId",
+              //                           isEqualTo: snapshot.data!.docs[index]
+              //                               ["uid"])
+              //                       .snapshots(),
+              //                   builder: (context, quizSnapshot) {
+              //                     if (!quizSnapshot.hasData) {
+              //                       return const SizedBox
+              //                           .shrink(); // Return an empty widget if the quiz data is not available yet.
+              //                     } else {
+              //                       final quizData = quizSnapshot.data!.docs;
+              //                       String? quizCode = quizData.isNotEmpty
+              //                           ? quizData[0]["code"]
+              //                           : "nocode"; // Get the quiz code from the first document in the quiz data.
 
-                                    return ChatUsersList(
-                                      name: snapshot.data!.docs[index]["name"],
+              //                       return ChatUsersList(
+              //                         name: snapshot.data!.docs[index]["name"],
                                   
-                                      time: snapshot.data!.docs[index]
-                                          ["createdAt"],
-                                      // email: snapshot.data!.docs[index]
-                                      //     ["email"],
-                                      userId: snapshot.data!.docs[index]["uid"],
-                                      phone: snapshot.data!.docs[index]
-                                          ["phone"],
-                                      password: snapshot.data!.docs[index]
-                                          ["password"],
-                                      role: snapshot.data!.docs[index]["role"],
-                                      quizCode: quizCode.toString(),
-                                      referralCode: snapshot.data!.docs[index]
-                                          ["referralCode"],
-                                      // Pass the quiz code to the ChatUsersList widget.
-                                      deviceId: snapshot.data!.docs[index]
-                                          ["deviceId"],
-                                    );
-                                  }
-                                },
-                              );
-                            },
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("Users")
-                            .where("role", whereIn: ['Ambassador', 'Caller'])
-                            .orderBy("createdAt", descending: true)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return SizedBox(
-                              height: MediaQuery.of(context)
-                                      .copyWith()
-                                      .size
-                                      .height -
-                                  MediaQuery.of(context)
-                                          .copyWith()
-                                          .size
-                                          .height /
-                                      5,
-                              width:
-                                  MediaQuery.of(context).copyWith().size.width,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation(
-                                  kPrimaryColor,
-                                )),
-                              ),
-                            );
-                          } else {
-                            snapshot.data!.docs.removeWhere(
-                                (i) => i["uid"] == currentuserid);
-                            allUsersList = snapshot.data!.docs;
-                            return ListView.builder(
-                              padding: const EdgeInsets.only(top: 16, left: 20),
-                              itemCount: snapshot.data!.docs.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  child: null,
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              //                         time: snapshot.data!.docs[index]
+              //                             ["createdAt"],
+              //                         // email: snapshot.data!.docs[index]
+              //                         //     ["email"],
+              //                         userId: snapshot.data!.docs[index]["uid"],
+              //                         phone: snapshot.data!.docs[index]
+              //                             ["phone"],
+              //                         password: snapshot.data!.docs[index]
+              //                             ["password"],
+              //                         role: snapshot.data!.docs[index]["role"],
+              //                         quizCode: quizCode.toString(),
+              //                         referralCode: snapshot.data!.docs[index]
+              //                             ["referralCode"],
+              //                         // Pass the quiz code to the ChatUsersList widget.
+              //                         deviceId: snapshot.data!.docs[index]
+              //                             ["deviceId"],
+              //                       );
+              //                     }
+              //                   },
+              //                 );
+              //               },
+              //             ),
+              //           );
+              //         }
+              //       },
+              //     ),
+              //     Column(
+              //       crossAxisAlignment: CrossAxisAlignment.start,
+              //       children: <Widget>[
+              //         StreamBuilder(
+              //           stream: FirebaseFirestore.instance
+              //               .collection("Users")
+              //               .where("role", whereIn: ['Ambassador', 'Caller'])
+              //               .orderBy("createdAt", descending: true)
+              //               .snapshots(),
+              //           builder: (context, snapshot) {
+              //             if (!snapshot.hasData) {
+              //               return SizedBox(
+              //                 height: MediaQuery.of(context)
+              //                         .copyWith()
+              //                         .size
+              //                         .height -
+              //                     MediaQuery.of(context)
+              //                             .copyWith()
+              //                             .size
+              //                             .height /
+              //                         5,
+              //                 width:
+              //                     MediaQuery.of(context).copyWith().size.width,
+              //                 child: const Center(
+              //                   child: CircularProgressIndicator(
+              //                       valueColor: AlwaysStoppedAnimation(
+              //                     kPrimaryColor,
+              //                   )),
+              //                 ),
+              //               );
+              //             } else {
+              //               snapshot.data!.docs.removeWhere(
+              //                   (i) => i["uid"] == currentuserid);
+              //               allUsersList = snapshot.data!.docs;
+              //               return ListView.builder(
+              //                 padding: const EdgeInsets.only(top: 16, left: 20),
+              //                 itemCount: snapshot.data!.docs.length,
+              //                 shrinkWrap: true,
+              //                 physics: const NeverScrollableScrollPhysics(),
+              //                 itemBuilder: (context, index) {
+              //                   return Container(
+              //                     child: null,
+              //                   );
+              //                 },
+              //               );
+              //             }
+              //           },
+              //         ),
+              //       ],
+              //     ),
+              //   ],
+              // ),
             )
           : Container(),
     );

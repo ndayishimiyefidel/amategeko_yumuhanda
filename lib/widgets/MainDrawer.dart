@@ -1,8 +1,5 @@
-import 'package:amategeko/resources/user_state_methods.dart';
 import 'package:amategeko/screens/accounts/AccountSettingsPage.dart';
 import 'package:amategeko/utils/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:share_plus/share_plus.dart';
@@ -13,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../screens/Signup/signup_screen.dart';
 import '../screens/amasomo/prayer.dart';
 import '../screens/homepages/dashboard.dart';
-import '../screens/quizzes/old_quiz.dart';
 
 class MainDrawer extends StatefulWidget {
   final String? userRole;
@@ -29,7 +25,6 @@ class MainDrawer extends StatefulWidget {
 }
 
 class _MainDrawerState extends State<MainDrawer> {
-  FirebaseAuth auth = FirebaseAuth.instance;
   late SharedPreferences preferences;
 
   @override
@@ -155,14 +150,14 @@ class _MainDrawerState extends State<MainDrawer> {
           ),
           ListTile(
             onTap: () {
-              SchedulerBinding.instance.addPostFrameCallback((_) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => const OldQuiz(),
-                  ),
-                );
-              });
+              // SchedulerBinding.instance.addPostFrameCallback((_) {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //       builder: (BuildContext context) => const OldQuiz(),
+              //     ),
+              //   );
+              // });
             },
             leading: Image.asset(
               "assets/exam.png",
@@ -237,7 +232,7 @@ class _MainDrawerState extends State<MainDrawer> {
                   ),
           ),
           ListTile(
-            onTap: () => deleteUser(auth.currentUser!.uid),
+            // onTap: () => deleteUser(auth.currentUser!.uid),
             leading: IconButton(
               onPressed: () {
                 SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -298,17 +293,17 @@ class _MainDrawerState extends State<MainDrawer> {
     );
   }
 
-  Future<void> deleteUser(String docId) async {
-    await auth.currentUser!.delete().then((value) => {
-          FirebaseFirestore.instance
-              .collection("Users")
-              .doc(docId)
-              .delete()
-              .then((value) => {
-                    UserStateMethods().logoutuser(context),
-                    // ignore: avoid_print
-                    print("User deleted"),
-                  })
-        });
-  }
+  // Future<void> deleteUser(String docId) async {
+  //   await auth.currentUser!.delete().then((value) => {
+  //         FirebaseFirestore.instance
+  //             .collection("Users")
+  //             .doc(docId)
+  //             .delete()
+  //             .then((value) => {
+  //                   UserStateMethods().logoutuser(context),
+  //                   // ignore: avoid_print
+  //                   print("User deleted"),
+  //                 })
+  //       });
+  // }
 }

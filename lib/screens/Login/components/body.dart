@@ -14,6 +14,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../ads/reward_video_manager.dart';
 import '../../../backend/apis/db_connection.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
@@ -49,10 +50,19 @@ class _SignInState extends State<SignIn> {
         print("My fcm token is: $fcmToken");
       }
     });
+    RewardedVideoAdManager.loadRewardAd();
 
     // Await the retrieveDeviceId() function here
     retrieveDeviceId();
     getCurrUserId();
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
   }
 
   String? currentuserid;
@@ -89,6 +99,7 @@ class _SignInState extends State<SignIn> {
   @override
   void dispose() {
     super.dispose();
+    RewardedVideoAdManager.dispose();
   }
 
   @override
@@ -211,6 +222,7 @@ class _SignInState extends State<SignIn> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor),
                     onPressed: () {
+                      showRewardedAd();
                       loginUser();
                     },
                     child: const Text(

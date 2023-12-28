@@ -1,7 +1,9 @@
 import 'package:amategeko/backend/apis/db_connection.dart';
 import 'package:amategeko/utils/generate_code.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CourseContentList extends StatefulWidget {
@@ -30,68 +32,29 @@ class _CourseContentListState extends State<CourseContentList> {
   late String phoneNumber;
   late SharedPreferences preferences;
   bool isLoading = false;
-  AudioPlayer? _audioPlayer;
-  Duration _duration = Duration();
-  Duration _position = Duration();
-  int _currentlyPlayingIndex = -1;
+  List<AudioPlayer> _audioPlayers = [];
+  late int _currentlyPlayingIndex;
+  Stream<PositionData> get _positionDataStream {
+    final List<Stream<PositionData>> individualStreams =
+        _audioPlayers.map((audioPlayer) {
+      return Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+        audioPlayer.positionStream,
+        audioPlayer.bufferedPositionStream,
+        audioPlayer.durationStream,
+        (position, bufferedPosition, duration) =>
+            PositionData(position, bufferedPosition, duration ?? Duration.zero),
+      );
+    }).toList();
+
+    return Rx.merge<PositionData>(individualStreams);
+  }
 
   @override
   void initState() {
     super.initState();
     getCurrUser();
-    _audioPlayer = AudioPlayer();
-    if (_audioPlayer != null) {
-      _initAudioPlayer();
-    }
-  }
-
-  void _initAudioPlayer() {
-    _audioPlayer!.durationStream.listen((event) {
-      setState(() {
-        _duration = event!;
-      });
-    });
-
-    _audioPlayer!.positionStream.listen((event) {
-      setState(() {
-        _position = event;
-      });
-    });
-  }
-
-  void _playAudio(String audioUrl, int index) async {
-    try {
-      if (_audioPlayer == null) {
-        _audioPlayer = AudioPlayer();
-        _initAudioPlayer();
-      }
-
-      if (_currentlyPlayingIndex != -1) {
-        // Pause the previous audio if there is one playing
-        _audioPlayer?.pause();
-      }
-
-      // Check if _audioPlayer is still not null before attempting to setUrl
-      if (_audioPlayer != null) {
-        await _audioPlayer!.setUrl(audioUrl);
-
-        // Check if _audioPlayer is still not null before attempting to play
-        if (_audioPlayer != null) {
-          await _audioPlayer!.play();
-          setState(() {
-            _currentlyPlayingIndex = index;
-          });
-        }
-      }
-    } catch (e) {
-      print("Error playing audio: $e");
-    }
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer?.dispose();
-    super.dispose();
+    _audioPlayers = widget.audios.map((audioUrl) => AudioPlayer()).toList();
+    _currentlyPlayingIndex = -1;
   }
 
   final apiUrl = API.hostUser;
@@ -103,6 +66,11 @@ class _CourseContentListState extends State<CourseContentList> {
       currentUserPhone = preferences.getString("phone")!;
       userRole = preferences.getString("role")!;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -135,53 +103,146 @@ class _CourseContentListState extends State<CourseContentList> {
                       .map(
                         (entry) => Column(
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                _playAudio(
-                                    '${apiUrl}/${entry.value}', entry.key);
-                              },
-                              child: Text('Play Audio'),
+                            StreamBuilder<PositionData>(
+                                stream: _positionDataStream,
+                                builder: (context, snapshot) {
+                                  final positionData = snapshot.data;
+                                  return ProgressBar(
+                                    barHeight: 5,
+                                    baseBarColor: Colors.grey[600],
+                                    bufferedBarColor: Colors.grey,
+                                    progressBarColor: Colors.red,
+                                    thumbColor: Colors.blueAccent,
+                                    timeLabelTextStyle: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    progress:
+                                        positionData?.position ?? Duration.zero,
+                                    total:
+                                        positionData?.duration ?? Duration.zero,
+                                    buffered: positionData?.bufferedPosition ??
+                                        Duration.zero,
+                                    onSeek: (value) {
+                                      final newPosition = Duration(
+                                          milliseconds:
+                                              value.inMilliseconds.round());
+                                      _audioPlayers[entry.key]
+                                          .seek(newPosition);
+                                    },
+                                  );
+                                }),
+                            SizedBox(
+                              height: 10,
                             ),
-                            if (_currentlyPlayingIndex == entry.key)
-                              Slider(
-                                value: _position.inMilliseconds.toDouble(),
-                                min: 0,
-                                max: _duration.inMilliseconds.toDouble(),
-                                onChanged: (value) {
-                                  final newPosition =
-                                      Duration(milliseconds: value.toInt());
-                                  _audioPlayer!.seek(newPosition);
-                                },
-                              ),
+                            Controls(
+                              audioPlayer: _audioPlayers[entry.key],
+                              index: entry.key,
+                              apiUrl: apiUrl,
+                              audios: widget.audios,
+                              currentlyPlayingIndex: _currentlyPlayingIndex,
+                              onIndexChanged: (newIndex) {
+                                setState(() {
+                                  _currentlyPlayingIndex = newIndex;
+                                });
+                              },
+                            )
                           ],
                         ),
                       )
                       .toList(),
                 ),
           const Divider(),
-          Align(
-            alignment: Alignment.centerRight,
-            child: IconButton(
-              color: Colors.red,
-              onPressed: () async {
-                final url = API.deleteIremboUser;
-                GenerateUser.deleteUserCode(
-                  context,
-                  widget.id.toString(),
-                  url,
-                  "course deletion",
-                  "deleted successfully!",
-                );
-              },
-              icon: const Icon(
-                Icons.delete,
-                size: 30,
-                color: Colors.red,
-              ),
-            ),
-          ),
+          userRole == "Admin"
+              ? Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    color: Colors.red,
+                    iconSize: 20,
+                    onPressed: () async {
+                      final url = API.deleteContent;
+                      GenerateUser.deleteUserCode(
+                        context,
+                        widget.id.toString(),
+                        url,
+                        "course deletion",
+                        "deleted successfully!",
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.delete,
+                      size: 20,
+                      color: Colors.red,
+                    ),
+                  ),
+                )
+              : SizedBox(),
         ],
       ),
     );
   }
+}
+
+class Controls extends StatelessWidget {
+  const Controls(
+      {super.key,
+      required this.audioPlayer,
+      required this.index,
+      required this.apiUrl,
+      required this.audios,
+      required this.currentlyPlayingIndex,
+      required this.onIndexChanged});
+  final AudioPlayer audioPlayer;
+  final int index;
+  final String apiUrl;
+  final List<String> audios;
+  final int currentlyPlayingIndex;
+  final Function(int) onIndexChanged;
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<PlayerState>(
+      stream: audioPlayer.playerStateStream,
+      builder: (context, snapshot) {
+        final playerState = snapshot.data;
+        // final processingState = playerState?.processingState;
+        final playing = playerState?.playing;
+        return IconButton(
+          onPressed: () {
+            if (currentlyPlayingIndex == index) {
+              // If the same track is pressed again, toggle play/pause
+              if (playing ?? false) {
+                audioPlayer.pause();
+              } else {
+                audioPlayer.play();
+              }
+            } else {
+              // Pause the previous track and play the new one
+              audioPlayer.pause();
+              audioPlayer.setUrl('$apiUrl/${audios[index]}');
+              audioPlayer.play();
+              onIndexChanged(index); // Update the currentlyPlayingIndex
+            }
+          },
+          color: Colors.black,
+          iconSize: 50,
+          icon: Icon(
+            currentlyPlayingIndex == index && playing == true
+                ? Icons.pause_rounded
+                : Icons.play_arrow_rounded,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class PositionData {
+  const PositionData(
+    this.position,
+    this.bufferedPosition,
+    this.duration,
+  );
+  final Duration position;
+  final Duration bufferedPosition;
+  final Duration duration;
 }

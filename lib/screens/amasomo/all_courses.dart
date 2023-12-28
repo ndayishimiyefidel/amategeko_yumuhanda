@@ -1,6 +1,5 @@
 import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/amasomo/course_contents.dart';
-import 'package:amategeko/services/database_service.dart';
 import 'package:amategeko/utils/generate_code.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -30,7 +29,6 @@ class _AllCourseState extends State<AllCourse> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Stream<dynamic>? courseStream;
   bool isLoading = false;
-  DatabaseService databaseService = DatabaseService();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   //shared preferences

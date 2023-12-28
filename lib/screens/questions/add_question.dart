@@ -1,15 +1,8 @@
 import 'dart:io';
-
 import 'package:amategeko/components/text_field_container.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
-
-import '../../services/database_service.dart';
 import '../../utils/constants.dart';
-import '../quizzes/create_quiz.dart';
 
 class AddQuestion extends StatefulWidget {
   final String quizId, quizTitle;
@@ -42,7 +35,6 @@ class _AddQuestionState extends State<AddQuestion> {
   bool _isLoading = false;
 
   final picker = ImagePicker();
-  UploadTask? uploadTask;
   File? pickedFile;
 
   Future selectsFile() async {
@@ -56,148 +48,18 @@ class _AddQuestionState extends State<AddQuestion> {
     });
   }
 
-  //database service
-  DatabaseService databaseService = DatabaseService();
-
-  ///saving quiz data inside quiz
-  ///creating map data
+  
 
   @override
   void initState() {
     super.initState();
   }
 
-  uploadQuizData() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      int totQuestion = 0;
-      String refId = randomAlphaNumeric(16);
-      String filepath = 'images/$refId';
-
-      if (pickedFile == null) {
-        questionUrl = "";
-      } else {
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(pickedFile!);
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        questionUrl = downloadlink.toString();
-      }
-      Map<String, String> questionMap = {
-        "quizId": widget.quizId,
-        "question": question,
-        "option1": option1,
-        "option2": option2,
-        "option3": option3,
-        "option4": option4,
-        "correctOption": "Not Specified",
-        "quizPhotoUrl": questionUrl,
-      };
-
-      ///check whether if the quiz is not filled
-      ///using collection group
-      await FirebaseFirestore.instance
-          .collectionGroup("QNA")
-          .where("quizId", isEqualTo: widget.quizId)
-          .get()
-          .then((querySnapshot) async {
-        totQuestion = querySnapshot.size;
-
-        ///19<20
-        if (totQuestion < 20) {
-          await databaseService
-              .addQuestionData(questionMap, widget.quizId)
-              .then((value) {
-            setState(() {
-              _isLoading = false;
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: const Text("Question saved successfully"),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              _formkey.currentState!.reset();
-                              questionController.clear();
-                              option1Controller.clear();
-                              option2Controller.clear();
-                              option3Controller.clear();
-                              option4Controller.clear();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("ok"))
-                      ],
-                    );
-                  });
-            });
-          });
-        } else {
-          ///please create new quiz or exam
-          setState(() {
-            _isLoading = false;
-
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text("Quiz Filled"),
-                    content: const Text(
-                      "Every quiz must have 20 question,simply create new quiz",
-                      style: TextStyle(color: Colors.redAccent),
-                    ),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            _formkey.currentState!.reset();
-                            questionController.clear();
-                            option1Controller.clear();
-                            option2Controller.clear();
-                            option3Controller.clear();
-                            option4Controller.clear();
-                            // correctOptionController.clear();
-                            Route route = MaterialPageRoute(
-                                builder: (c) => const CreateQuiz());
-                            Navigator.of(context).push(route);
-                          },
-                          child: const Text(
-                            "Create new",
-                            style: TextStyle(color: Colors.blueAccent),
-                          ))
-                    ],
-                  );
-                });
-          });
-        }
-      });
-    }
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    // final correctOptionField = TextFieldContainer(
-    //   child: TextFormField(
-    //     autofocus: false,
-    //     controller: correctOptionController,
-    //     keyboardType: TextInputType.text,
-    //     onSaved: (value) {
-    //       correctOptionController.text = value!;
-    //     },
-    //     textInputAction: TextInputAction.next,
-    //     decoration: const InputDecoration(
-    //       hintText: "Type correct option...",
-    //       border: InputBorder.none,
-    //     ),
-    //     onChanged: (val) {
-    //       correctOption = val;
-    //     },
-    //     autovalidateMode: AutovalidateMode.disabled,
-    //     validator: (input) => input!.isEmpty ? 'Enter correct option' : null,
-    //   ),
-    // );
+   
     final questionField = TextFieldContainer(
       child: TextFormField(
         autofocus: false,
@@ -312,7 +174,7 @@ class _AddQuestionState extends State<AddQuestion> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            uploadQuizData();
+           
           },
           child: const Text(
             "SAVE QUESTION",

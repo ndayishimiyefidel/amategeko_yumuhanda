@@ -39,8 +39,15 @@ class API {
   static const deleteCourse = "$hostUser/deleteCourse.php";
   static const courseList = "$hostUser/courseList.php";
   static const uploadContent = "$hostUser/uploadContent.php";
+  static const createCourseQuiz = "$hostUser/createCourseQuiz.php";
+  //createCourseQuiz.php
   static const openCourseContent = "$hostUser/openCourseContent.php";
-
-  //courseList
-  //openCourseContent
+  //getCourseQuiz.php
+  static const getCourseQuiz = "$hostUser/getCourseQuiz.php";
+  //deleteQuestion.php
+  static const deleteQuestion = "$hostUser/deleteQuestion.php";
+  //updateCourseQuestion
+  static const updateCourseQuestion = "$hostUser/updateCourseQuestion.php";
+  //deleteContent.php
+  static const deleteContent = "$hostUser/deleteContent.php";
 }

@@ -1,13 +1,7 @@
-import 'dart:io';
-
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
-import 'package:amategeko/services/database_service.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
-
 import '../../utils/constants.dart';
 import '../homepages/notificationtab.dart';
 
@@ -35,7 +29,6 @@ class _UploadDocumentsState extends State<UploadDocuments> {
   //select file
   PlatformFile? pickedFile;
   final picker = ImagePicker();
-  UploadTask? uploadTask;
 
   Future selectsFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -49,102 +42,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
   }
 
   bool _isLoading = false;
-  DatabaseService databaseService = DatabaseService();
-
-  Future uploadDocument() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      if (pickedFile != null) {
-        print(widget.isNew);
-        String docId = randomAlphaNumeric(16);
-        String filepath = 'PdfDocuments/$docId';
-        File fileChoose = File(pickedFile!.path.toString());
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(fileChoose);
-
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        print("download link $downloadlink");
-        fileUrl = downloadlink.toString();
-
-        print("download link $fileUrl");
-        Map<String, dynamic> fileMap = {
-          "fileName": fileName,
-          "fileUrl": fileUrl,
-          "fileSize": fileSize,
-        };
-        if (widget.isNew == true) {
-          await databaseService.uploadDocsData(fileMap).then((value) {
-            setState(() {
-              _isLoading = false;
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: const Text("File Uploaded successfully"),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("ok"))
-                      ],
-                    );
-                  });
-            });
-          });
-        } else {
-          await databaseService
-              .updateDocsData(fileMap, widget.documentId)
-              .then((value) {
-            setState(() {
-              _isLoading = false;
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: const Text("File Updated successfully"),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("ok"))
-                      ],
-                    );
-                  });
-            });
-          });
-        }
-      } else {
-        setState(() {
-          _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text("Please choose"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text(
-                          "Close",
-                          style: TextStyle(
-                            color: Colors.redAccent,
-                          ),
-                        ))
-                  ],
-                );
-              });
-        });
-      }
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +56,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            uploadDocument();
+           
           },
           child: Text(
             widget.isNew == true ? "Upload Doc" : "Update Doc",

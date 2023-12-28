@@ -1,13 +1,7 @@
 import 'dart:io';
-
 import 'package:amategeko/components/text_field_container.dart';
-import 'package:amategeko/screens/quizzes/open_quiz.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
-
-import '../../services/database_service.dart';
 import '../../utils/constants.dart';
 
 class EditQuestion extends StatefulWidget {
@@ -53,7 +47,6 @@ class _EditQuestionState extends State<EditQuestion> {
   bool _isLoading = false;
 
   final picker = ImagePicker();
-  UploadTask? uploadTask;
   File? pickedFile;
 
   Future selectsFile() async {
@@ -67,77 +60,7 @@ class _EditQuestionState extends State<EditQuestion> {
     });
   }
 
-  //database service
-  DatabaseService databaseService = DatabaseService();
-
-  ///saving quiz data inside quiz
-  ///creating map data
-
-  uploadQuizData() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      String refId = randomAlphaNumeric(16);
-      String filepath = 'images/$refId';
-
-      if (pickedFile == null) {
-        questionUrl = "";
-      } else {
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(pickedFile!);
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        questionUrl = downloadlink.toString();
-      }
-      Map<String, String> questionMap = {
-        "question": questionController.text,
-        "option1": option1Controller.text,
-        "option2": option2Controller.text,
-        "option3": option3Controller.text,
-        "option4": option4Controller.text,
-        "correctOption": correctOption,
-        "quizPhotoUrl": questionUrl.isEmpty ? widget.questionUrl : questionUrl,
-      };
-
-      ///check whether if the quiz is not filled
-      await databaseService
-          .updateQuestionData(questionMap, widget.quizId, widget.question)
-          .then((value) {
-        setState(() {
-          _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text("Question changed successfully"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          _formkey.currentState!.reset();
-                          questionController.clear();
-                          option1Controller.clear();
-                          option2Controller.clear();
-                          option3Controller.clear();
-                          option4Controller.clear();
-                          Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (context) {
-                            return OpenQuiz(
-                              quizId: widget.quizId,
-                              title: widget.quizTitle,
-                              questions: const [],
-                            );
-                          }));
-                        },
-                        child: const Text("ok"))
-                  ],
-                );
-              });
-        });
-      });
-    }
-  }
-
+  
   @override
   void initState() {
     super.initState();
@@ -282,7 +205,7 @@ class _EditQuestionState extends State<EditQuestion> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            uploadQuizData();
+        
           },
           child: const Text(
             "EDIT QUESTION",

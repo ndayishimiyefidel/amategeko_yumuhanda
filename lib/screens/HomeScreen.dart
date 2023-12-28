@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison, avoid_print
 import 'package:amategeko/screens/quizzes/quizzes.dart';
 import 'package:amategeko/screens/rules/amategeko_yose.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -93,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   TextEditingController searchTextEditingController = TextEditingController();
-  Future<QuerySnapshot>? futureSearchResults;
+
   final String currentuserid;
 
   @override

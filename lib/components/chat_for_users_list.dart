@@ -1,14 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'package:amategeko/utils/generate_code.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../backend/apis/db_connection.dart';
-import '../screens/ambassador/view_referrals.dart';
 
 class ChatUsersList extends StatefulWidget {
   // final String secondaryText;
@@ -50,12 +46,10 @@ class _ChatUsersListState extends State<ChatUsersList> {
     preferences.setBool("called_${widget.userId}", true);
   }
 
-  late FirebaseFirestore firestore;
 
   @override
   void initState() {
     super.initState();
-    firestore = FirebaseFirestore.instance;
   }
 
   Future<bool?> _showCallConfirmationDialog(BuildContext context) async {
@@ -94,11 +88,11 @@ class _ChatUsersListState extends State<ChatUsersList> {
   // Method to update the call status for a user in Firestore
   Future<void> _setUserCalledStatus(bool called) async {
     try {
-      await firestore
-          .collection('Users')
-          .doc(widget.userId)
-          // ignore: avoid_print
-          .update({'called': called}).then((value) => {print("Updated")});
+      // await firestore
+      //     .collection('Users')
+      //     .doc(widget.userId)
+      //     // ignore: avoid_print
+      //     .update({'called': called}).then((value) => {print("Updated")});
     } catch (e) {
       // ignore: avoid_print
       print("Error updating user's call status: $e");
@@ -115,12 +109,12 @@ class _ChatUsersListState extends State<ChatUsersList> {
       splashColor: Colors.brown,
       onTap: () {
         if (widget.role == "Admin" || widget.role == "Ambassador") {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return ViewReferrals(
-              referralCode: widget.referralCode.toString(),
-              refUid: widget.userId,
-            );
-          }));
+          // Navigator.push(context, MaterialPageRoute(builder: (context) {
+          //   return ViewReferrals(
+          //     referralCode: widget.referralCode.toString(),
+          //     refUid: widget.userId,
+          //   );
+          // }));
         }
       },
       child: Card(
@@ -138,37 +132,36 @@ class _ChatUsersListState extends State<ChatUsersList> {
                       Text(widget.phone),
                       const SizedBox(width: 60),
                       IconButton(
-                              onPressed: () async {
-                                bool hasBeenCalled = await _hasUserBeenCalled();
-                                bool? confirmed =
-                                    await _showCallConfirmationDialog(context);
-                                if (confirmed == true) {
-                                  await FlutterPhoneDirectCaller.callNumber(
-                                      widget.phone);
-                                  if (!hasBeenCalled) {
-                                    await _setUserCalled();
-                                  } else {
-                                    await _setUserCalledStatus(true);
-                                  }
-                                  setState(
-                                      () {}); // Update the state to reflect the change
-                                }
-                              },
-                              icon: FutureBuilder<bool>(
-                                future: _hasUserBeenCalled(),
-                                builder: (context, snapshot) {
-                                  final hasBeenCalled = snapshot.data ?? false;
-                                  final callColor = hasBeenCalled
-                                      ? Colors.grey
-                                      : Colors.blueAccent;
-                                  return Icon(
-                                    Icons.call,
-                                    size: 30,
-                                    color: callColor,
-                                  );
-                                },
-                              ),
-                            ),
+                        onPressed: () async {
+                          bool hasBeenCalled = await _hasUserBeenCalled();
+                          bool? confirmed =
+                              await _showCallConfirmationDialog(context);
+                          if (confirmed == true) {
+                            await FlutterPhoneDirectCaller.callNumber(
+                                widget.phone);
+                            if (!hasBeenCalled) {
+                              await _setUserCalled();
+                            } else {
+                              await _setUserCalledStatus(true);
+                            }
+                            setState(
+                                () {}); // Update the state to reflect the change
+                          }
+                        },
+                        icon: FutureBuilder<bool>(
+                          future: _hasUserBeenCalled(),
+                          builder: (context, snapshot) {
+                            final hasBeenCalled = snapshot.data ?? false;
+                            final callColor =
+                                hasBeenCalled ? Colors.grey : Colors.blueAccent;
+                            return Icon(
+                              Icons.call,
+                              size: 30,
+                              color: callColor,
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   Text(

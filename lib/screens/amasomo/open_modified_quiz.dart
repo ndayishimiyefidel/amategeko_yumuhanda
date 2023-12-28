@@ -1,16 +1,17 @@
 import 'dart:async';
-
+import 'package:amategeko/utils/generate_code.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:amategeko/enume/models/question_model.dart';
-import 'package:amategeko/screens/amasomo/play_modified_quiz.dart';
 import 'package:amategeko/screens/quizzes/result_screen.dart';
-import 'package:amategeko/services/database_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/count_down.dart';
+import '../../widgets/play_quiz_widget.dart';
 import '../homepages/noficationtab1.dart';
 import 'edit_quiz_question.dart';
 
@@ -21,7 +22,8 @@ class OpenModifiedQuiz extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables
   final quizNumber;
 
-  const OpenModifiedQuiz({super.key, required this.courseId, this.title, this.quizNumber});
+  const OpenModifiedQuiz(
+      {super.key, required this.courseId, this.title, this.quizNumber});
 
   @override
   State<OpenModifiedQuiz> createState() => _OpenModifiedQuizState();
@@ -39,57 +41,97 @@ String qn = "";
 String correctOp = "";
 String questionImgUrl = "";
 bool ans = false;
+String id = "";
 
 class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
-     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  
-  DatabaseService databaseService = DatabaseService();
-  QuerySnapshot? questionSnapshot;
+
   late AnimationController _controller;
   final limitTime = 1200;
   int currentPageIndex = 0;
+  List<Map<String, dynamic>> allQuestionList = [];
 
-  QuestionModel getQuestionModelFromDatasnapshot(
-      DocumentSnapshot questionSnapshot) {
-    QuestionModel questionModel =
-        QuestionModel(qn, op1, op2, op3, op4, correctOp, ans, questionImgUrl);
-    questionModel.question = questionSnapshot['question'];
-    questionModel.questionImgUrl = questionSnapshot['quizPhotoUrl'];
+  Future<void> fetchAlCourseQuestion() async {
+    final apiUrl = API.getCourseQuiz + "?courseId=${widget.courseId}";
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("Response data:$data");
+
+        if (data['success'] == true) {
+          if (!mounted) return;
+          setState(() {
+            allQuestionList.clear();
+            allQuestionList
+                .addAll(List<Map<String, dynamic>>.from(data['data']));
+            print("allQuestionList: $allQuestionList");
+          });
+        } else {
+          print("Failed to execute query");
+        }
+      } else {
+        throw Exception('Failed to load data from the API');
+      }
+    } catch (e) {
+      print("Error occurs: $e");
+    }
+  }
+
+  QuestionModel getQuestionModelFromList(int index) {
+    QuestionModel questionModel = QuestionModel(
+      qn,
+      op1,
+      op2,
+      op3,
+      op4,
+      correctOp,
+      ans,
+      questionImgUrl,
+      id,
+    );
+
+    questionModel.question = allQuestionList[index]['question'];
+    questionModel.questionImgUrl = allQuestionList[index]['quizPhotoUrl'];
+    questionModel.id = allQuestionList[index]['id'];
+
     List<String> options = [
-      questionSnapshot["option1"],
-      questionSnapshot["option2"],
-      questionSnapshot["option3"],
-      questionSnapshot["option4"],
+      allQuestionList[index]["option1"],
+      allQuestionList[index]["option2"],
+      allQuestionList[index]["option3"],
+      allQuestionList[index]["option4"],
     ];
-    //options.shuffle(); //random question
+
+    // Shuffle options if needed
+    // options.shuffle();
+
     questionModel.option1 = options[0];
     questionModel.option2 = options[1];
     questionModel.option3 = options[2];
     questionModel.option4 = options[3];
-    questionModel.correctOption = questionSnapshot["correctAnswer"];
+
+    questionModel.correctOption = allQuestionList[index]["correctAnswer"];
     questionModel.answered = false;
+
     return questionModel;
   }
 
-bool btnPressed = false;
-late PageController _controller1;
+  bool btnPressed = false;
+  late PageController _controller1;
   String btnText = "Next";
   String btnTextPrevious = "Previous";
   bool answered = false;
 
   @override
   void initState() {
+    fetchAlCourseQuestion();
     _controller1 = PageController(initialPage: 0);
-    databaseService.getModifiedQuizQuestion(widget.courseId).then((value) {
-      questionSnapshot = value;
-      _notAttempted = 0;
-      _correct = 0;
-      _incorrect = 0;
-      total = questionSnapshot!.docs.length;
-      setState(() {});
-    });
+    _notAttempted = 0;
+    _correct = 0;
+    _incorrect = 0;
     _controller = AnimationController(
         vsync: this, duration: Duration(seconds: limitTime));
     _controller.addListener(() {
@@ -110,16 +152,15 @@ late PageController _controller1;
     super.initState();
   }
 
-
   // onPressed callback for the "Next" button.
   void onNextPressed() {
-    if (currentPageIndex < (questionSnapshot?.docs.length ?? 0) - 1) {
-      // If there are more questions, move to the next question.
+    if (currentPageIndex < (allQuestionList.length) - 1) {
       currentPageIndex++;
       if (kDebugMode) {
         print("current page $currentPageIndex");
       }
-      if (currentPageIndex == 4) { //show ads on question 10
+      if (currentPageIndex == 4) {
+        //show ads on question 10
         _controller1.animateToPage(
           currentPageIndex, // Use the updated index
           duration: const Duration(milliseconds: 250),
@@ -131,7 +172,7 @@ late PageController _controller1;
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInExpo,
       );
-      if (currentPageIndex == (questionSnapshot?.docs.length)! - 1) {
+      if (currentPageIndex == (allQuestionList.length) - 1) {
         setState(() {
           btnText = "Soza Quiz";
         });
@@ -173,7 +214,6 @@ late PageController _controller1;
       });
     }
   }
-
 
   @override
   void dispose() {
@@ -217,151 +257,135 @@ late PageController _controller1;
         ],
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 35, top: 10),
-                child: Text(
-                  "TQ:${questionSnapshot == null ? 0 : questionSnapshot!.docs.length} question(s)",
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(
-                    fontSize: 25,
-                    color: kPrimaryColor,
-                    fontWeight: FontWeight.bold,
+      body: allQuestionList.isNotEmpty
+          ? Stack(
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 35, top: 10),
+                      child: Text(
+                        "TQ:${allQuestionList.isEmpty ? 0 : allQuestionList.length} question(s)",
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: kPrimaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20, top: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Icon(
+                        Icons.punch_clock,
+                        size: 30,
+                        color: kPrimaryColor,
+                      ),
+                      Countdown(
+                          animation: StepTween(begin: limitTime, end: 0)
+                              .animate(_controller)),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const Icon(
-                  Icons.punch_clock,
-                  size: 40,
-                  color: kPrimaryColor,
-                ),
-                Countdown(
-                    animation: StepTween(begin: limitTime, end: 0)
-                        .animate(_controller)),
-              ],
-            ),
-          ),
-
-            FutureBuilder<QuerySnapshot>(
-              future: FirebaseFirestore.instance
-                  .collection("courses")
-                  .doc(widget.courseId)
-                  .collection("courseQuiz")
-                  .get(),
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return const CircularProgressIndicator();
-                default:
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return PageView.builder(
-                        controller: _controller1,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: questionSnapshot?.docs.length ?? 0,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, right: 20, top: 80),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                PageView.builder(
+                    controller: _controller1,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: allQuestionList.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(left: 20, right: 20, top: 80),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ModifiedQuizPlayTile(
+                                questionModel: getQuestionModelFromList(index),
+                                index: index,
+                                quizId: widget.courseId,
+                                quizTitle: "Testing Quiz",
+                              ),
+                              const SizedBox(
+                                height: 20.0,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                   ModifiedQuizPlayTile(
-                                      questionModel:
-                                          getQuestionModelFromDatasnapshot(
-                                              questionSnapshot!.docs[currentPageIndex]),
-                                      index: currentPageIndex,
-                                      quizId: widget.courseId,
-                                      quizTitle: "Testing Quiz",
+                                  RawMaterialButton(
+                                    onPressed: onPreviousPressed,
+                                    shape: const StadiumBorder(),
+                                    fillColor: Colors.blue,
+                                    padding: const EdgeInsets.all(14.0),
+                                    elevation: 0.0,
+                                    child: Text(
+                                      btnTextPrevious,
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 18),
                                     ),
-                                  const SizedBox(
-                                    height: 20.0,
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      RawMaterialButton(
-                                        onPressed: onPreviousPressed,
-                                        shape: const StadiumBorder(),
-                                        fillColor: Colors.blue,
-                                        padding: const EdgeInsets.all(14.0),
-                                        elevation: 0.0,
-                                        child: Text(
-                                          btnTextPrevious,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18),
-                                        ),
-                                      ),
-                                      RawMaterialButton(
-                                        onPressed: onNextPressed,
-                                        shape: const StadiumBorder(),
-                                        fillColor: Colors.blue,
-                                        padding: const EdgeInsets.all(14.0),
-                                        elevation: 0.0,
-                                        child: Text(
-                                          btnText,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
+                                  RawMaterialButton(
+                                    onPressed: onNextPressed,
+                                    shape: const StadiumBorder(),
+                                    fillColor: Colors.blue,
+                                    padding: const EdgeInsets.all(14.0),
+                                    elevation: 0.0,
+                                    child: Text(
+                                      btnText,
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 18),
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        });
-                  }
-              }
-            }),
-        ],
-      ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+              ],
+            )
+          : Container(
+              child: Center(child: Text("No quiz available for this course")),
+            ),
 
       //floating action button
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: kPrimaryLightColor,
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Results(
-                  correct: _correct, incorrect: _incorrect, total: total),
-            ),
-          );
-        },
-        label: const Text(
-          "Soza Imyitozo",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-      ),
+      floatingActionButton: allQuestionList.isNotEmpty
+          ? FloatingActionButton.extended(
+              backgroundColor: kPrimaryLightColor,
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Results(
+                        correct: _correct, incorrect: _incorrect, total: total),
+                  ),
+                );
+              },
+              label: const Text(
+                "Soza Imyitozo",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            )
+          : SizedBox(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
@@ -386,11 +410,15 @@ class ModifiedQuizPlayTile extends StatefulWidget {
 
 class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
   String optionSelected = "";
+  bool hasInternetConnection = true;
+  bool isInCorrectOption = false;
   bool _isLoading = false;
+  final apiUrl = API.hostUser;
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    Color backgroundColor = Colors.white;
     return Padding(
       padding: const EdgeInsets.only(top: 0),
       child: Column(
@@ -435,81 +463,74 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                   (widget.questionModel.questionImgUrl.isEmpty)
                       ? Container()
                       : Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Material(
-                              // display new updated image
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(5)),
-                              clipBehavior: Clip.hardEdge,
-                              // display new updated image
-                              child: Image.network(
-                                widget.questionModel.questionImgUrl,
-                                width: size.width * 0.5,
-                                height: size.height * 0.2,
-                                fit: BoxFit.cover,
-                              )),
-                        ],
-                      ),
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Material(
+                                // display new updated image
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(5)),
+                                clipBehavior: Clip.hardEdge,
+                                // display new updated image
+                                child: Image.network(
+                                  apiUrl +
+                                      "/${widget.questionModel.questionImgUrl}",
+                                  width: size.width * 0.5,
+                                  height: size.height * 0.2,
+                                  fit: BoxFit.cover,
+                                )),
+                          ],
+                        ),
                 ],
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () {
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: Icon(Icons.check),
+            description: widget.questionModel.option1,
+            optionSelected: optionSelected,
+            onPressed: () {
               if (!widget.questionModel.answered) {
-                //check correct
+                // Check if the selected option is correct
                 if (widget.questionModel.option1 ==
                     widget.questionModel.correctOption) {
                   optionSelected = widget.questionModel.option1;
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option1;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
-
-                  setState(() {});
+                  if (!mounted) return;
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                if (!mounted) return;
+                setState(() {
+                  // Set the background color of the OptionTile
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionModifiedTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(
-                (Icons.check),
-              ),
-              description: widget.questionModel.option1,
-              optionSelected: optionSelected,
-            ),
+            backgroundColor: backgroundColor, // Pass the background color here
           ),
           SizedBox(
             height: size.height * 0.01,
           ),
-          GestureDetector(
-            onTap: () {
-              print("correct option: ${widget.questionModel.correctOption}");
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: const Icon(
+              (Icons.check),
+            ),
+            description: widget.questionModel.option2,
+            optionSelected: optionSelected,
+            onPressed: () {
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option2 ==
@@ -518,47 +539,39 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option2;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
-                  setState(() {});
+                  if (!mounted) return;
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                if (!mounted) return;
+                setState(() {
+                  // Set the background color of the OptionTile
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionModifiedTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(Icons.check),
-              description: widget.questionModel.option2,
-              optionSelected: optionSelected,
-            ),
+            backgroundColor: backgroundColor,
           ),
           const SizedBox(
             height: 5,
           ),
-          GestureDetector(
-            onTap: () {
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: const Icon(
+              (Icons.check),
+            ),
+            description: widget.questionModel.option3,
+            optionSelected: optionSelected,
+            onPressed: () {
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option3 ==
@@ -567,46 +580,37 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option3;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
+                  if (!mounted) return;
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                if (!mounted) return;
+                setState(() {
+                  // Set the background color of the OptionTile
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionModifiedTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(Icons.check),
-              description: widget.questionModel.option3,
-              optionSelected: optionSelected,
-            ),
+            backgroundColor: backgroundColor,
           ),
           const SizedBox(
             height: 5,
           ),
-          GestureDetector(
-            onTap: () {
+          OptionTile(
+            correctAnswer: widget.questionModel.correctOption,
+            option: const Icon(
+              (Icons.check),
+            ),
+            onPressed: () {
               if (!widget.questionModel.answered) {
                 //check correct
                 if (widget.questionModel.option4 ==
@@ -615,44 +619,41 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
                   widget.questionModel.answered = true;
                   _correct = _correct + 1;
                   _notAttempted = _notAttempted - 1;
-                  setState(() {});
                 } else {
                   optionSelected = widget.questionModel.option4;
                   widget.questionModel.answered = true;
                   _incorrect = _incorrect + 1;
                   _notAttempted = _notAttempted - 1;
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(
-                            "Igisubizo cy'ukuri: ${widget.questionModel.correctOption}",
-                            style: const TextStyle(
-                                color: Colors.green, fontSize: 18),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Close"))
-                          ],
-                        );
-                      });
-                  setState(() {});
+                  if (!mounted) return;
+                  setState(() {
+                    isInCorrectOption = true;
+                  });
                 }
+                if (!mounted) return;
+                setState(() {
+                  backgroundColor =
+                      optionSelected == widget.questionModel.correctOption
+                          ? Colors.green.withOpacity(0.7)
+                          : Colors.red.withOpacity(0.7);
+                });
               }
             },
-            child: OptionModifiedTile(
-              correctAnswer: widget.questionModel.correctOption,
-              option: const Icon(Icons.check),
-              description: widget.questionModel.option4,
-              optionSelected: optionSelected,
-            ),
+            description: widget.questionModel.option4,
+            optionSelected: optionSelected,
+            backgroundColor: backgroundColor,
           ),
           const SizedBox(
             height: 20,
           ),
+          isInCorrectOption
+              ? Text(
+                  "Igisubizo cy'ukuri ni: ${widget.questionModel.correctOption}",
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold),
+                )
+              : SizedBox(),
           // Text(answerCorrect),
         ],
       ),
@@ -676,7 +677,8 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
           MaterialPageRoute(
             builder: (context) {
               return Edit1Question(
-                quizId: widget.quizId,
+                id: widget.questionModel.id.toString(),
+                courseId: widget.quizId,
                 question: widget.questionModel.question,
                 questionUrl: widget.questionModel.questionImgUrl,
                 option1: widget.questionModel.option1,
@@ -707,42 +709,11 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
         setState(() {
           _isLoading = true;
         });
-        deleteDoc(widget.quizId, widget.questionModel.question);
+        final deleteApiUrl = API.deleteQuestion;
+        GenerateUser.deleteUserCode(context, widget.questionModel.id.toString(),
+            deleteApiUrl, "quiz 1", "question deleted successfully");
       },
     );
-  }
-
-  Future<void> deleteDoc(String docId, String question) async {
-    await FirebaseFirestore.instance
-        .collection("courses")
-        .doc(docId)
-        .collection("courseQuiz")
-        .where("question", isEqualTo: question)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        doc.reference.delete().then((value) {
-          //question delete
-          setState(() {
-            _isLoading = false;
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text("question deleted successfully"),
-                    actions: [
-                      TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text("ok"))
-                    ],
-                  );
-                });
-          });
-        });
-      }
-    });
   }
 
   //shared preferences

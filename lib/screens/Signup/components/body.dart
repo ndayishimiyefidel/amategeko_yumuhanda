@@ -10,6 +10,7 @@ import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../ads/interestial_ad.dart';
 import '../../../components/text_field_container.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
@@ -43,6 +44,7 @@ class _SignUpState extends State<SignUp> {
   bool isloading = false;
   final userRole = "User";
   String? deviceId;
+  final InterestialAds adManager = InterestialAds();
 
   @override
   void initState() {
@@ -50,8 +52,11 @@ class _SignUpState extends State<SignUp> {
     _messaging.getToken().then((value) {
       fcmToken = value;
     });
+    //loads ads
+    adManager.loadInterstitialAd();
 
     retrieveDeviceId();
+    getCurrUserId();
   }
 
   String? currentuserid;
@@ -471,6 +476,8 @@ class _SignUpState extends State<SignUp> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: kPrimaryColor),
                       onPressed: () {
+                        //showInterstitialAd
+                        adManager.showInterstitialAd();
                         if (phoneNumber == password) {
                           _registerUser();
                         } else {

@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,7 +12,6 @@ import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
 import '../../Login/components/check_deviceid.dart';
 import '../../Signup/components/background.dart';
-import '../ambassador.dart';
 
 class SignUpAmbassador extends StatefulWidget {
   const SignUpAmbassador({super.key});
@@ -38,7 +34,6 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
   String name = "", phoneNumber = "", emailAddress = "", password = "";
 
   late SharedPreferences preferences;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isloading = false;
   late bool _passwordVisible;
   String userRole = "";
@@ -92,106 +87,6 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
   }
 
   String? selectedUserRole;
-
-  void _registerUser() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        isloading = true;
-      });
-
-      if (selectedUserRole == "Ambassador") {
-        referralCode = await generateReferralCode();
-      }
-      preferences = await SharedPreferences.getInstance();
-      var firebaseUser = FirebaseAuth.instance.currentUser;
-
-      final QuerySnapshot checkToken = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("deviceId", isEqualTo: deviceId)
-          .where("password", isEqualTo: password.toString().trim())
-          .get();
-      final List<DocumentSnapshot> document = checkToken.docs;
-      // Generate a random email based on the user's name
-      String randomEmail =
-          generateRandomEmail(nameEditingController.text.toString().trim());
-
-      if (document.isEmpty) {
-        await _auth
-            .createUserWithEmailAndPassword(
-                email: randomEmail, password: password.toString().trim())
-            .then((auth) async {
-          firebaseUser = auth.user;
-        }).catchError((err) {
-          setState(() {
-            isloading = false;
-          });
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(err.message)));
-        });
-
-        if (firebaseUser != null) {
-          final QuerySnapshot result = await FirebaseFirestore.instance
-              .collection("Users")
-              .where("uid", isEqualTo: firebaseUser!.uid)
-              .get();
-
-          final List<DocumentSnapshot> documents = result.docs;
-          if (documents.isEmpty) {
-            FirebaseFirestore.instance
-                .collection("Users")
-                .doc(firebaseUser!.uid)
-                .set({
-              "uid": firebaseUser!.uid,
-              "email": firebaseUser!.email,
-              "name": name.toString().trim(),
-              "phone": phoneNumber.trim(),
-              "password": password.trim(),
-              "photoUrl": defaultPhotoUrl,
-              "createdAt": DateTime.now().millisecondsSinceEpoch.toString(),
-              "state": 1,
-              "role": selectedUserRole,
-              "fcmToken": fcmToken,
-              "deviceId": deviceId,
-              "referralCode": referralCode
-            });
-          } else {
-            //get user detail for current user
-            setState(() {
-              isloading = false;
-            });
-            Fluttertoast.showToast(
-                msg: "Account with this credentials is already created");
-          }
-
-          setState(() {
-            isloading = false;
-          });
-          Fluttertoast.showToast(msg: "User created successfully");
-          Route route =
-              MaterialPageRoute(builder: (c) => const AllAmbassadors());
-          // ignore: use_build_context_synchronously
-          Navigator.push(context, route);
-        } else {
-          setState(() {
-            isloading = false;
-          });
-          Fluttertoast.showToast(msg: "Sign up Failed");
-        }
-      } else {
-        ///device already exists
-
-        setState(() {
-          isloading = false;
-        });
-        Fluttertoast.showToast(
-            textColor: Colors.red,
-            fontSize: 18,
-            msg:
-                "Device Already registered in the app, please contact the administrator");
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -382,7 +277,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                           backgroundColor: kPrimaryColor),
                       onPressed: () {
                         if (phoneNumber == password) {
-                          _registerUser();
+                          // _registerUser();
                         } else {
                           Fluttertoast.showToast(
                               msg: "Phone number must be the same!");

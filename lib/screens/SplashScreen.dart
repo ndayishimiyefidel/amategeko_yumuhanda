@@ -59,12 +59,13 @@ class _SplashScreenState extends State<SplashScreen>
       } catch (e) {
         print("Error: $e");
       }
-
+      if (!mounted) return;
       setState(() {
         isAlreadyLoggedIn = true;
         preferences.setString("fcmToken", fcmToken!);
       });
     } else {
+      if (!mounted) return;
       setState(() {
         isAlreadyLoggedIn = false;
       });

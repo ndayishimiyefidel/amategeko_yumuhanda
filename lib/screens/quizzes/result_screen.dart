@@ -2,6 +2,7 @@ import 'package:amategeko/screens/quizzes/exams.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
 import '../homepages/notificationtab.dart';
 
@@ -9,7 +10,10 @@ class Results extends StatefulWidget {
   final int correct, incorrect, total;
 
   const Results(
-      {super.key, required this.correct, required this.incorrect, required this.total});
+      {super.key,
+      required this.correct,
+      required this.incorrect,
+      required this.total});
 
   @override
   State<Results> createState() => _ResultsState();
@@ -18,7 +22,6 @@ class Results extends StatefulWidget {
 class _ResultsState extends State<Results> {
   //check whether the person is failed or not
   String status = "";
-  
 
   _checkFailed() {
     // double pass = (widget.correct + widget.incorrect) / 2 + 2;
@@ -39,6 +42,21 @@ class _ResultsState extends State<Results> {
   void initState() {
     super.initState();
     _checkFailed();
+    RewardedVideoAdManager.loadRewardAd();
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  @override
+  void dispose() {
+    RewardedVideoAdManager.dispose();
+    super.dispose();
   }
 
   @override
@@ -120,6 +138,7 @@ class _ResultsState extends State<Results> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  showRewardedAd();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Exams()));
                 },

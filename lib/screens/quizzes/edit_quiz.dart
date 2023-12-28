@@ -1,17 +1,12 @@
 import 'dart:io';
-
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/quizzes/quizzes.dart';
-import 'package:amategeko/services/database_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../utils/constants.dart';
 import '../homepages/notificationtab.dart';
-import '../questions/add_question.dart';
 
 class EditQuiz extends StatefulWidget {
   final String quizId, quizTitle, quizType, quizImage, quizDesc, quizPrice;
@@ -45,7 +40,6 @@ class _EditQuizState extends State<EditQuiz> {
   String _selectedtype = "";
 
   final picker = ImagePicker();
-  UploadTask? uploadTask;
   File? pickedFile;
 
   Future selectsFile() async {
@@ -79,59 +73,9 @@ class _EditQuizState extends State<EditQuiz> {
   } //database service
   bool _isLoading = false;
   final bool isNew = true;
-  DatabaseService databaseService = DatabaseService();
-  final _firestore = FirebaseFirestore.instance;
 
-  Future editOnlineQuiz() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      quizId = widget.quizId;
-      String filepath = 'images/$quizId';
-      // final file = File(pickedFile!.path!);
 
-      if (pickedFile == null) {
-        quizUrl = widget.quizImage;
-      } else {
-        final refs = FirebaseStorage.instance.ref().child(filepath);
-        uploadTask = refs.putFile(pickedFile!);
 
-        final snapshot = await uploadTask!.whenComplete(() {});
-        final downloadlink = await snapshot.ref.getDownloadURL();
-        quizUrl = downloadlink.toString();
-      }
-
-      Map<String, String> quizMap = {
-        "quizTitle": quiztitleController.text,
-        "quizImgUrl": quizUrl.isEmpty ? widget.quizImage : quizUrl,
-        "quizType": _selectedtype.isEmpty ? widget.quizType : _selectedtype,
-        "quizDesc": quizdescController.text,
-        "quizPrice": quizPriceController.text
-      };
-      await _firestore
-          .collection("Quizmaker")
-          .doc(widget.quizId)
-          .update(quizMap)
-          .then((value) {
-        setState(() {
-          _isLoading = false;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return AddQuestion(
-                  quizId: quizId,
-                  quizTitle: quizTitle,
-                  isNew: isNew,
-                );
-              },
-            ),
-          );
-        });
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +188,7 @@ class _EditQuizState extends State<EditQuiz> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            editOnlineQuiz();
+          
           },
           child: const Text(
             "EDIT QUIZ",

@@ -1,10 +1,8 @@
-import '../../../services/auth.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
 import '../../Login/login_screen.dart';
 import '../../../widgets/ProgressWidget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:amategeko/screens/Signup/signup_screen.dart';
@@ -25,9 +23,7 @@ class _ForgotState extends State<Forgot> {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   String? fcmToken;
   TextEditingController emailEditingController = TextEditingController();
-  final AuthService _authService = AuthService();
   bool isLoading = false;
-  final _firestore = FirebaseFirestore.instance;
   String emailAddress = "";
 
   @override
@@ -173,75 +169,73 @@ class _ForgotState extends State<Forgot> {
       });
       preferences = await SharedPreferences.getInstance();
 
-
-      await _firestore
-          .collection('Users')
-          .where('email', isEqualTo: emailAddress)
-          .get()
-          .then((value) async {
-        if (value.size == 1) {
-          _authService.forgotPassword(emailAddress).then((value) {
-            setState(() {
-              isLoading = false;
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      content: const Text(
-                        "Reset Password Link sent successfully to your email,please check it",
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 14,
-                        ),
-                      ),
-                      actions: [
-                        ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                isLoading = false;
-                              });
-                              Navigator.of(context).pop();
-                              _formkey.currentState!.reset();
-                              emailEditingController.clear();
-                            },
-                            child: const Text("Ok"))
-                      ],
-                    );
-                  });
-            });
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: const Text(
-                      "Email does not exist, please double check your email and try again",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 14,
-                      ),
-                    ),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              isLoading = false;
-                            });
-                            Navigator.of(context).pop();
-                            _formkey.currentState!.reset();
-                            emailEditingController.clear();
-                          },
-                          child: const Text("Close"))
-                    ],
-                  );
-                });
-          });
-        }
-      });
+      // await _firestore
+      //     .collection('Users')
+      //     .where('email', isEqualTo: emailAddress)
+      //     .get()
+      //     .then((value) async {
+      //   if (value.size == 1) {
+      //     _authService.forgotPassword(emailAddress).then((value) {
+      //       setState(() {
+      //         isLoading = false;
+      //         showDialog(
+      //             context: context,
+      //             builder: (context) {
+      //               return AlertDialog(
+      //                 content: const Text(
+      //                   "Reset Password Link sent successfully to your email,please check it",
+      //                   style: TextStyle(
+      //                     color: Colors.green,
+      //                     fontSize: 14,
+      //                   ),
+      //                 ),
+      //                 actions: [
+      //                   ElevatedButton(
+      //                       onPressed: () {
+      //                         setState(() {
+      //                           isLoading = false;
+      //                         });
+      //                         Navigator.of(context).pop();
+      //                         _formkey.currentState!.reset();
+      //                         emailEditingController.clear();
+      //                       },
+      //                       child: const Text("Ok"))
+      //                 ],
+      //               );
+      //             });
+      //       });
+      //     });
+      //   } else {
+      //     setState(() {
+      //       isLoading = false;
+      //       showDialog(
+      //           context: context,
+      //           builder: (context) {
+      //             return AlertDialog(
+      //               content: const Text(
+      //                 "Email does not exist, please double check your email and try again",
+      //                 style: TextStyle(
+      //                   color: Colors.red,
+      //                   fontSize: 14,
+      //                 ),
+      //               ),
+      //               actions: [
+      //                 ElevatedButton(
+      //                     onPressed: () {
+      //                       setState(() {
+      //                         isLoading = false;
+      //                       });
+      //                       Navigator.of(context).pop();
+      //                       _formkey.currentState!.reset();
+      //                       emailEditingController.clear();
+      //                     },
+      //                     child: const Text("Close"))
+      //               ],
+      //             );
+      //           });
+      //     });
+      //   }
+      // });
     }
   }
 }

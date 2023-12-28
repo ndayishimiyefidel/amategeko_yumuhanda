@@ -1,9 +1,6 @@
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/groups/group_list.dart';
-import 'package:amategeko/services/database_service.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
-
 import '../../utils/constants.dart';
 import '../homepages/notificationtab.dart';
 
@@ -38,43 +35,9 @@ class _CreateGroupState extends State<CreateGroup> {
   //database service
   bool _isLoading = false;
   final bool isNew = true;
-  DatabaseService databaseService = DatabaseService();
 
-  Future createquizOnline() async {
-    if (_formkey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      String groupId = randomAlphaNumeric(16);
 
-      Map<String, String> groupMap = {
-        "quizId": groupId,
-        "groupName": groupName,
-        "linkUrl": linkUrl,
-        "groupType": _selectedType,
-        "groupPrice": groupPrice
-      };
-      await databaseService.uploadGroupData(groupMap).then((value) {
-        setState(() {
-          _isLoading = false;
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text("Group created successfully"),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
-        });
-      });
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +154,7 @@ class _CreateGroupState extends State<CreateGroup> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
           onPressed: () {
-            createquizOnline();
+          
           },
           child: const Text(
             "CREATE GROUP",
