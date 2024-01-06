@@ -477,7 +477,7 @@ class _SignUpState extends State<SignUp> {
                           backgroundColor: kPrimaryColor),
                       onPressed: () {
                         //showInterstitialAd
-                        adManager.showInterstitialAd();
+                        // adManager.showInterstitialAd();
                         if (phoneNumber == password) {
                           _registerUser();
                         } else {

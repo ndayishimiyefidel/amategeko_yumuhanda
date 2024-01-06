@@ -15,7 +15,8 @@ class MainDrawer extends StatefulWidget {
   final String? userRole;
   final String? referralCode;
 
-  const MainDrawer({super.key, 
+  const MainDrawer({
+    super.key,
     this.userRole,
     this.referralCode,
   });
@@ -37,7 +38,7 @@ class _MainDrawerState extends State<MainDrawer> {
     try {
       Uri? initialLink = Uri.parse(getInitialLink().toString());
       handleDeepLink(initialLink);
-    
+
       uriLinkStream.listen((Uri? uri) {
         if (uri != null) {
           handleDeepLink(uri);

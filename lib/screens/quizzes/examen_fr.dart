@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
-import 'new_quiz _english.dart';
+import 'new_quiz_fr.dart';
 
-class ExamEnglish extends StatefulWidget {
-  const ExamEnglish({super.key});
+class ExamFrench extends StatefulWidget {
+  const ExamFrench({super.key});
 
   @override
-  State createState() => _ExamEnglishState();
+  State createState() => _ExamFrenchState();
 }
 
-class _ExamEnglishState extends State<ExamEnglish>
+class _ExamFrenchState extends State<ExamFrench>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class _ExamEnglishState extends State<ExamEnglish>
       ),
       appBar: AppBar(
         title: const Text(
-          "Exam English",
+          "Examen Francais",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -46,7 +46,7 @@ class _ExamEnglishState extends State<ExamEnglish>
         ),
         actions: [
           CustomButton(
-            text: "Rules",
+            text: "règles",
             onPressed: () {
               Navigator.push(
                 context,
@@ -61,7 +61,7 @@ class _ExamEnglishState extends State<ExamEnglish>
         backgroundColor: kPrimaryColor,
         elevation: 0.0,
       ),
-      body: const NewQuizEnglish(),
+      body: const NewQuizFrench(),
     );
   }
 

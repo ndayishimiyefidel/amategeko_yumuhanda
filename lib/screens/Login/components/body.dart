@@ -222,7 +222,7 @@ class _SignInState extends State<SignIn> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor),
                     onPressed: () {
-                      showRewardedAd();
+                    //  showRewardedAd();
                       loginUser();
                     },
                     child: const Text(
@@ -452,101 +452,5 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  // void loginUser() async {
-  //   if (_formKey.currentState!.validate()) {
-  //     setState(() {
-  //       isLoading = true;
-  //     });
-  //     preferences = await SharedPreferences.getInstance();
-  //     FirebaseFirestore.instance
-  //         .collection("Users")
-  //         .where("password", isEqualTo: password)
-  //         .get()
-  //         .then((QuerySnapshot querySnapshot) async {
-  //       if (querySnapshot.size > 0) {
-  //         var firstDoc = querySnapshot.docs.last;
-  //         if (firstDoc.data() != null) {
-  //           Map<String, dynamic> data = firstDoc.data() as Map<String, dynamic>;
 
-  //           String userRole = data['role'];
-
-  //           if (data.containsKey('role') &&
-  //               (data['role'] == "Admin" ||
-  //                   data['role'] == "Ambassador" ||
-  //                   data['role'] == "Caller")) {
-  //             await preferences.setString("uid", data["uid"]);
-  //             await preferences.setString("name", data["name"]);
-  //             await preferences.setString("photo", data["photoUrl"]);
-  //             await preferences.setString("email", data["userEmail"]);
-  //             await preferences.setString("role", data["role"]);
-  //             await preferences.setString("phone", data["phone"]);
-
-  //             setState(() {
-  //               isLoading = false;
-  //               isLoggedIn = true; // Update login state
-  //             });
-  //             preferences.setBool('isLoggedIn', isLoggedIn);
-  //             Route route = MaterialPageRoute(
-  //               builder: (c) => HomeScreen(
-  //                 currentuserid: data["uid"],
-  //                 userRole: userRole,
-  //               ),
-  //             );
-  //             setState(() {
-  //               Navigator.push(context, route);
-  //             });
-  //           } else {
-  //             if (data.containsKey("deviceId") &&
-  //                 data["deviceId"] == deviceId) {
-  //               await preferences.setString("uid", data["uid"]);
-  //               await preferences.setString("name", data["name"]);
-  //               await preferences.setString("photo", data["photoUrl"]);
-  //               await preferences.setString("email", data["userEmail"]);
-  //               await preferences.setString("role", data["role"]);
-  //               await preferences.setString("phone", data["phone"]);
-  //               if (kDebugMode) {
-  //                 print("db device id");
-  //                 print(data["deviceId"]);
-  //               }
-
-  //               setState(() {
-  //                 isLoading = false;
-  //                 isLoggedIn = true; // Update login state
-  //               });
-  //               preferences.setBool('isLoggedIn', isLoggedIn);
-  //               Route route = MaterialPageRoute(
-  //                 builder: (c) => HomeScreen(
-  //                   currentuserid: data["uid"],
-  //                   userRole: userRole,
-  //                 ),
-  //               );
-  //               setState(() {
-  //                 Navigator.push(context, route);
-  //               });
-  //             } else {
-  //               setState(() {
-  //                 isLoading = false;
-  //               });
-  //               Fluttertoast.showToast(
-  //                 msg:
-  //                     "Not registered on this device, please use the device you have registered before.",
-  //                 textColor: Colors.red,
-  //                 fontSize: 18,
-  //               );
-  //             }
-  //           }
-  //         }
-  //       } else {
-  //         setState(() {
-  //           isLoading = false;
-  //         });
-  //         Fluttertoast.showToast(
-  //           msg: "Login Failed, No such user matching with your credentials",
-  //           textColor: Colors.red,
-  //           fontSize: 18,
-  //         );
-  //       }
-  //     });
-  //   }
-  // }
 }

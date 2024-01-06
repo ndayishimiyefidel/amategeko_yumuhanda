@@ -77,7 +77,10 @@ class _OpenQuizState extends State<OpenQuiz>
     String option4 = questionData['option4'];
     String correctOption = questionData[
         'correctAnswer']; // Use 'correctAnswer' for the correct option
-    String questionImgUrl = questionData['questionImgUrl'];
+    // String questionImgUrl = questionData['questionImgUrl'];
+    String questionImgUrl = questionData.containsKey('questionImgUrl')
+        ? questionData['questionImgUrl']
+        : '';
     bool answered = false; // You can set the initial value as needed
 
     // Create a new QuestionModel with the extracted data
@@ -189,9 +192,16 @@ class _OpenQuizState extends State<OpenQuiz>
           },
         ),
         title: Text(
-          "${widget.examType == "English" ? 'Take the Test' : 'Gukora Ikizamini'}",
-          style:
-              TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
+          widget.examType == 'English'
+              ? 'Take the Test'
+              : (widget.examType == 'French'
+                  ? 'Passer l\'examen'
+                  : 'Gukora Ikizamini'),
+          style: TextStyle(
+            letterSpacing: 1.25,
+            fontSize: 24,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: kPrimaryColor,
         actions: [
@@ -224,7 +234,7 @@ class _OpenQuizState extends State<OpenQuiz>
     return FloatingActionButton.extended(
       backgroundColor: kPrimaryLightColor,
       onPressed: () {
-        showRewardedAd();
+        // showRewardedAd();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -269,7 +279,7 @@ class _OpenQuizState extends State<OpenQuiz>
         btnPressed = false;
       });
     } else {
-      _showInterstitialAd();
+      // _showInterstitialAd();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -344,8 +354,16 @@ class _OpenQuizState extends State<OpenQuiz>
               padding: const EdgeInsets.only(left: 20),
               child: Text(
                 widget.questions.isEmpty
-                    ? "TQ: No questionfor this exam!" // Display loading message
-                    : "TQ:${widget.questions.length} question(s)",
+                    ? widget.examType == 'English'
+                        ? 'TQ: No question for this exam!'
+                        : (widget.examType == 'French'
+                            ? 'TQ: Pas de question pour cet examen !'
+                            : 'TQ: Nta bibazo biri kuri iki kizamini!')
+                    : widget.examType == 'English'
+                        ? 'TQ: ${widget.questions.length} question(s)'
+                        : (widget.examType == 'French'
+                            ? 'TQ: ${widget.questions.length} question(s)'
+                            : 'TQ: ${widget.questions.length} ikibazo'),
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontSize: 18,
@@ -487,7 +505,11 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
               ? Padding(
                   padding: const EdgeInsets.only(left: 0),
                   child: Text(
-                    "${widget.examType == "English" ? 'NB: Choosing to press on the knee as in the provisoire exam on the machine happens!' : 'NB:Guhitamo ukanda mu kavi nkuko muri exam ya provisoire kuri machine biba bimeze!'}",
+                    widget.examType == 'English'
+                        ? 'NB: Choosing to press on the knee as in the provisional exam on the machine happens!'
+                        : (widget.examType == 'French'
+                            ? 'NB: Choisir d\'appuyer sur le genou comme dans l\'examen provisoire sur la machine se produit!'
+                            : 'NB: Guhitamo ukanda mu kavi nkuko muri exam ya provisoire kuri machine biba bimeze!'),
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontSize: 12,
@@ -692,7 +714,11 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
           ),
           isInCorrectOption
               ? Text(
-                  "Igisubizo cy'ukuri ni: ${widget.questionModel.correctOption}",
+                  widget.examType == 'English'
+                      ? "The correct answer is: ${widget.questionModel.correctOption}"
+                      : (widget.examType == 'French'
+                          ? "La réponse correcte est : ${widget.questionModel.correctOption}"
+                          : "Igisubizo cy'ukuri ni: ${widget.questionModel.correctOption}"),
                   style: const TextStyle(
                       fontSize: 12,
                       color: Colors.green,

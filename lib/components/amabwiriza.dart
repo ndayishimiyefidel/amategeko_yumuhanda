@@ -1,9 +1,24 @@
 import 'package:amategeko/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../utils/insttruction.dart';
 
 class AmabwirizaList extends StatelessWidget {
+  void shareApp() {
+    const String playStoreLink =
+        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
+
+    final String message =
+        "Iyi application  yitwa RWANDA TRAFFIC RULE ni nziza iri kuri play store igizwe n'ibibazo n'ibisubizo babaza muri examin ya provisoire iga examin zose zirimo kuko bazakubaza imwe muri zo cyangwa baterure ibibazo 20 muri application Ni karibu kuri mwe mwese mushaka Provisoire mukoresheje uburyo bworoshye kandi bwizewe yangiriye akamaro Nawe yakugirira umumaro cyane kanda hano  $playStoreLink";
+
+    // Share the message containing the link (with or without referral code)
+    Share.share(
+      message,
+      subject: "",
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +44,7 @@ class AmabwirizaList extends StatelessWidget {
               InstructionItem(
                 title: '1. UBUSOBANURO BWA APPLICATION',
                 description:
-                    "Iyi application yitwa ``RWANDA TRAFFIC RULE`` ni application yigisha amategeko y'umuhanda,igizwe n'ibibazo babaza mu kizimini  cya provisoire (uruhushya rw'agatenyo)",
+                    "Iyi application yitwa ``RWANDA TRAFFIC RULE`` ni application yigisha amategeko y'umuhanda,igizwe n'ibibazo babaza mu kizamini  cya provisoire (uruhushya rw'agatenyo)",
               ),
               InstructionItem(
                 title: '2. UKO APPLICATION IKORA',
@@ -50,6 +65,31 @@ class AmabwirizaList extends StatelessWidget {
                 title: '4. IBINDI BISABANURO BIRAMBUYE',
                 phoneNumbers: ['0788659575', '0728877442'],
               ),
+              SizedBox(
+                height: 10,
+              ),
+              ListTile(
+                onTap: shareApp, // Call the shareApp function
+                leading: IconButton(
+                  onPressed: shareApp, // Call the shareApp function
+                  icon: const Icon(
+                    Icons.share,
+                    size: 30,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.only(
+                  left: 60,
+                  top: 5,
+                  bottom: 5,
+                ),
+                title: const Text(
+                  "Sangiza application",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
             ],
           ),
         ),

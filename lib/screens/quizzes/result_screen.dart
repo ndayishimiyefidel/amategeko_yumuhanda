@@ -25,7 +25,7 @@ class _ResultsState extends State<Results> {
 
   _checkFailed() {
     // double pass = (widget.correct + widget.incorrect) / 2 + 2;
-    if (widget.correct < 12) {
+    if (widget.correct < 16) {
       if (kDebugMode) {
         print("failed");
       }
@@ -138,7 +138,7 @@ class _ResultsState extends State<Results> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  showRewardedAd();
+                  //showRewardedAd();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Exams()));
                 },

@@ -168,7 +168,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              //showRewardedAd();
+                              ////showRewardedAd();
 
                               if (adShown) {
                                 Navigator.push(
@@ -260,7 +260,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   ),
                                 );
                               }
-                              // showRewardedAd();
+                              // //showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -280,7 +280,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               delayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              _showInterstitialAd();
+                              //_showInterstitialAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -315,7 +315,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    _showInterstitialAd();
+                                    //_showInterstitialAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -335,7 +335,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     delayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    showRewardedAd();
+                                    //showRewardedAd();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -408,7 +408,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    _showInterstitialAd();
+                                    //_showInterstitialAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

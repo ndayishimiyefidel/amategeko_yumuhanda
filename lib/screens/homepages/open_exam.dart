@@ -10,6 +10,7 @@ import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
 import '../../widgets/MainDrawer.dart';
 import '../quizzes/exam_english.dart';
+import '../quizzes/examen_fr.dart';
 import '../quizzes/exams.dart';
 
 class OpenExamPage extends StatefulWidget {
@@ -160,7 +161,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              _showInterstitialAd();
+                              //_showInterstitialAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -180,7 +181,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              showRewardedAd();
+                              //showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -214,13 +215,13 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (BuildContext context) =>
-                              //         const AmategekoYose(),
-                              //   ),
-                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      ExamFrench(),
+                                ),
+                              );
                             },
                             child: const DashboardCard(
                               name: "Francais",

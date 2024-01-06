@@ -644,7 +644,7 @@ class _QuizTileState extends State<QuizTile> {
                                               children: [
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "for the exam to close click below in blue to request the code but see if you have a connection.",
+                                                  "To open the exam, click below in blue to request the code, but make sure you have an Internet connection.",
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight:
