@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
@@ -36,9 +38,9 @@ class _SignUpState extends State<SignUp> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController nameEditingController = TextEditingController();
-  TextEditingController passwordEditingController = TextEditingController();
+  // TextEditingController passwordEditingController = TextEditingController();
   TextEditingController phoneNumberEditingController = TextEditingController();
-  String name = "", phoneNumber = "", password = "";
+  String name = "", phoneNumber = "";
 
   late SharedPreferences preferences;
   bool isloading = false;
@@ -87,7 +89,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future<void> _registerUser() async {
-    print("device Ids:$deviceId");
+    //print("device Ids:$deviceId");
     // if (deviceId!.isNotEmpty || deviceId != "") {
     try {
       if (_formKey.currentState!.validate()) {
@@ -95,8 +97,8 @@ class _SignUpState extends State<SignUp> {
           isloading = true;
         });
 
-        final deviceValidationUrl = API.validate;
-        final registrationUrl = API.signUp;
+        const deviceValidationUrl = API.validate;
+        const registrationUrl = API.signUp;
         final String uid = generateUniqueUid();
 
         // Device validation
@@ -106,7 +108,7 @@ class _SignUpState extends State<SignUp> {
           User userModel = User(
               uid: uid,
               createdAt: dateF.toString(),
-              password: password.toString().trim(),
+              password: phoneNumber.toString().trim(),
               role: userRole,
               phone: phoneNumber.toString().trim(),
               name: name.trim(),
@@ -137,6 +139,7 @@ class _SignUpState extends State<SignUp> {
                 if (fcmToken != null) {
                   await preferences.setString("fcmToken", fcmToken!);
                 }
+                // ignore: use_build_context_synchronously
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -170,10 +173,12 @@ class _SignUpState extends State<SignUp> {
               body: {"deviceId": deviceId, "phone": phoneNumber},
             );
 
+            // print("response body ${deviceValidationResponse.body}");
+
             if (deviceValidationResponse.statusCode == 200) {
               final deviceValidationResult =
                   json.decode(deviceValidationResponse.body);
-              print("REg w:$deviceValidationResult ");
+              print("REg w:$deviceValidationResult");
 
               if (deviceValidationResult['success'] == false) {
                 // Continue with user registration
@@ -182,7 +187,7 @@ class _SignUpState extends State<SignUp> {
                 User userModel = User(
                     uid: uid,
                     createdAt: dateF.toString(),
-                    password: password.toString().trim(),
+                    password: phoneNumber.toString().trim(),
                     role: userRole,
                     phone: phoneNumber.toString().trim(),
                     name: name.trim(),
@@ -432,40 +437,40 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                TextFieldContainer(
-                  child: TextFormField(
-                    controller: passwordEditingController,
-                    keyboardType: TextInputType.phone,
-                    textInputAction: TextInputAction.done,
-                    onChanged: (val) {
-                      password = val;
-                    },
-                    validator: (pwValue) {
-                      if (pwValue!.isEmpty) {
-                        return 'This field is mandatory';
-                      }
+                // TextFieldContainer(
+                //   child: TextFormField(
+                //     controller: passwordEditingController,
+                //     keyboardType: TextInputType.phone,
+                //     textInputAction: TextInputAction.done,
+                //     onChanged: (val) {
+                //       password = val;
+                //     },
+                //     validator: (pwValue) {
+                //       if (pwValue!.isEmpty) {
+                //         return 'This field is mandatory';
+                //       }
 
-                      const String p = "^07[2,389]\\d{7}";
-                      RegExp regExp = RegExp(p);
+                //       const String p = "^07[2,389]\\d{7}";
+                //       RegExp regExp = RegExp(p);
 
-                      if (regExp.hasMatch(pwValue)) {
-                        // So, the email is valid
-                        return null;
-                      }
+                //       if (regExp.hasMatch(pwValue)) {
+                //         // So, the email is valid
+                //         return null;
+                //       }
 
-                      return 'This is not a valid phone number';
-                    },
-                    cursorColor: kPrimaryColor,
-                    decoration: const InputDecoration(
-                      hintText: "Andika Nimero ya Telephone Yawe",
-                      icon: Icon(
-                        Icons.phone,
-                        color: kPrimaryColor,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
+                //       return 'This is not a valid phone number';
+                //     },
+                //     cursorColor: kPrimaryColor,
+                //     decoration: const InputDecoration(
+                //       hintText: "Andika Nimero ya Telephone Yawe",
+                //       icon: Icon(
+                //         Icons.phone,
+                //         color: kPrimaryColor,
+                //       ),
+                //       border: InputBorder.none,
+                //     ),
+                //   ),
+                // ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   width: size.width * 0.3,
@@ -477,13 +482,8 @@ class _SignUpState extends State<SignUp> {
                           backgroundColor: kPrimaryColor),
                       onPressed: () {
                         //showInterstitialAd
-                        // adManager.showInterstitialAd();
-                        if (phoneNumber == password) {
-                          _registerUser();
-                        } else {
-                          Fluttertoast.showToast(
-                              msg: "Phone number must be the same!");
-                        }
+                        adManager.showInterstitialAd();
+                        _registerUser();
                       },
                       child: const Text(
                         "Emeza",
@@ -500,35 +500,41 @@ class _SignUpState extends State<SignUp> {
                     : Container(
                         child: null,
                       ),
-                currentuserid == null
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          const Text(
-                            "Usanzwe ufite konti ? ",
-                            style: TextStyle(color: kPrimaryColor),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const LoginScreen();
-                                  },
-                                ),
-                              );
-                            },
-                            child: const Text(
-                              "Injira",
-                              style: TextStyle(
-                                color: kPrimaryColor,
-                                fontWeight: FontWeight.bold,
+                currentuserid != null
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Flexible(
+                              child: const Text(
+                                "Niba usanzwe wigira muri application kanda hano handitse injira? ",
+                                style: TextStyle(color: kPrimaryColor),
                               ),
                             ),
-                          ),
-                          SizedBox(height: size.height * 0.1),
-                        ],
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return const LoginScreen();
+                                    },
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "INJIRA",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: kPrimaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: size.height * 0.1),
+                          ],
+                        ),
                       )
                     : const SizedBox(),
               ]),

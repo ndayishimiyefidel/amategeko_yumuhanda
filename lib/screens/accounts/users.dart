@@ -108,8 +108,8 @@ class _AllUsersState extends State<AllUsers>
                           ),
                           child: const TabBarView(
                             children: <Widget>[
-                              UserList(),
                               UserList100(),
+                              UserList(),
                             ],
                           ),
                         ),

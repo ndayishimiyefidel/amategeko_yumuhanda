@@ -33,7 +33,7 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 android {
-    compileSdkVersion flutter.compileSdkVersion = 33
+    compileSdkVersion flutter.compileSdkVersion = 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -65,17 +65,19 @@ android {
     }
     buildTypes {
         release {
+          
             signingConfig signingConfigs.release
-            minifyEnabled true
-            shrinkResources true
+
+          
         }
     }
 
 
 }
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:32.6.0')
-    implementation 'com.google.firebase:firebase-analytics'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // implementation platform('com.google.firebase:firebase-bom:32.6.0')
+    // implementation 'com.google.firebase:firebase-analytics'
 }
 flutter {
     source '../..'

@@ -22,28 +22,26 @@ class _BodyState extends State<Body> {
     super.initState();
   }
 
-
   loginNavigator() {
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return const LoginScreen();
-          },
-        ),
-      );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const LoginScreen();
+        },
+      ),
+    );
   }
 
   signupNavigator() {
-   Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) {
-            return const SignUpScreen();
-          },
-        ),
-      );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return const SignUpScreen();
+        },
+      ),
+    );
   }
 
   @override

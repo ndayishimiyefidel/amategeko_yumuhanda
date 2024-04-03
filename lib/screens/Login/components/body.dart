@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:amategeko/components/text_field_container.dart';
 import 'package:amategeko/screens/HomeScreen.dart';
 import 'package:amategeko/screens/Login/components/background.dart';
@@ -23,7 +22,6 @@ import 'package:http/http.dart' as http;
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
-
   @override
   State createState() => _SignInState();
 }
@@ -61,7 +59,7 @@ class _SignInState extends State<SignIn> {
     bool adShown = RewardedVideoAdManager.showRewardAd();
 
     if (!adShown) {
-      print('Rewarded Ad is not loaded yet.');
+      //print('Rewarded Ad is not loaded yet.');
     }
   }
 
@@ -222,7 +220,6 @@ class _SignInState extends State<SignIn> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor),
                     onPressed: () {
-                    //  showRewardedAd();
                       loginUser();
                     },
                     child: const Text(
@@ -245,38 +242,42 @@ class _SignInState extends State<SignIn> {
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        const Text(
-                          "Niba uri mushya?   ",
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return const SignUpScreen();
-                                },
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Iyandikishe",
+                        const Flexible(
+                          child: Text(
+                            "Niba uri mushya Kanda hano handitse iyandikishe ukurikize amabwiriza",
                             style: TextStyle(
                               color: kPrimaryColor,
-                              fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
                           ),
-                        )
+                        ),
+                        Flexible(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return const SignUpScreen();
+                                  },
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "IYANDIKISHE",
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     )
                   : const SizedBox(),
               SizedBox(
-                height: size.height * 0.01,
+                height: size.height * 0.02,
               ),
               GestureDetector(
                 onTap: () {
@@ -326,7 +327,7 @@ class _SignInState extends State<SignIn> {
           isLoading = true;
         });
         preferences = await SharedPreferences.getInstance();
-        final loginUrl = API.login; // Set the URL to your login.php script
+        const loginUrl = API.login; // Set the URL to your login.php script
 
         final response = await http.post(
           Uri.parse(loginUrl),
@@ -341,6 +342,7 @@ class _SignInState extends State<SignIn> {
           if (loginResult['success'] == true) {
             ///update fcm
             // Successful login
+            // showRewardedAd();
             final userData = loginResult;
             final String userRole = userData['role'];
 
@@ -349,7 +351,7 @@ class _SignInState extends State<SignIn> {
               print("Fcm Token :$fcmToken");
 
               try {
-                final fcmTokenUrl = API.updateFcmToken;
+                const fcmTokenUrl = API.updateFcmToken;
                 final response = await http.post(
                   Uri.parse(fcmTokenUrl),
                   body: {'docId': userData["uid"], 'fcmToken': fcmToken},
@@ -451,6 +453,4 @@ class _SignInState extends State<SignIn> {
       // You can show an error message or perform other error handling as needed
     }
   }
-
-
 }
