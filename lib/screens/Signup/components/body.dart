@@ -127,6 +127,7 @@ class _SignUpState extends State<SignUp> {
               final registrationResult = jsonDecode(registrationResponse.body);
               print("REg Error: $registrationResult ");
 
+              // ignore: duplicate_ignore
               if (registrationResult['registered'] == true) {
                 // Registration successful
                 preferences = await SharedPreferences.getInstance();
@@ -139,7 +140,7 @@ class _SignUpState extends State<SignUp> {
                 if (fcmToken != null) {
                   await preferences.setString("fcmToken", fcmToken!);
                 }
-                // ignore: use_build_context_synchronously
+
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -508,7 +509,7 @@ class _SignUpState extends State<SignUp> {
                           children: <Widget>[
                             Flexible(
                               child: const Text(
-                                "Niba usanzwe wigira muri application kanda hano handitse injira? ",
+                                "Niba usanzwe wigira muri application kanda hano handitse injira. ",
                                 style: TextStyle(color: kPrimaryColor),
                               ),
                             ),
