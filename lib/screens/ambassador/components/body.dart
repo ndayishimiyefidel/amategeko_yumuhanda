@@ -173,11 +173,11 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
 
                       return 'This is not a valid name';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.person,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "Andika amazina ye",
                       border: InputBorder.none,
@@ -208,11 +208,11 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
 
                       return 'This is not a valid phone number';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.phone_outlined,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "Andika Telefoni ye",
                       border: InputBorder.none,
@@ -242,19 +242,19 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
 
                       return 'This is not a valid phone number';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: InputDecoration(
                       hintText: "Andika telephone nanone",
                       icon: const Icon(
                         Icons.lock,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _passwordVisible
                               ? Icons.visibility_off
                               : Icons.visibility,
-                          color: kPrimaryColor,
+                          color: kPrimaryGreenColor,
                         ),
                         onPressed: () {
                           setState(() {
@@ -274,7 +274,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                     borderRadius: BorderRadius.circular(10),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor),
+                          backgroundColor: kPrimaryGreenColor),
                       onPressed: () {
                         if (phoneNumber == password) {
                           // _registerUser();

@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../ads/reward_video_manager.dart';
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
@@ -50,46 +50,60 @@ class _AllCourseState extends State<AllCourse> {
   int from = 0;
   int totalRows = 0;
   int to = 10; // Initial range, fetch the first 10 records
+  bool isDisposed = false;
 
   Future<void> fetchAllCourses() async {
-    final apiUrl = API.courseList + "?from=$from&to=$to";
+    final apiUrl = "${API.courseList}?from=$from&to=$to";
     isLoading = true;
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print(data);
+      if (!isDisposed) {
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          print(data);
 
-        if (data['success'] == true) {
-          if (!mounted) return;
-          setState(() {
-            if (from == 0) {
-              // If it's the first load, clear the list
-              allCoursesList.clear();
-            }
-            // Append the new data to the existing list
-            allCoursesList
-                .addAll(List<Map<String, dynamic>>.from(data['data']));
+          if (data['success'] == true) {
             if (!mounted) return;
             setState(() {
-              isLoading = false;
-              totalRows = int.tryParse(data['total'])!.toInt();
-            });
+              if (from == 0) {
+                // If it's the first load, clear the list
+                allCoursesList.clear();
+              }
+              // Append the new data to the existing list
+              List<Map<String, dynamic>> newData =
+                  List<Map<String, dynamic>>.from(data['data']);
 
-            // Update 'from' and 'to' for the next load
-            from = to;
-            to += 10; // Fetch the next 10 records
-          });
+              newData.removeWhere((newItem) => allCoursesList.any(
+                  (existingItem) =>
+                      newItem['courseId'] == existingItem['courseId']));
+
+              allCoursesList.addAll(newData);
+              setState(() {
+                isLoading = false;
+                totalRows = int.tryParse(data['total'])!.toInt();
+              });
+
+              // Update 'from' and 'to' for the next load
+              from = to;
+              to += 10; // Fetch the next 10 records
+            });
+          } else {
+            print("Failed to execute query");
+          }
         } else {
-          print("Failed to execute query");
+          throw Exception('Failed to load data from the API');
         }
-      } else {
-        throw Exception('Failed to load data from the API');
       }
     } catch (e) {
       print("Error occurs: $e");
+    } finally {
+      if (!isDisposed) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -104,7 +118,7 @@ class _AllCourseState extends State<AllCourse> {
   }
 
   Future<void> getToken() async {
-    final url = API.getToken; // Replace with your PHP script URL
+    const url = API.getToken; // Replace with your PHP script URL
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -120,7 +134,7 @@ class _AllCourseState extends State<AllCourse> {
         }
       } else {
         // Handle HTTP request errors
-        print("failed to connect to server");
+        print("failed to connect to serverss");
       }
     } catch (e) {
       // Handle exceptions
@@ -146,7 +160,22 @@ class _AllCourseState extends State<AllCourse> {
     listenFCM(); //list fcm
     getToken(); //get admin token
     FirebaseMessaging.instance;
+    RewardedVideoAdManager.loadRewardAd();
     super.initState();
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    RewardedVideoAdManager.dispose();
   }
 
   @override
@@ -187,7 +216,7 @@ class _AllCourseState extends State<AllCourse> {
             )
           ],
           centerTitle: true,
-          backgroundColor: kPrimaryColor,
+          backgroundColor: kPrimaryGreenColor,
           elevation: 0.0,
         ),
         //appbar
@@ -264,6 +293,7 @@ class _AllCourseState extends State<AllCourse> {
                   ],
                 ),
                 onPressed: () {
+                  showRewardedAd();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -277,9 +307,9 @@ class _AllCourseState extends State<AllCourse> {
 
   Future<void> requestCode(
       String userId, String quizId, String senderName, String title) async {
-    final url = API.requestCode;
-    final sabaCodeUrl = API.sabaCode;
-    final int exam = 0;
+    const url = API.requestCode;
+    const sabaCodeUrl = API.sabaCode;
+    const int exam = 0;
     String body =
         "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
@@ -333,6 +363,7 @@ class _AllCourseState extends State<AllCourse> {
                 isLoading = false;
 
                 Size size = MediaQuery.of(context).size;
+                // ignore: use_build_context_synchronously
                 showDialog(
                     context: context,
                     builder: (context) {
@@ -348,7 +379,7 @@ class _AllCourseState extends State<AllCourse> {
                               borderRadius: BorderRadius.circular(30),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
+                                    backgroundColor: kPrimaryGreenColor),
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
@@ -408,6 +439,7 @@ class _AllCourseState extends State<AllCourse> {
 }
 
 class CourseTile extends StatefulWidget {
+  // showRewardedAd();
   final String title;
   final String courseId;
   final int totalCourses;
@@ -444,6 +476,28 @@ class CourseTile extends StatefulWidget {
 
 class _CourseTileState extends State<CourseTile> {
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    //get admin token
+    RewardedVideoAdManager.loadRewardAd();
+    super.initState();
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    RewardedVideoAdManager.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -454,13 +508,13 @@ class _CourseTileState extends State<CourseTile> {
           Card(
             shape: RoundedRectangleBorder(
               side: BorderSide(
-                color: kPrimaryColor,
+                color: kPrimaryGreenColor,
                 width: size.width * 0.001,
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
             child: InkWell(
-              splashColor: kPrimaryColor,
+              splashColor: kPrimaryGreenColor,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -489,6 +543,7 @@ class _CourseTileState extends State<CourseTile> {
                             GestureDetector(
                               onTap: () {
                                 //all
+                                showRewardedAd();
                                 if (widget.userRole == "Admin" ||
                                     widget.courseType == "Free") {
                                   Navigator.push(
@@ -537,8 +592,10 @@ class _CourseTileState extends State<CourseTile> {
                                       borderRadius: BorderRadius.circular(10),
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                            backgroundColor: kPrimaryColor),
+                                            backgroundColor:
+                                                kPrimaryGreenColor),
                                         onPressed: () {
+                                          showRewardedAd();
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -575,7 +632,8 @@ class _CourseTileState extends State<CourseTile> {
                                           setState(() {
                                             _isLoading = true;
                                           });
-                                          final deleteApiUrl = API.deleteCourse;
+                                          showRewardedAd();
+                                          const deleteApiUrl = API.deleteCourse;
                                           GenerateUser.deleteUserCode(
                                               context,
                                               widget.courseId,
@@ -613,7 +671,7 @@ class _CourseTileState extends State<CourseTile> {
   }
 
   Future<void> navigateToIshuli(String currentUserId) async {
-    final url = API.navigateToIshuri; // Replace with your PHP script URL
+    const url = API.navigateToIshuri; // Replace with your PHP script URL
 
     try {
       final response = await http.post(

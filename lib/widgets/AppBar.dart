@@ -76,12 +76,11 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
       ],
       centerTitle: true,
-      backgroundColor: kPrimaryColor,
+      backgroundColor: kPrimaryGreenColor,
       elevation: 0.0,
     );
   }
 
   @override
-  
   Size get preferredSize => const Size.fromHeight(50);
 }

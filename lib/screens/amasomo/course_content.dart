@@ -164,7 +164,7 @@ class _CourseContentState extends State<CourseContent> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
           onPressed: () {
             uploadFiles();
           },
@@ -194,7 +194,7 @@ class _CourseContentState extends State<CourseContent> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(

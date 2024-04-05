@@ -165,35 +165,35 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             padding: const EdgeInsets.all(10.0),
             child: Icon(
               Icons.dashboard_customize,
-              color: _selectedIndex == 0 ? kPrimaryColor : Colors.black,
+              color: _selectedIndex == 0 ? kPrimaryGreenColor : Colors.black,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Icon(
               Icons.quiz_outlined,
-              color: _selectedIndex == 1 ? kPrimaryColor : Colors.black,
+              color: _selectedIndex == 1 ? kPrimaryGreenColor : Colors.black,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Icon(
               Icons.notifications_outlined,
-              color: _selectedIndex == 2 ? kPrimaryColor : Colors.black,
+              color: _selectedIndex == 2 ? kPrimaryGreenColor : Colors.black,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Icon(
               Icons.traffic_outlined,
-              color: _selectedIndex == 3 ? kPrimaryColor : Colors.black,
+              color: _selectedIndex == 3 ? kPrimaryGreenColor : Colors.black,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Icon(
               Icons.person_outline,
-              color: _selectedIndex == 4 ? kPrimaryColor : Colors.black,
+              color: _selectedIndex == 4 ? kPrimaryGreenColor : Colors.black,
             ),
           ),
         ],

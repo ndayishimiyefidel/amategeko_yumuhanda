@@ -33,9 +33,7 @@ class _EditQuizState extends State<EditQuiz> {
   }
 
   final _formkey = GlobalKey<FormState>();
-  String quizUrl = "",
-      quizTitle = "",
-      quizDesc = "";
+  String quizUrl = "", quizTitle = "", quizDesc = "";
   String quizId = "";
   String _selectedtype = "";
 
@@ -71,18 +69,14 @@ class _EditQuizState extends State<EditQuiz> {
     quizdescController.text = widget.quizDesc;
     quizPriceController.text = widget.quizPrice;
   } //database service
+
   bool _isLoading = false;
   final bool isNew = true;
-
-
-
 
   @override
   Widget build(BuildContext context) {
     //quiz url image
-    Size size = MediaQuery
-        .of(context)
-        .size;
+    Size size = MediaQuery.of(context).size;
     final quizPriceField = TextFieldContainer(
       child: TextFormField(
         autofocus: false,
@@ -96,7 +90,7 @@ class _EditQuizState extends State<EditQuiz> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.price_change_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Quiz Price ",
           border: InputBorder.none,
@@ -118,7 +112,7 @@ class _EditQuizState extends State<EditQuiz> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.title_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Quiz Title ",
           border: InputBorder.none,
@@ -128,7 +122,7 @@ class _EditQuizState extends State<EditQuiz> {
         },
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (input) =>
-        input != null && input.length < 5 ? 'Enter quiz title' : null,
+            input != null && input.length < 5 ? 'Enter quiz title' : null,
       ),
     );
     //quiz desc
@@ -153,11 +147,10 @@ class _EditQuizState extends State<EditQuiz> {
       child: DropdownButtonFormField(
         value: widget.quizType.isEmpty ? _selectedtype : widget.quizType,
         items: _quizType
-            .map((e) =>
-            DropdownMenuItem(
-              value: e,
-              child: Text(e),
-            ))
+            .map((e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(e),
+                ))
             .toList(),
         onChanged: (val) {
           setState(() {
@@ -166,7 +159,7 @@ class _EditQuizState extends State<EditQuiz> {
         },
         icon: const Icon(
           Icons.arrow_drop_down_circle,
-          // color: kPrimaryColor,
+          // color: kPrimaryGreenColor,
         ),
         dropdownColor: Colors.white,
         decoration: InputDecoration(
@@ -174,7 +167,7 @@ class _EditQuizState extends State<EditQuiz> {
           border: InputBorder.none,
           prefixIcon: const Icon(
             Icons.quiz_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
         ),
       ),
@@ -186,10 +179,8 @@ class _EditQuizState extends State<EditQuiz> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-          
-          },
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
+          onPressed: () {},
           child: const Text(
             "EDIT QUIZ",
             style: TextStyle(
@@ -212,9 +203,9 @@ class _EditQuizState extends State<EditQuiz> {
         title: const Text(
           "Edit Quiz",
           style:
-          TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
+              TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(
@@ -282,59 +273,57 @@ class _EditQuizState extends State<EditQuiz> {
                         children: <Widget>[
                           (pickedFile == null)
                               ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                    // display already existing image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display already existing image
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
-                                              width: 200.0,
-                                              height: 200.0,
-                                              padding:
-                                              const EdgeInsets.all(20.0),
-                                              child:
-                                              const CircularProgressIndicator(
-                                                strokeWidth: 2.0,
-                                                valueColor:
-                                                AlwaysStoppedAnimation<
-                                                    Color>(
-                                                    Colors.lightBlueAccent),
-                                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display already existing image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display already existing image
+                                        child: CachedNetworkImage(
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            width: 200.0,
+                                            height: 200.0,
+                                            padding: const EdgeInsets.all(20.0),
+                                            child:
+                                                const CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.lightBlueAccent),
                                             ),
-                                        imageUrl: widget.quizImage,
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              )
+                                          ),
+                                          imageUrl: widget.quizImage,
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                )
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                    // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.file(
-                                        pickedFile!,
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.file(
+                                          pickedFile!,
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 150.0, right: 120.0),
+                                padding:
+                                    EdgeInsets.only(top: 150.0, right: 120.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -379,8 +368,8 @@ class _EditQuizState extends State<EditQuiz> {
                   _isLoading
                       ? const LinearProgressIndicator()
                       : Container(
-                    child: null,
-                  ),
+                          child: null,
+                        ),
                   SizedBox(height: size.height * 0.03),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -389,7 +378,7 @@ class _EditQuizState extends State<EditQuiz> {
                       const Text(
                         "Add question to existing quiz? ",
                         style: TextStyle(
-                          color: kPrimaryColor,
+                          color: kPrimaryGreenColor,
                           fontSize: 18,
                         ),
                       ),
@@ -410,7 +399,7 @@ class _EditQuizState extends State<EditQuiz> {
                         child: const Text(
                           "Continue",
                           style: TextStyle(
-                            color: kPrimaryColor,
+                            color: kPrimaryGreenColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 22,
                           ),

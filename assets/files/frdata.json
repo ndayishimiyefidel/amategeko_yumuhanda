@@ -500,7 +500,7 @@
                     "option2": "b) À l’avant 1.70m",
                     "option3": "c) A et B sont justes",
                     "option4": "d) Aucune de réponses n’est correcte",
-                    "correctAnswer": "c) A et B sont justes"
+                    "correctAnswer": "a) À l’arrière 3.50m"
                 },
                 {
                     "question": "20. Lorsque le chargement dépasse de plus d’un metre l’extremité arrière du véhicule et qu’eclairage de véhicules est requis la plus forte soillie doit être signalée par:",
@@ -1536,13 +1536,13 @@
                     "correctAnswer": "c) Remontez au bord le plus proche, garez-vous, et répondez au téléphone."
                 },
                 {
-                    "question": "212. Votre téléphone portable sonne pendant votre voyage. Que pouvez-vous faire?",
+                    "question": "2. Votre téléphone portable sonne pendant votre voyage. Que pouvez-vous faire?",
                     "questionImgUrl": "",
                     "option1": "a) Répondre ou s’arrêter immédiatement",
                     "option2": "b) L'ignorer",
                     "option3": "c) Remontez au bord le plus proche, garez-vous, et répondez au téléphone.",
                     "option4": "d) B et c sont correctes",
-                    "correctAnswer": "d) B et c sont correctes"
+                    "correctAnswer": "c) Remontez au bord le plus proche, garez-vous, et répondez au téléphone."
                 },
                 {
                     "question": "3. Que devez-vous faire avant de faire demi-tour?",
@@ -1820,7 +1820,7 @@
                     "option2": "b) Fin d’autoroute",
                     "option3": "c) A et B sont correctes",
                     "option4": "d) Pas de route",
-                    "correctAnswer": "b) Fin d’autoroute"
+                    "correctAnswer": "c) A et B sont correctes"
                 },
                 {
                     "question": "13. Ce signal signifie?",
@@ -1922,7 +1922,7 @@
                 },
                 {
                     "question": "3. Que signifie un feu rouge ?",
-                    "questionImgUrl": "assets/examimages/q253.png",
+                    "questionImgUrl": "assets/examimages/ex12q3.jpg",
                     "option1": "a) Vous arrêtez à moins de tourner à gauche",
                     "option2": "b) Arrêtez-vous si vous pouvez freiner en toute sécurité",
                     "option3": "c) Interdiction de franchir le signal",
@@ -1931,7 +1931,7 @@
                 },
                 {
                     "question": "4. Que signifie un feu jaune ?",
-                    "questionImgUrl": "assets/examimages/q254.png",
+                    "questionImgUrl": "assets/examimages/ex12q4.jpg",
                     "option1": "a) Préparez-vous à y aller",
                     "option2": "b) Interdiction de franchir la ligne d'arrêt ou, à défaut de ligne d'arrêt, le signal même",
                     "option3": "c) A et B sont de bonne réponse",
@@ -1940,7 +1940,7 @@
                 },
                 {
                     "question": "5. Que signifie un feu vert ?",
-                    "questionImgUrl": "assets/examimages/q255.png",
+                    "questionImgUrl": "assets/examimages/ex12q5.jpg",
                     "option1": "a) Préparez-vous à y aller",
                     "option2": "b) Autorisation de franchir le signal",
                     "option3": "c) Arrêt si votre sortie de l’intersection est bloquée",
@@ -1949,7 +1949,7 @@
                 },
                 {
                     "question": "6. Que signifie cette ligne blanche discontinue ?",
-                    "questionImgUrl": "assets/examimages/q256.png",
+                    "questionImgUrl": "assets/examimages/ex12q6.jpg",
                     "option1": "a) Interdit de franchir cette ligne",
                     "option2": "b) Stationner interdit",
                     "option3": "c) Vous approchez d'un danger",
@@ -2173,7 +2173,7 @@
                 },
                 {
                     "question": "10. Quel signal m’oblige à céder le passage :",
-                    "questionImgUrl": "assets/examimages/q290.png",
+                    "questionImgUrl": "assets/examimages/q280.png",
                     "option1": "a) Le signal A19",
                     "option2": "b) Le signal B5",
                     "option3": "c) Le signal B6",
@@ -2518,7 +2518,7 @@
                     "option2": "b) Oui, à condition que la ligne brisée ne devienne pas continue.",
                     "option3": "c) Oui, les cyclistes entendront votre véhicule et s’écarteront ainsi du chemin.",
                     "option4": "d) Oui, tout trafic venant en sens inverse peut observer la situation et s’écartera du chemin.",
-                    "correctAnswer": "a) Non, le conducteur ne peut pas voir clairement devant."
+                    "correctAnswer": "a) Non, le conducteur ne peut pas voire clairement devant."
                 },
                 {
                     "question": "7. Que doit faire le conducteur dans cette situation ?",
@@ -2585,7 +2585,7 @@
                 },
                 {
                     "question": "14. Que signifie une ligne blanche continue au centre de la route ?",
-                    "questionImgUrl": "assets/examimages/324.png",
+                    "questionImgUrl": "assets/examimages/q324.png",
                     "option1": "a) Interdit à tout conducteur de la franchir.",
                     "option2": "b) Les motocyclistes peuvent dépasser.",
                     "option3": "c) Parking autorisé.",
@@ -2742,7 +2742,7 @@
                     "option2": "b) Juste à droite du centre de la route",
                     "option3": "c) De part et d'autre du centre de la route",
                     "option4": "d) Le côté gauche de la route",
-                    "correctAnswer": "d) Le côté gauche de la route"
+                    "correctAnswer": "b) Juste à droite du centre de la route"
                 },
                 {
                     "question": "11. De quoi un conducteur doit-il avoir connaissance avant d'entrer dans un rond-point ?",
@@ -2925,7 +2925,7 @@
                 },
                 {
                     "question": "10. Vous vous approchez d’une intersection où les feux de circulation ne fonctionnent pas. Que devriez-vous faire lorsqu'un policier donne ce signal ?",
-                    "questionImgUrl": "",
+                    "questionImgUrl": "assets/examimages/q360.png",
                     "option1": "a) Tourner à gauche seulement",
                     "option2": "b) Tourner à droite seulement continuer devant",
                     "option3": "c) Arrêtez-vous à la ligne d'arrêt",
@@ -3328,7 +3328,7 @@
                 },
                 {
                     "question": "13. Que signifie ce signal?",
-                    "questionImgUrl": "assets/examimages/q402.png",
+                    "questionImgUrl": "assets/examimages/q403.png",
                     "option1": "a) Arrêtez-vous pour le passage de l'école à venir.",
                     "option2": "b) Arrêtez votre véhicule.",
                     "option3": "c) L'autre trafic doit céder le passage à vous.",

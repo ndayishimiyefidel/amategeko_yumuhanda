@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:amategeko/widgets/fcmWidget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -63,7 +65,7 @@ class _UserNotificationState extends State<UserNotification> {
   }
 
   Future<void> checkQuizCode(String userId) async {
-    final url = API.checkCode;
+    const url = API.checkCode;
 
     try {
       final response = await http.post(
@@ -100,7 +102,7 @@ class _UserNotificationState extends State<UserNotification> {
   }
 
   Future<void> getToken() async {
-    final url = API.getToken; // Replace with your PHP script URL
+    const url = API.getToken; // Replace with your PHP script URL
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -116,7 +118,7 @@ class _UserNotificationState extends State<UserNotification> {
         }
       } else {
         // Handle HTTP request errors
-        print("failed to connect to server");
+        print("failed to connect to servers");
       }
     } catch (e) {
       // Handle exceptions
@@ -126,9 +128,9 @@ class _UserNotificationState extends State<UserNotification> {
 
   Future<void> requestCode(
       String userId, String quizId, String senderName, String title) async {
-    final url = API.requestCode;
-    final sabaCodeUrl = API.sabaCode;
-    final int exam = 0;
+    const url = API.requestCode;
+    const sabaCodeUrl = API.sabaCode;
+    const int exam = 0;
     String body =
         "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
@@ -180,6 +182,7 @@ class _UserNotificationState extends State<UserNotification> {
                 sendPushMessage(userToken, body, notificationTitle);
                 isloading = false;
                 Size size = MediaQuery.of(context).size;
+
                 showDialog(
                     context: context,
                     builder: (context) {
@@ -195,7 +198,7 @@ class _UserNotificationState extends State<UserNotification> {
                               borderRadius: BorderRadius.circular(30),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
+                                    backgroundColor: kPrimaryGreenColor),
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
@@ -265,6 +268,7 @@ class _UserNotificationState extends State<UserNotification> {
 
         if (data['success'] == true) {
           // Append the new data to the existing list
+          if (!mounted) return;
           setState(() {
             allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
             isloading = false;
@@ -334,7 +338,7 @@ class _UserNotificationState extends State<UserNotification> {
                                             child: ElevatedButton(
                                               style: ElevatedButton.styleFrom(
                                                   backgroundColor:
-                                                      kPrimaryColor),
+                                                      kPrimaryGreenColor),
                                               onPressed: () {
                                                 requestCode(
                                                     userToken,
@@ -383,7 +387,7 @@ class _UserNotificationState extends State<UserNotification> {
                   ],
                 ),
               )
-            : Center(
+            : const Center(
                 child: CircularProgressIndicator(),
               ),
       ),

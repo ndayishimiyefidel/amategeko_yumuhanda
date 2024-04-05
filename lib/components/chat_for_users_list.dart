@@ -12,17 +12,18 @@ class ChatUsersList extends StatefulWidget {
   final String? referralCode;
   final String? quizCode, deviceId;
 
-  const ChatUsersList(
-      {super.key,
-      this.referralCode,
-      required this.name,
-      required this.time,
-      required this.userId,
-      required this.phone,
-      required this.password,
-      required this.role,
-      this.quizCode,
-      this.deviceId});
+  const ChatUsersList({
+    super.key,
+    this.referralCode,
+    required this.name,
+    required this.time,
+    required this.userId,
+    required this.phone,
+    required this.password,
+    required this.role,
+    this.quizCode,
+    this.deviceId,
+  });
 
   @override
   State createState() => _ChatUsersListState();
@@ -45,7 +46,6 @@ class _ChatUsersListState extends State<ChatUsersList> {
     preferences = await SharedPreferences.getInstance();
     preferences.setBool("called_${widget.userId}", true);
   }
-
 
   @override
   void initState() {
@@ -118,7 +118,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
         }
       },
       child: Card(
-        margin: EdgeInsets.all(8), // Add margin for spacing
+        margin: const EdgeInsets.all(8), // Add margin for spacing
         child: Row(
           children: [
             Flexible(
@@ -144,8 +144,6 @@ class _ChatUsersListState extends State<ChatUsersList> {
                             } else {
                               await _setUserCalledStatus(true);
                             }
-                            setState(
-                                () {}); // Update the state to reflect the change
                           }
                         },
                         icon: FutureBuilder<bool>(
@@ -181,7 +179,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
                             fontStyle: FontStyle.italic,
                           ),
                         )
-                      : SizedBox(),
+                      : const SizedBox(),
                   (widget.deviceId != "nodevice")
                       ? Text(
                           "Device Id: ${widget.deviceId}",
@@ -191,7 +189,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
                             fontStyle: FontStyle.normal,
                           ),
                         )
-                      : SizedBox(),
+                      : const SizedBox(),
                   Text(
                     "Joined date: $dateTimeFormat",
                     style: const TextStyle(
@@ -206,7 +204,7 @@ class _ChatUsersListState extends State<ChatUsersList> {
             IconButton(
               color: Colors.red,
               onPressed: () async {
-                final url = API.deleteUser;
+                const url = API.deleteUser;
                 GenerateUser.deleteUserCode(context, widget.userId, url,
                     widget.name, "deleted successfully!");
               },

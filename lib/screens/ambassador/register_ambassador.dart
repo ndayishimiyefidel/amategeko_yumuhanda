@@ -60,7 +60,7 @@ class RegisterAmbassadorScreen extends StatelessWidget {
           ),
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: const SignUpAmbassador(),

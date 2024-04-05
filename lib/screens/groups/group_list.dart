@@ -81,7 +81,7 @@ class _GroupListState extends State<GroupList> {
           )
         ],
         centerTitle: false,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: Container(
@@ -126,14 +126,14 @@ class _FileTileState extends State<FileTile> {
           Card(
             shape: RoundedRectangleBorder(
               side: BorderSide(
-                color: kPrimaryColor,
+                color: kPrimaryGreenColor,
                 width: size.width * 0.003,
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
             child: InkWell(
               onTap: () {},
-              splashColor: kPrimaryColor,
+              splashColor: kPrimaryGreenColor,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.only(

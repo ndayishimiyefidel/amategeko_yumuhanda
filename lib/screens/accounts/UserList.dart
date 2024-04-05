@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +8,6 @@ import '../../components/chat_for_users_list.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
-
   @override
   State createState() => _UserListState();
 }
@@ -22,51 +22,94 @@ class _UserListState extends State<UserList> {
   String? code;
   late String quizTitle;
   late SharedPreferences preferences;
-  int itemsPerPage = 10;
-  int currentPage = 0;
+  // int itemsPerPage = 10;
+  // int currentPage = 0;
   bool isLoading = false;
 
   int from = 0;
   int totalRows = 0;
-  int to = 10; // Initial range, fetch the first 10 records
-
+  int to = 100; // Initial range, fetch the first 10 records
+  bool isDisposed = false;
   Future<void> fetchAllUsers() async {
-    final apiUrl = API.userWithCode + "?from=$from&to=$to";
-    isLoading = true;
+    final apiUrl = "${API.userWithCode}?from=$from&to=$to";
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (!isDisposed) {
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
 
-        if (data['success'] == true) {
-          if (!mounted) return;
-          setState(() {
-            if (from == 0) {
-              // If it's the first load, clear the list
-              allUsersList.clear();
-            }
-            // Append the new data to the existing list
-            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+          if (data['success'] == true) {
             if (!mounted) return;
             setState(() {
+              if (from == 0) {
+                allUsersList.clear();
+              }
+              List<Map<String, dynamic>> newData =
+                  List<Map<String, dynamic>>.from(data['data']);
+
+              newData.removeWhere((newItem) => allUsersList.any(
+                  (existingItem) => newItem['uid'] == existingItem['uid']));
+
+              allUsersList.addAll(newData);
+
               isLoading = false;
               totalRows = int.tryParse(data['total'])!.toInt();
-            });
 
-            // Update 'from' and 'to' for the next load
-            from = to;
-            to += 10; // Fetch the next 10 records
-          });
+              from = to;
+              to += 10; // Fetch the next 10 records
+            });
+          } else {
+            print("Failed to execute query");
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content:
+                    Text('Failed to execute query. Please try again later'),
+              ));
+            }
+          }
         } else {
-          print("Failed to execute query");
+          throw Exception(
+              'Failed to load data from the API. Status Code: ${response.statusCode}');
         }
-      } else {
-        throw Exception('Failed to load data from the API');
+      }
+    } on SocketException catch (e) {
+      print("Error occurs: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Failed to connect to the server. Please check your internet connection'),
+        ));
+      }
+    } on FormatException catch (e) {
+      print("Error occurs: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Unexpected response from the server. Please try again later'),
+        ));
       }
     } catch (e) {
       print("Error occurs: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  'Failed to load data from the API. Please try again later')),
+        );
+      }
+    } finally {
+      if (!isDisposed && mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -79,13 +122,14 @@ class _UserListState extends State<UserList> {
       userRole = preferences.getString("role")!;
       phoneNumber = preferences.getString("phone")!;
     });
+    fetchAllUsers();
   }
 
   @override
   void initState() {
     super.initState();
     getCurrUserId();
-    fetchAllUsers(); // Load the initial 10 records
+    // Load the initial 10 records
   }
 
   @override
@@ -106,7 +150,7 @@ class _UserListState extends State<UserList> {
                   children: [
                     if (allUsersList.isEmpty)
                       const Center(
-                        child: Text("No user with code"),
+                        child: Text("No new user with code"),
                       )
                     else
                       Column(
@@ -148,7 +192,7 @@ class _UserListState extends State<UserList> {
                   ],
                 ),
               )
-            : Center(
+            : const Center(
                 child: CircularProgressIndicator(),
               ),
       ),

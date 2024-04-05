@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:amategeko/screens/homepages/usernotification.dart';
@@ -59,7 +61,7 @@ class _AllUsersState extends State<AllUsers>
                 '',
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
               ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -108,8 +110,8 @@ class _AllUsersState extends State<AllUsers>
                           ),
                           child: const TabBarView(
                             children: <Widget>[
-                              UserList100(),
                               UserList(),
+                              UserList100(),
                             ],
                           ),
                         ),
@@ -139,11 +141,12 @@ class _AllUsersState extends State<AllUsers>
   }
 
   Future<void> fetchUserData() async {
-    final apiUrl = API.searchUser;
+    const apiUrl = API.searchUser;
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
+      print("Response code :${response.statusCode}");
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         // print("response body $data");
@@ -156,7 +159,7 @@ class _AllUsersState extends State<AllUsers>
           print("Failed to execute query");
         }
       } else {
-        print("Failed to connect to api");
+        print("Failed to connect to apis server");
       }
     } catch (e) {
       print("Error: $e");
@@ -283,7 +286,7 @@ class DataSearch extends SearchDelegate {
                             .substring(0, query.length)
                         : "",
                     style: const TextStyle(
-                      color: kPrimaryColor,
+                      color: kPrimaryGreenColor,
                       fontSize: 16,
                     ),
                   ),
@@ -343,7 +346,7 @@ class DataSearch extends SearchDelegate {
                     children: [
                       IconButton(
                         onPressed: () async {
-                          final url = API.addedToClass;
+                          const url = API.addedToClass;
                           if (suggestionList[index]["addedToClass"] == null ||
                               suggestionList[index]["addedToClass"] == "") {
                             GenerateUser.addedRemoveToClass(
@@ -397,7 +400,7 @@ class DataSearch extends SearchDelegate {
                                   1);
                             }
                           } else {
-                            final url = API.deleteCode;
+                            const url = API.deleteCode;
                             GenerateUser.deleteUserCode(
                                 context,
                                 suggestionList[index]["uid"],
@@ -414,7 +417,7 @@ class DataSearch extends SearchDelegate {
                       ),
                     ],
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ],
         ),
       ),

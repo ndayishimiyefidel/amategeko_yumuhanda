@@ -36,9 +36,6 @@ class _CreateGroupState extends State<CreateGroup> {
   bool _isLoading = false;
   final bool isNew = true;
 
-
- 
-
   @override
   Widget build(BuildContext context) {
     //quiz url image
@@ -55,7 +52,7 @@ class _CreateGroupState extends State<CreateGroup> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.link_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Group Url",
           border: InputBorder.none,
@@ -79,7 +76,7 @@ class _CreateGroupState extends State<CreateGroup> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.price_change_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Group Price",
           border: InputBorder.none,
@@ -102,7 +99,7 @@ class _CreateGroupState extends State<CreateGroup> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.title_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Group Name",
           border: InputBorder.none,
@@ -132,7 +129,7 @@ class _CreateGroupState extends State<CreateGroup> {
         },
         icon: const Icon(
           Icons.arrow_drop_down_circle,
-          // color: kPrimaryColor,
+          // color: kPrimaryGreenColor,
         ),
         dropdownColor: Colors.white,
         decoration: const InputDecoration(
@@ -140,7 +137,7 @@ class _CreateGroupState extends State<CreateGroup> {
           border: InputBorder.none,
           prefixIcon: Icon(
             Icons.group_add_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
         ),
       ),
@@ -152,10 +149,8 @@ class _CreateGroupState extends State<CreateGroup> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-          
-          },
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
+          onPressed: () {},
           child: const Text(
             "CREATE GROUP",
             style: TextStyle(
@@ -180,7 +175,7 @@ class _CreateGroupState extends State<CreateGroup> {
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(
@@ -273,7 +268,7 @@ class _CreateGroupState extends State<CreateGroup> {
                       const Text(
                         "Already created group ? ",
                         style: TextStyle(
-                          color: kPrimaryColor,
+                          color: kPrimaryGreenColor,
                           fontSize: 18,
                         ),
                       ),
@@ -294,7 +289,7 @@ class _CreateGroupState extends State<CreateGroup> {
                         child: const Text(
                           "View All",
                           style: TextStyle(
-                            color: kPrimaryColor,
+                            color: kPrimaryGreenColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 22,
                           ),

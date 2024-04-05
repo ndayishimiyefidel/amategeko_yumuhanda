@@ -24,7 +24,7 @@ void requestPermission() async {
   );
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('User granted permission');
+    // print('User granted permission');
   } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
     print('User granted provisional permission');
   } else {
@@ -76,7 +76,7 @@ void listenFCM() async {
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,
-    
+
             //      one that already exists in example app.
             icon: 'launch_background',
           ),

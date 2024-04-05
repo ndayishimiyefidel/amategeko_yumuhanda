@@ -54,7 +54,7 @@ class _NotificationsState extends State<Notifications>
                 'My Notifications',
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
               ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -132,7 +132,7 @@ class _NotificationsState extends State<Notifications>
   }
 
   Future<void> fetchQuizData() async {
-    final apiUrl = API.fetchQuizData;
+    const apiUrl = API.fetchQuizData;
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -270,8 +270,8 @@ class DataSearch extends SearchDelegate {
             suggestionList[index]["code"] != ""
                 ? RichText(
                     text: TextSpan(
-                      text: suggestionList[index]["code"] ?? ''
-                          .substring(0, query.length),
+                      text: suggestionList[index]["code"] ??
+                          ''.substring(0, query.length),
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,

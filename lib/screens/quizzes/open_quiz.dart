@@ -123,6 +123,7 @@ class _OpenQuizState extends State<OpenQuiz>
         vsync: this, duration: Duration(seconds: limitTime));
     _controller.addListener(() {
       if (_controller.isCompleted) {
+        _showInterstitialAd();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -203,7 +204,7 @@ class _OpenQuizState extends State<OpenQuiz>
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -234,7 +235,7 @@ class _OpenQuizState extends State<OpenQuiz>
     return FloatingActionButton.extended(
       backgroundColor: kPrimaryLightColor,
       onPressed: () {
-        // showRewardedAd();
+        showRewardedAd();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -279,7 +280,7 @@ class _OpenQuizState extends State<OpenQuiz>
         btnPressed = false;
       });
     } else {
-      // _showInterstitialAd();
+      _showInterstitialAd();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -342,7 +343,7 @@ class _OpenQuizState extends State<OpenQuiz>
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontSize: 20,
-                  color: kPrimaryColor,
+                  color: kPrimaryGreenColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -367,7 +368,7 @@ class _OpenQuizState extends State<OpenQuiz>
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontSize: 18,
-                  color: kPrimaryColor,
+                  color: kPrimaryGreenColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -382,7 +383,7 @@ class _OpenQuizState extends State<OpenQuiz>
               const Icon(
                 Icons.punch_clock,
                 size: 40,
-                color: kPrimaryColor,
+                color: kPrimaryGreenColor,
               ),
               Countdown(
                   animation:

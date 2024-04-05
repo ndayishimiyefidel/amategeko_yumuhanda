@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -65,12 +68,14 @@ class _NewQuizState extends State<NewQuiz> {
       userToken = preferences.getString("fcmToken")!;
     });
     print(currentuserid);
-    print(userRole);
+    if (kDebugMode) {
+      print(userRole);
+    }
     checkQuizCode(currentuserid);
   }
 
   Future<void> checkQuizCode(String userId) async {
-    final url = API.checkCode; // Replace with your PHP script URL
+    const url = API.checkCode; // Replace with your PHP script URL
 
     try {
       final response = await http.post(
@@ -107,7 +112,7 @@ class _NewQuizState extends State<NewQuiz> {
   }
 
   Future<void> getToken() async {
-    final url = API.getToken; // Replace with your PHP script URL
+    const url = API.getToken; // Replace with your PHP script URL
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -123,7 +128,7 @@ class _NewQuizState extends State<NewQuiz> {
         }
       } else {
         // Handle HTTP request errors
-        print("failed to connect to server");
+        print("failed to connect to servers");
       }
     } catch (e) {
       // Handle exceptions
@@ -192,6 +197,7 @@ class _NewQuizState extends State<NewQuiz> {
         ),
         floatingActionButton: (userRole != "Admin" && hasCode == false)
             ? FloatingActionButton.extended(
+                backgroundColor: Colors.black45,
                 label: const Row(
                   children: [
                     Text(
@@ -210,20 +216,20 @@ class _NewQuizState extends State<NewQuiz> {
                           child: AlertDialog(
                             title: Column(
                               children: [
-                                Text(
-                                  "REQUEST CODE",
+                                const Text(
+                                  "SABA CODE",
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                const SizedBox(height: 10),
                                 Column(
                                   children: [
-                                    Column(
+                                    const Column(
                                       children: [
                                         Text(
-                                          "1.Kugirango examen zifunguke ubanza kwishyura 1500 rwf kuri 0788659575/0728877442  cyangwa ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay ibaruye kuri ALEXIS",
+                                          "1.Kugirango examen zifunguke ubanza kwishyura 5000 rwf kuri 0782877442/0728877442  cyangwa ukanze mu ibara ry'umukara cyangwa ukanze *182*8*1*847318*5000# kuri momo pay ibaruye kuri ALEXIS",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -232,7 +238,7 @@ class _NewQuizState extends State<NewQuiz> {
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umuhondo ibi byose ubikora wafunguye connection",
+                                          "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umukara ibi byose ubikora wafunguye connection",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -254,9 +260,9 @@ class _NewQuizState extends State<NewQuiz> {
                                     InstructionItems(
                                       title:
                                           '4. Iyo wishyuye ukoresheje nimero itari muri application cg ukanze uhanditse saba code  utafunguye connection uhamagara kuri izi nimero tugufungurira: ',
-                                      phoneNumbers: [
-                                        '0788659575',
-                                        '0728877442'
+                                      phoneNumbers: const [
+                                        '0782877442',
+                                        '0738469060'
                                       ],
                                     ),
                                   ],
@@ -266,7 +272,7 @@ class _NewQuizState extends State<NewQuiz> {
                             actions: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.yellow,
+                                    backgroundColor: Colors.black87,
                                     elevation: 3),
                                 onPressed: () async {
                                   //saba code
@@ -276,7 +282,7 @@ class _NewQuizState extends State<NewQuiz> {
                                 child: const Text(
                                   "Saba Code",
                                   style: TextStyle(
-                                      color: Colors.black87,
+                                      color: Colors.white,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -288,14 +294,14 @@ class _NewQuizState extends State<NewQuiz> {
                                   borderRadius: BorderRadius.circular(10),
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green),
+                                        backgroundColor: kPrimaryGreenColor),
                                     onPressed: () async {
                                       //direct phone call
                                       await FlutterPhoneDirectCaller.callNumber(
-                                          "*182*8*1*329494*1500#");
+                                          "*182*8*1*847318*5000#");
                                     },
                                     child: const Text(
-                                      "Kanda hano *182*8*1*329494*1500# wishyure",
+                                      "Kanda hano *182*8*1*847318*5000# wishyure",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -315,11 +321,11 @@ class _NewQuizState extends State<NewQuiz> {
 
   Future<void> requestCode(
       String userId, String quizId, String senderName, String title) async {
-    final url = API.requestCode;
-    final sabaCodeUrl = API.sabaCode;
-    final int exam = 0;
+    const url = API.requestCode;
+    const sabaCodeUrl = API.sabaCode;
+    const int exam = 0;
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga5000 kuri 0782877442 gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
@@ -360,11 +366,11 @@ class _NewQuizState extends State<NewQuiz> {
                 "ex_type": exam.toString()
               },
             );
-            print(res.body);
+            // print(res.body);
 
             if (res.statusCode == 200) {
               final data = json.decode(res.body);
-              print('Response Body: $data');
+              //  print('Response Body: $data');
               if (data['requestSent'] == true) {
                 //handle if not sent
                 sendPushMessage(userToken, body, notificationTitle);
@@ -386,14 +392,14 @@ class _NewQuizState extends State<NewQuiz> {
                               borderRadius: BorderRadius.circular(30),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
+                                    backgroundColor: kPrimaryGreenColor),
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
+                                      "*182*8*1*847318*5000#");
                                 },
                                 child: const Text(
-                                  "Ishyura 1500 Rwf.",
+                                  "Ishyura 5000 Rwf.",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,
@@ -497,7 +503,7 @@ class _QuizTileState extends State<QuizTile> {
           Card(
             shape: RoundedRectangleBorder(
               side: BorderSide(
-                color: kPrimaryColor,
+                color: kPrimaryGreenColor,
                 width: size.width * 0.006,
               ),
               borderRadius: BorderRadius.circular(5.0),
@@ -536,7 +542,7 @@ class _QuizTileState extends State<QuizTile> {
                         borderRadius: BorderRadius.circular(10),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: kPrimaryGreenColor,
                             side:
                                 const BorderSide(color: Colors.green, width: 1),
                           ),
@@ -559,7 +565,7 @@ class _QuizTileState extends State<QuizTile> {
                                 ),
                               );
                             } else {
-                              final isOpenUrl = API.isQuizOpen;
+                              const isOpenUrl = API.isQuizOpen;
                               preferences =
                                   await SharedPreferences.getInstance();
                               isAlreadyOpened =
@@ -639,8 +645,8 @@ class _QuizTileState extends State<QuizTile> {
                                     showDialog(
                                         context: context,
                                         builder: (context) {
-                                          return AlertDialog(
-                                            title: const Column(
+                                          return const AlertDialog(
+                                            title: Column(
                                               children: [
                                                 SizedBox(height: 10),
                                                 Text(

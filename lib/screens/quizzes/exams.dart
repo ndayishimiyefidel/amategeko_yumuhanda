@@ -46,20 +46,20 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
           ),
         ),
         actions: [
-         CustomButton(
-          text: "Amabwiriza",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => AmabwirizaList(),
-              ),
-            );
-          },
-        )
+          CustomButton(
+            text: "Amabwiriza",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: const NewQuiz(),
@@ -97,7 +97,6 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
       phone = preferences.getString("phone")!;
-    
     });
   }
 

@@ -2,6 +2,7 @@ class API {
   //static const baseUrl = 'https://rwandatraffic.com/apis';
   static const baseUrl = 'https://amategeko.hafiyacu.rw';
   // static const baseUrl = 'http://192.168.1.71/apis';
+  //https://amategeko.hafiyacu.rw/c
   //192.168.1.71
   static const hostUser = "$baseUrl/user";
   static const validate = "$hostUser/validate.php";

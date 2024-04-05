@@ -82,7 +82,7 @@ class _SignUpState extends State<SignUp> {
         }
       } else {
         // Handle HTTP request errors
-        print("failed to connect to server");
+        print("failed to connect to servers");
       }
     } catch (e) {
       // Handle exceptions
@@ -277,7 +277,7 @@ class _SignUpState extends State<SignUp> {
                               borderRadius: BorderRadius.circular(30),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
+                                    backgroundColor: kPrimaryGreenColor),
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
@@ -388,7 +388,7 @@ class _SignUpState extends State<SignUp> {
                               child: const Text(
                                 "0726656615",
                                 style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: kPrimaryGreenColor,
                                   fontSize: 18,
                                 ),
                               ),
@@ -401,7 +401,7 @@ class _SignUpState extends State<SignUp> {
                               child: const Text(
                                 "0785460748",
                                 style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: kPrimaryGreenColor,
                                   fontSize: 18,
                                 ),
                               ),
@@ -435,7 +435,7 @@ class _SignUpState extends State<SignUp> {
                       labelText: "Hitamo ubwoko bw'uruhushya ushaka gukorera",
                       icon: Icon(
                         Icons.select_all_outlined,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       border: InputBorder.none,
                     ),
@@ -468,11 +468,11 @@ class _SignUpState extends State<SignUp> {
 
                       return 'This is not a valid name';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.person,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "Andika Amazina",
                       border: InputBorder.none,
@@ -497,11 +497,11 @@ class _SignUpState extends State<SignUp> {
                       }
                       return null;
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.numbers,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "NIMERO Y'INDANGAMUNTU YAWE",
                       border: InputBorder.none,
@@ -530,11 +530,11 @@ class _SignUpState extends State<SignUp> {
                             // }
                             return null;
                           },
-                          cursorColor: kPrimaryColor,
+                          cursorColor: kPrimaryGreenColor,
                           decoration: const InputDecoration(
                             icon: Icon(
                               Icons.code,
-                              color: kPrimaryColor,
+                              color: kPrimaryGreenColor,
                             ),
                             hintText: "ANDIKA CODE YA PROVISOIRE",
                             border: InputBorder.none,
@@ -583,7 +583,7 @@ class _SignUpState extends State<SignUp> {
                             labelText: "Hitamo Category",
                             icon: Icon(
                               Icons.select_all_outlined,
-                              color: kPrimaryColor,
+                              color: kPrimaryGreenColor,
                             ),
                             border: InputBorder.none,
                           ),
@@ -616,11 +616,11 @@ class _SignUpState extends State<SignUp> {
 
                       return 'This is not a valid name';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.phone,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "ANDIKA TELEPHONE",
                       border: InputBorder.none,
@@ -703,7 +703,7 @@ class _SignUpState extends State<SignUp> {
                     borderRadius: BorderRadius.circular(30),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor),
+                          backgroundColor: kPrimaryGreenColor),
                       onPressed: () {
                         _registerUser();
                       },
@@ -725,7 +725,7 @@ class _SignUpState extends State<SignUp> {
                     borderRadius: BorderRadius.circular(30),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor),
+                          backgroundColor: kPrimaryGreenColor),
                       onPressed: () {
                         requestCode(userToken, currentuserid.toString(),
                             currentusername, "Exams");

@@ -2,7 +2,6 @@ import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../ads/interestial_ad.dart';
 import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
@@ -142,7 +141,7 @@ class _OpenExamPageState extends State<OpenExamPage>
               )
             ],
             centerTitle: true,
-            backgroundColor: kPrimaryColor,
+            backgroundColor: kPrimaryGreenColor,
             elevation: 0.0,
           ),
           body: ListView(
@@ -161,7 +160,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              //_showInterstitialAd();
+                              _showInterstitialAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -181,7 +180,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              //showRewardedAd();
+                              showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -215,6 +214,7 @@ class _OpenExamPageState extends State<OpenExamPage>
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
+                              showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

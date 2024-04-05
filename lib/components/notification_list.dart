@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ads/reward_video_manager.dart';
 import '../backend/apis/db_connection.dart';
 import '../utils/generate_code.dart';
 import '../widgets/fcmWidget.dart';
@@ -60,6 +61,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     loadFCM(); //load fcm
     listenFCM(); //li st fcm
     //get admin token
+    RewardedVideoAdManager.loadRewardAd();
     FirebaseMessaging.instance.subscribeToTopic("Traffic-Notification");
   }
 
@@ -74,6 +76,20 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
       fcmToken = preferences.getString("fcmToken")!;
     });
     print("Fcm Token:$fcmToken");
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    RewardedVideoAdManager.dispose();
   }
 
   @override
@@ -274,6 +290,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         setState(() {
           _isLoading = true;
         });
+        showRewardedAd();
         // _generateCode(widget.docId);
         String generatedCode = randomNumeric(6);
         GenerateUser.generateCodeAndNotify(context, widget.docId, generatedCode,
@@ -299,6 +316,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         setState(() {
           _isLoading = true;
         });
+
         _pickDate();
 
         //date picker
@@ -358,6 +376,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
         setState(() {
           _isLoading = true;
         });
+        showRewardedAd();
         final delUrl = API.deleteCode;
         GenerateUser.deleteUserCode(context, widget.docId, delUrl, widget.name,
                 ",Code have been deleted succesfully")

@@ -147,7 +147,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                         icon: const Icon(
                                           Icons.copy,
                                           size: 25,
-                                          color: kPrimaryColor,
+                                          color: kPrimaryGreenColor,
                                         ),
                                       ),
                                       IconButton(
@@ -236,7 +236,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                       icon: const Icon(
                                         Icons.copy,
                                         size: 25,
-                                        color: kPrimaryColor,
+                                        color: kPrimaryGreenColor,
                                       ),
                                     ),
                                   ],
@@ -256,7 +256,7 @@ class _IremboUsersListState extends State<IremboUsersList> {
                                               icon: const Icon(
                                                 Icons.copy,
                                                 size: 25,
-                                                color: kPrimaryColor,
+                                                color: kPrimaryGreenColor,
                                               ),
                                             ),
                                           ],

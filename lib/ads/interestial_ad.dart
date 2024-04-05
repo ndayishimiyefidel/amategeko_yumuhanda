@@ -43,7 +43,7 @@ class InterestialAds {
 
   // You may want to add a method to dispose of the interstitial ad when it's no longer needed.
   void dispose() {
-    _interstitialAd?.dispose();
-    _interstitialTimer?.cancel();
+    _interstitialAd!.dispose();
+    _interstitialTimer!.cancel();
   }
 }

@@ -7,12 +7,11 @@ import '../../widgets/MainDrawer.dart';
 import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
 
-
 class Quizzes extends StatefulWidget {
   const Quizzes({super.key});
 
   @override
- State createState() => _QuizzesState();
+  State createState() => _QuizzesState();
 }
 
 class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
@@ -68,7 +67,7 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
           ),
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: SingleChildScrollView(
@@ -101,10 +100,10 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                     ),
-                    child:  TabBarView(
+                    child: TabBarView(
                       children: <Widget>[
                         NewQuiz(),
-                       // OldQuiz(),
+                        // OldQuiz(),
                       ],
                     ),
                   ),

@@ -58,7 +58,7 @@ class _ExamFrenchState extends State<ExamFrench>
           )
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: const NewQuizFrench(),

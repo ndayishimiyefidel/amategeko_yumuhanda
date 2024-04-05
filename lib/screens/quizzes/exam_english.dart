@@ -58,7 +58,7 @@ class _ExamEnglishState extends State<ExamEnglish>
           )
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: const NewQuizEnglish(),

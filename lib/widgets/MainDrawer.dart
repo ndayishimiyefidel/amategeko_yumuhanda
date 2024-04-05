@@ -74,16 +74,16 @@ class _MainDrawerState extends State<MainDrawer> {
   }
 
   void redirectToPlayStore() {
-    // Replace "com.amategeko.amategeko" with your app package name on the Play Store
+    // Replace "com.amategeko.amategeko11" with your app package name on the Play Store
     String playStoreLink =
-        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
+        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko11";
     // Redirect to the Play Store
     launchUrl(Uri.parse(playStoreLink));
   }
 
   Future<bool> checkAppInstalled() async {
-    // Replace "com.amategeko.amategeko" with your app package name
-    const String appPackage = "com.amategeko.amategeko";
+    // Replace "com.amategeko.amategeko11" with your app package name
+    const String appPackage = "com.amategeko.amategeko11";
     // Check if the app is installed by attempting to launch it
     bool isInstalled = await canLaunchUrl(Uri.parse(appPackage));
     return isInstalled;
@@ -91,7 +91,7 @@ class _MainDrawerState extends State<MainDrawer> {
 
   void shareApp() {
     const String playStoreLink =
-        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
+        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko11";
     const String appUrl = "https://amategeko-75e59.web.app/";
     String message;
 

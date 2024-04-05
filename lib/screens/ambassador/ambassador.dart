@@ -9,12 +9,12 @@ class AllAmbassadors extends StatefulWidget {
   const AllAmbassadors({super.key});
 
   @override
-State createState() => _AllAmbassadorsState();
+  State createState() => _AllAmbassadorsState();
 }
 
 class _AllAmbassadorsState extends State<AllAmbassadors>
     with SingleTickerProviderStateMixin {
-  var allUsersList=[];
+  var allUsersList = [];
   String? currentuserid;
   String? currentusername;
   String? currentuserphoto;
@@ -53,7 +53,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
                 '',
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
               ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -76,8 +76,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
         ],
       ),
       body: userRole == "Admin"
-          ? SingleChildScrollView(
-              child: Container()
+          ? SingleChildScrollView(child: Container()
               // Column(
               //   //crossAxisAlignment: CrossAxisAlignment.stretch,
               //   children: <Widget>[
@@ -97,7 +96,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
               //             child: const Center(
               //               child: CircularProgressIndicator(
               //                 valueColor: AlwaysStoppedAnimation(
-              //                   kPrimaryColor,
+              //                   kPrimaryGreenColor,
               //                 ),
               //               ),
               //             ),
@@ -139,7 +138,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
 
               //                       return ChatUsersList(
               //                         name: snapshot.data!.docs[index]["name"],
-                                  
+
               //                         time: snapshot.data!.docs[index]
               //                             ["createdAt"],
               //                         // email: snapshot.data!.docs[index]
@@ -192,7 +191,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
               //                 child: const Center(
               //                   child: CircularProgressIndicator(
               //                       valueColor: AlwaysStoppedAnimation(
-              //                     kPrimaryColor,
+              //                     kPrimaryGreenColor,
               //                   )),
               //                 ),
               //               );
@@ -218,7 +217,7 @@ class _AllAmbassadorsState extends State<AllAmbassadors>
               //     ),
               //   ],
               // ),
-            )
+              )
           : Container(),
     );
   }

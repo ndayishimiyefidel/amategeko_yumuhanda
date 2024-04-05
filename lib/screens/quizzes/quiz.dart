@@ -6,12 +6,11 @@ import '../../widgets/MainDrawer.dart';
 import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
 
-
 class OnlyQuiz extends StatefulWidget {
   const OnlyQuiz({super.key});
 
   @override
-State createState() => _OnlyQuizState();
+  State createState() => _OnlyQuizState();
 }
 
 class _OnlyQuizState extends State<OnlyQuiz>
@@ -68,7 +67,7 @@ class _OnlyQuizState extends State<OnlyQuiz>
           ),
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: const OnlyQuiz(),

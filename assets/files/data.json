@@ -2386,7 +2386,7 @@
           "option3": "C. A na b ni ibisubizo by’ukuri",
           "option4": "D. Ntagisubizo cy’ukuri",
           "correctAnswer": "C. A na b ni ibisubizo by’ukuri",
-          "questionImgUrl": ""
+          "questionImgUrl": "assets/examimages/q264.png"
         },
         {
           "question": "15. Ugeze ahabereye impanuka yo mumuhanda bwambere ugasanga abakomeretse bikomeye. Wakiriza icyarimwe amatara y’ibyerekezo byombi, niki kindi ushobora gukora?",
@@ -2395,7 +2395,7 @@
           "option3": "C. A na b ni ibisubizo by’ukuri",
           "option4": "D. Nta gisubizo cy’ukuri",
           "correctAnswer": "A. Kumenya neza niba imbangukiragutabara yahamagawe",
-          "questionImgUrl": ""
+          "questionImgUrl": "assets/examimages/q265.png"
         },
         {
           "question": "16. Umuyobozi w’ikinyabizaga cy’ikoreye ibintu bishobora gufata inkongi, n’ikihe cyapa cyerekana ko ibyo atwaye biturika by’afata inkongi?",
@@ -2413,7 +2413,7 @@
           "option3": "B.",
           "option4": "C. Imikorere y’ikinyabiziga",
           "correctAnswer": "B. Uruhusa rwa burundu rwo gutwara ikinyabiziga",
-          "questionImgUrl": ""
+          "questionImgUrl": "assets/examimages/q267.png"
         },
         {
           "question": "18. Uhuye n’ingorane utwaye ikinyabiziga, mu muhanda ufite ibyerekezo bibiri, ufite ikimenyetso kiburira cya mpandeshatu. Wagishyira mu ntera ingana iki uvuye aho ikinyabiziga cyahagaze",
@@ -2425,7 +2425,7 @@
           "questionImgUrl": "assets/examimages/q268.png"
         },
         {
-          "question": "19. Umuyobozi w’ikinyabizaga cy’ikoreye ibintu bishobora gufata inkongi, n’ikihe cyapa cyerekana ko ibyo atwaye biturika by’afata inkongi?",
+          "question": "19.Umuyobozi usunika ipikipiki agomba gufatwa nka:",
           "option1": "A. Umunyamaguru ",
           "option2": "B. Umuyobozi w’ikinyabiziga",
           "option3": "C. Umugenzi ",
@@ -2998,11 +2998,11 @@
           "questionImgUrl": ""
         },
         {
-          "question": "20. Umuyobozi w’ ikinyabiziga  agomba gukora ahuye n’amatungo mu muhanda?",
-          "option1": "A. kuguma yicyo kinyabiziga hagati mu muhanda",
+          "question": "20. Umuyobozi w’ ikinyabiziga agendera inyuma y’ikindi kinyabizaga akaba adateganya kukinyuraho yakora iki ?",
+          "option1": "A. kuguma yicyo kinyabiziga hagati mumuhanda",
           "option2": "B. kuguma inyuma yacyo kugirango yemerere ibindi binyabiziga gutambuka",
-          "option3": "C. gutegereza ko undi muyobozi w’ikinyabiziga ava mu muhanda",
-          "option4": "D. gutwarira ikinyabiziga mu muhanda hagati kugirango abandi bayobozi bahagararare",
+          "option3": "C. gutwarira inyuma ye umwegereye cyane kugirango ureke ibindi binyabiziga bibanyureho",
+          "option4": "D. gutanga ibimenyetso kubindi binyabiziga ko byabanyuraho ",
           "correctAnswer": "B. kuguma inyuma yacyo kugirango yemerere ibindi binyabiziga gutambuka",
           "questionImgUrl": ""
         }
@@ -3375,11 +3375,11 @@
         },
         {
           "question": "20. Iki cyapa kigizwe:",
-          "option1": "A. ishusho mpandeshatu, ubuso ubururu",
-          "option2": "B. ishusho mpandeshatu, ubuso umukara",
-          "option3": "C. ishusho mpandeshatu, ubuso umweru",
+          "option1": "A. ishusho mpandeshatu ,ubuso ubururu",
+          "option2": "B. ishusho mpandeshatu,ubuso umukara",
+          "option3": "C. ishusho mpandeshatu,ubuso umweru",
           "option4": "D. nta gisubizo cy’ukuri",
-          "correctAnswer": "C. ishusho mpandeshatu, ubuso umweru",
+          "correctAnswer": "C. ishusho mpandeshatu,ubuso umweru",
           "questionImgUrl": "assets/examimages/q370.png"
         }
       ]

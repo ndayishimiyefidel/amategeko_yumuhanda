@@ -46,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.amategeko.amategeko"
+        applicationId "com.amategeko.amategeko1"
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
         minSdkVersion 21

@@ -118,7 +118,7 @@ class _IsomoPageState extends State<IsomoPage> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.price_change_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Course Price",
           border: InputBorder.none,
@@ -143,7 +143,7 @@ class _IsomoPageState extends State<IsomoPage> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.title_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Course Title",
           border: InputBorder.none,
@@ -200,7 +200,7 @@ class _IsomoPageState extends State<IsomoPage> {
           labelText: "Course Type",
           icon: Icon(
             Icons.select_all_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           border: InputBorder.none,
         ),
@@ -214,7 +214,7 @@ class _IsomoPageState extends State<IsomoPage> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
           onPressed: () {
             createCourse();
           },
@@ -242,7 +242,7 @@ class _IsomoPageState extends State<IsomoPage> {
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(

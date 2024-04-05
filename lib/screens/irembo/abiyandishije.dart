@@ -148,7 +148,7 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
           ),
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: SingleChildScrollView(

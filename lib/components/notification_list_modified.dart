@@ -95,16 +95,16 @@ class _ModifiedUsersNotificationListState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           widget.ex_type == "1"
-                              ? Text(
+                              ? const Text(
                                   "English",
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   "Kinyarwanda",
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -246,6 +246,7 @@ class _ModifiedUsersNotificationListState
         ),
       ),
       onTap: () {
+        if (!mounted) return;
         setState(() {
           _isLoading = true;
         });
@@ -271,6 +272,7 @@ class _ModifiedUsersNotificationListState
         ),
       ),
       onTap: () {
+        if (!mounted) return;
         setState(() {
           _isLoading = true;
         });
@@ -291,7 +293,7 @@ class _ModifiedUsersNotificationListState
       lastDate: DateTime(2100),
     );
 
-    final url = API.setLimitTime;
+    const url = API.setLimitTime;
 
     if (pickedDate != null && pickedDate != _selectedDate) {
       if (!mounted) return;
@@ -334,7 +336,7 @@ class _ModifiedUsersNotificationListState
         setState(() {
           _isLoading = true;
         });
-        final delUrl = API.deleteCode;
+        const delUrl = API.deleteCode;
         GenerateUser.deleteUserCode(context, widget.docId, delUrl, widget.name,
                 ",Code have been deleted succesfully")
             .then((value) => _isLoading = false);

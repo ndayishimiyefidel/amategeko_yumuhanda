@@ -149,7 +149,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.question_answer_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Type Question...",
           border: InputBorder.none,
@@ -291,7 +291,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
           onPressed: () {
             uploadCourseQuizData();
           },
@@ -347,7 +347,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(

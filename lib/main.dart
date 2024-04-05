@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:amategeko/screens/SplashScreen.dart';
 import 'package:amategeko/utils/constants.dart';
 import 'package:amategeko/utils/utils.dart';
@@ -24,6 +25,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  HttpOverrides.global = MyHttpOverrides();
 
   runApp(const MyApp());
 }
@@ -51,12 +53,21 @@ class MyApp extends StatelessWidget {
         Locale('en', 'GB'), // English UK
       ],
       theme: ThemeData(
-        primaryColor: kPrimaryColor,
+        primaryColor: kPrimaryGreenColor,
         scaffoldBackgroundColor: Colors.white,
       ),
       home: UpgradeAlert(
         child: const SplashScreen(),
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }

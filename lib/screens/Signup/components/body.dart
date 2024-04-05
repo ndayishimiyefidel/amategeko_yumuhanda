@@ -336,7 +336,7 @@ class _SignUpState extends State<SignUp> {
                               child: const Text(
                                 "0788659575",
                                 style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: kPrimaryGreenColor,
                                   fontSize: 18,
                                 ),
                               ),
@@ -349,7 +349,7 @@ class _SignUpState extends State<SignUp> {
                               child: const Text(
                                 "0728877442",
                                 style: TextStyle(
-                                  color: kPrimaryColor,
+                                  color: kPrimaryGreenColor,
                                   fontSize: 18,
                                 ),
                               ),
@@ -389,11 +389,11 @@ class _SignUpState extends State<SignUp> {
 
                       return 'This is not a valid name';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.person,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "Andika amazina yawe",
                       border: InputBorder.none,
@@ -426,11 +426,11 @@ class _SignUpState extends State<SignUp> {
 
                       return 'This is not a valid phone number';
                     },
-                    cursorColor: kPrimaryColor,
+                    cursorColor: kPrimaryGreenColor,
                     decoration: const InputDecoration(
                       icon: Icon(
                         Icons.phone_outlined,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       hintText: "Andika Nimero ya Telefoni yawe",
                       border: InputBorder.none,
@@ -460,12 +460,12 @@ class _SignUpState extends State<SignUp> {
 
                 //       return 'This is not a valid phone number';
                 //     },
-                //     cursorColor: kPrimaryColor,
+                //     cursorColor: kPrimaryGreenColor,
                 //     decoration: const InputDecoration(
                 //       hintText: "Andika Nimero ya Telephone Yawe",
                 //       icon: Icon(
                 //         Icons.phone,
-                //         color: kPrimaryColor,
+                //         color: kPrimaryGreenColor,
                 //       ),
                 //       border: InputBorder.none,
                 //     ),
@@ -479,7 +479,7 @@ class _SignUpState extends State<SignUp> {
                     borderRadius: BorderRadius.circular(30),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor),
+                          backgroundColor: kPrimaryGreenColor),
                       onPressed: () {
                         //showInterstitialAd
                         adManager.showInterstitialAd();
@@ -509,7 +509,7 @@ class _SignUpState extends State<SignUp> {
                             Flexible(
                               child: const Text(
                                 "Niba usanzwe wigira muri application kanda hano handitse injira? ",
-                                style: TextStyle(color: kPrimaryColor),
+                                style: TextStyle(color: kPrimaryGreenColor),
                               ),
                             ),
                             GestureDetector(
@@ -527,7 +527,7 @@ class _SignUpState extends State<SignUp> {
                                 "INJIRA",
                                 style: TextStyle(
                                   fontSize: 18,
-                                  color: kPrimaryColor,
+                                  color: kPrimaryGreenColor,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

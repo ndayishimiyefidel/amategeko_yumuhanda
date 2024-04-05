@@ -5,6 +5,7 @@ import 'package:amategeko/screens/amasomo/open_modified_quiz.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../../ads/reward_video_manager.dart';
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../irembo/courses_widget .dart';
@@ -98,7 +99,22 @@ class _CourseContentsState extends State<CourseContents> {
   void initState() {
     getCurrUserData(); //get login data
     fetchAllCourseContent();
+    RewardedVideoAdManager.loadRewardAd();
     super.initState();
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    RewardedVideoAdManager.dispose();
   }
 
   @override
@@ -120,7 +136,7 @@ class _CourseContentsState extends State<CourseContents> {
               color: Colors.white,
             ),
           ),
-          backgroundColor: kPrimaryColor,
+          backgroundColor: kPrimaryGreenColor,
           actions: [
             IconButton(
               icon: const Icon(
@@ -207,6 +223,7 @@ class _CourseContentsState extends State<CourseContents> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
+                            showRewardedAd();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -222,6 +239,7 @@ class _CourseContentsState extends State<CourseContents> {
                         ),
                         ElevatedButton(
                           onPressed: () {
+                            showRewardedAd();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -238,6 +256,7 @@ class _CourseContentsState extends State<CourseContents> {
                     )
                   : ElevatedButton(
                       onPressed: () {
+                        showRewardedAd();
                         Navigator.push(
                           context,
                           MaterialPageRoute(

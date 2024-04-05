@@ -99,8 +99,8 @@ class _BodyState extends State<Body> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(30),
                 child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: kPrimaryGreenColor),
                   onPressed: () {
                     setState(() {});
                     signupNavigator();
@@ -138,6 +138,16 @@ class _BodyState extends State<Body> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              "Backend api provided by hafiyacu",
+              style: TextStyle(
+                color: Colors.grey[300],
+                fontSize: 12.0,
+              ),
+            )
           ],
         ),
       ),

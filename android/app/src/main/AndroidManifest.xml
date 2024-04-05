@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.amategeko.amategeko">
+    package="com.amategeko.amategeko1">
 
     <queries>
         <!-- If your app opens https URLs -->
@@ -37,8 +37,8 @@
 
     <application
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:label="Rwanda Traffic Rules"
+        android:icon="@drawable/ic_launcher"
+        android:label="Action Driving"
         android:usesCleartextTraffic="true"
         >
         <activity

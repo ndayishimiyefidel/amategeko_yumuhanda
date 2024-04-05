@@ -9,7 +9,10 @@ class AddQuestion extends StatefulWidget {
   final bool isNew;
 
   const AddQuestion(
-      {super.key, required this.quizId, required this.quizTitle, required this.isNew});
+      {super.key,
+      required this.quizId,
+      required this.quizTitle,
+      required this.isNew});
 
   @override
   State<AddQuestion> createState() => _AddQuestionState();
@@ -48,18 +51,15 @@ class _AddQuestionState extends State<AddQuestion> {
     });
   }
 
-  
-
   @override
   void initState() {
     super.initState();
   }
 
- 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-   
+
     final questionField = TextFieldContainer(
       child: TextFormField(
         autofocus: false,
@@ -72,7 +72,7 @@ class _AddQuestionState extends State<AddQuestion> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.question_answer_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Type Question...",
           border: InputBorder.none,
@@ -172,10 +172,8 @@ class _AddQuestionState extends State<AddQuestion> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-           
-          },
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
+          onPressed: () {},
           child: const Text(
             "SAVE QUESTION",
             textAlign: TextAlign.center,
@@ -223,7 +221,7 @@ class _AddQuestionState extends State<AddQuestion> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(
@@ -275,22 +273,22 @@ class _AddQuestionState extends State<AddQuestion> {
                           (pickedFile == null)
                               ? Container()
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.file(
-                                        pickedFile!,
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.file(
+                                          pickedFile!,
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(

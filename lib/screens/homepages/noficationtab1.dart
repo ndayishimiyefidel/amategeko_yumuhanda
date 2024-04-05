@@ -29,41 +29,50 @@ class _NotificationTab1State extends State<NotificationTab1> {
   int from = 0;
   int totalRows = 0;
   int to = 10; // Initial range, fetch the first 10 records
+  bool isDisposed = false;
 
   Future<void> fetchAbafiteCode() async {
-    final apiUrl = API.fetchAbafiteCode + "?from=$from&to=$to";
+    final apiUrl = "${API.fetchAbafiteCode}?from=$from&to=$to";
     isLoading = true;
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (!isDisposed) {
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
 
-        if (data['success'] == true) {
-          if (!mounted) return;
-          setState(() {
-            if (from == 0) {
-              // If it's the first load, clear the list
-              allUsersList.clear();
-            }
-            // Append the new data to the existing list
-            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+          if (data['success'] == true) {
             if (!mounted) return;
             setState(() {
-              isLoading = false;
-              totalRows = int.tryParse(data['total'])!.toInt();
-            });
+              if (from == 0) {
+                // If it's the first load, clear the list
+                allUsersList.clear();
+              }
+              // Append the new data to the existing list
+              List<Map<String, dynamic>> newData =
+                  List<Map<String, dynamic>>.from(data['data']);
 
-            // Update 'from' and 'to' for the next load
-            from = to;
-            to += 10; // Fetch the next 10 records
-          });
+              newData.removeWhere((newItem) => allUsersList
+                  .any((existingItem) => newItem['id'] == existingItem['id']));
+
+              allUsersList.addAll(newData);
+              if (!mounted) return;
+              setState(() {
+                isLoading = false;
+                totalRows = int.tryParse(data['total'])!.toInt();
+              });
+
+              // Update 'from' and 'to' for the next load
+              from = to;
+              to += 10; // Fetch the next 10 records
+            });
+          } else {
+            print("Failed to execute query");
+          }
         } else {
-          print("Failed to execute query");
+          throw Exception('Failed to load data from the API');
         }
-      } else {
-        throw Exception('Failed to load data from the API');
       }
     } catch (e) {
       print("Error occurs: $e");
@@ -148,7 +157,7 @@ class _NotificationTab1State extends State<NotificationTab1> {
                   ],
                 ),
               )
-            : Center(
+            : const Center(
                 child: CircularProgressIndicator(),
               ),
       ),

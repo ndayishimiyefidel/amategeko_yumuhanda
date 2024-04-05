@@ -56,9 +56,6 @@ class _CreateQuizState extends State<CreateQuiz> {
   bool _isLoading = false;
   final bool isNew = true;
 
-
- 
-
   @override
   Widget build(BuildContext context) {
     //quiz url image
@@ -76,7 +73,7 @@ class _CreateQuizState extends State<CreateQuiz> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.price_change_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Quiz Price",
           border: InputBorder.none,
@@ -98,7 +95,7 @@ class _CreateQuizState extends State<CreateQuiz> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.title_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Quiz Title",
           border: InputBorder.none,
@@ -147,7 +144,7 @@ class _CreateQuizState extends State<CreateQuiz> {
         },
         icon: const Icon(
           Icons.arrow_drop_down_circle,
-          // color: kPrimaryColor,
+          // color: kPrimaryGreenColor,
         ),
         dropdownColor: Colors.white,
         decoration: const InputDecoration(
@@ -155,7 +152,7 @@ class _CreateQuizState extends State<CreateQuiz> {
           border: InputBorder.none,
           prefixIcon: Icon(
             Icons.quiz_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
         ),
       ),
@@ -167,10 +164,8 @@ class _CreateQuizState extends State<CreateQuiz> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-      
-          },
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
+          onPressed: () {},
           child: const Text(
             "CREATE QUIZ",
             style: TextStyle(
@@ -195,7 +190,7 @@ class _CreateQuizState extends State<CreateQuiz> {
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(
@@ -263,60 +258,58 @@ class _CreateQuizState extends State<CreateQuiz> {
                         children: <Widget>[
                           (pickedFile == null)
                               ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display already existing image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display already existing image
-                                      child: CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display already existing image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display already existing image
+                                        child: CachedNetworkImage(
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            width: 200.0,
+                                            height: 200.0,
+                                            padding: const EdgeInsets.all(20.0),
+                                            child:
+                                                const CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.lightBlueAccent),
+                                            ),
+                                          ),
+                                          imageUrl:
+                                              "https://media.gettyimages.com/id/1311206139/vector/stop-sign.jpg?s=612x612&w=gi&k=20&c=LLieTSmvLgus4NJFlsiGoL3P7qTYO3WNMql0SF7uOZA=",
                                           width: 200.0,
                                           height: 200.0,
-                                          padding:
-                                              const EdgeInsets.all(20.0),
-                                          child:
-                                              const CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<
-                                                        Color>(
-                                                    Colors.lightBlueAccent),
-                                          ),
-                                        ),
-                                        imageUrl:
-                                            "https://media.gettyimages.com/id/1311206139/vector/stop-sign.jpg?s=612x612&w=gi&k=20&c=LLieTSmvLgus4NJFlsiGoL3P7qTYO3WNMql0SF7uOZA=",
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              )
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                )
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.file(
-                                        pickedFile!,
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.file(
+                                          pickedFile!,
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 150.0, right: 120.0),
+                                padding:
+                                    EdgeInsets.only(top: 150.0, right: 120.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
@@ -371,7 +364,7 @@ class _CreateQuizState extends State<CreateQuiz> {
                       const Text(
                         "Add question to existing quiz? ",
                         style: TextStyle(
-                          color: kPrimaryColor,
+                          color: kPrimaryGreenColor,
                           fontSize: 18,
                         ),
                       ),
@@ -392,7 +385,7 @@ class _CreateQuizState extends State<CreateQuiz> {
                         child: const Text(
                           "Continue",
                           style: TextStyle(
-                            color: kPrimaryColor,
+                            color: kPrimaryGreenColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 22,
                           ),

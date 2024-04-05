@@ -42,7 +42,6 @@ class _UploadDocumentsState extends State<UploadDocuments> {
   }
 
   bool _isLoading = false;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +53,8 @@ class _UploadDocumentsState extends State<UploadDocuments> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-           
-          },
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
+          onPressed: () {},
           child: Text(
             widget.isNew == true ? "Upload Doc" : "Update Doc",
             style: const TextStyle(
@@ -81,7 +78,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
           widget.isNew == true ? "Upload Docs" : "Update Docs",
           style: const TextStyle(letterSpacing: 1.25, fontSize: 24),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -194,13 +191,13 @@ class _UploadDocumentsState extends State<UploadDocuments> {
                           GestureDetector(
                             onTap: selectsFile,
                             child: const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 100.0, right: 120.0),
+                                padding:
+                                    EdgeInsets.only(top: 100.0, right: 120.0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     CircleAvatar(
-                                      backgroundColor: kPrimaryColor,
+                                      backgroundColor: kPrimaryGreenColor,
                                       radius: 25.0,
                                       child: Icon(
                                         Icons.picture_as_pdf,
@@ -234,7 +231,8 @@ class _UploadDocumentsState extends State<UploadDocuments> {
                     children: <Widget>[
                       const Text(
                         "See All Documents ",
-                        style: TextStyle(color: kPrimaryColor, fontSize: 16),
+                        style:
+                            TextStyle(color: kPrimaryGreenColor, fontSize: 16),
                       ),
                       SizedBox(
                         width: size.width * 0.04,
@@ -253,7 +251,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
                         child: const Text(
                           "View Docs",
                           style: TextStyle(
-                            color: kPrimaryColor,
+                            color: kPrimaryGreenColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),

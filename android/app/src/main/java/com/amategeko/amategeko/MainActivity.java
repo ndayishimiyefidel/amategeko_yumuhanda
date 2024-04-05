@@ -1,4 +1,4 @@
-package com.amategeko.amategeko;
+package com.amategeko.amategeko1;
 
 import android.content.Intent;
 import android.os.Bundle;

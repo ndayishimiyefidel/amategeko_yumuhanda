@@ -78,7 +78,7 @@ class _ResultsState extends State<Results> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(
@@ -138,7 +138,7 @@ class _ResultsState extends State<Results> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  //showRewardedAd();
+                  showRewardedAd();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Exams()));
                 },

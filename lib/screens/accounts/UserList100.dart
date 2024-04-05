@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -25,48 +26,96 @@ class _UserList100State extends State<UserList100> {
   int itemsPerPage = 10;
   int currentPage = 0;
   bool isLoading = false;
+  bool isDisposed = false;
 
   int from = 0;
   int totalRows = 0;
-  int to = 10; // Initial range, fetch the first 10 records
+  int to = 100; // Initial range, fetch the first 10 records
 
+  // Update the fetchAllUsers function to handle the response data
   Future<void> fetchAllUsers() async {
-    final apiUrl = API.userWithNoCode + "?from=$from&to=$to";
-    isLoading = true;
+    final apiUrl = "${API.userWithNoCode}?from=$from&to=$to";
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (!isDisposed) {
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
 
-        if (data['success'] == true) {
-          if (!mounted) return;
-          setState(() {
-            if (from == 0) {
-              // If it's the first load, clear the list
-              allUsersList.clear();
-            }
-            // Append the new data to the existing list
-            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+          if (data['success'] == true) {
             if (!mounted) return;
             setState(() {
-              isLoading = false;
-              totalRows = int.tryParse(data['total'])!.toInt();
-            });
+              if (from == 0) {
+                allUsersList.clear();
+              }
+              List<Map<String, dynamic>> newData =
+                  List<Map<String, dynamic>>.from(data['data'] ?? []);
 
-            // Update 'from' and 'to' for the next load
-            from = to;
-            to += 10; // Fetch the next 10 records
-          });
+              newData.removeWhere((newItem) => allUsersList
+                  .any((existingItem) => newItem['id'] == existingItem['id']));
+
+              allUsersList.addAll(newData);
+              print("user list response data: $allUsersList");
+              isLoading = false;
+              totalRows = int.tryParse(data['total'] ?? '0') ?? 0;
+
+              from = to;
+              to += 10; // Fetch the next 10 records
+            });
+          } else {
+            setState(() {
+              isLoading = false;
+            });
+            print("Failed to execute query");
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content:
+                    Text('Failed to execute query. Please try again later'),
+              ));
+            }
+          }
         } else {
-          print("Failed to execute query");
+          throw Exception(
+              'Failed to load data from the API. Status Code: ${response.statusCode}');
         }
-      } else {
-        throw Exception('Failed to load data from the API');
+      }
+    } on SocketException catch (e) {
+      print("Error occurs: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Failed to connect to the server. Please check your internet connection'),
+        ));
+      }
+    } on FormatException catch (e) {
+      print("Error occurs: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Unexpected response from the server. Please try again later'),
+        ));
       }
     } catch (e) {
       print("Error occurs: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  'Failed to load data from the API. Please try again later')),
+        );
+      }
+    } finally {
+      if (!isDisposed && mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -149,7 +198,7 @@ class _UserList100State extends State<UserList100> {
                   ],
                 ),
               )
-            : Center(
+            : const Center(
                 child: CircularProgressIndicator(),
               ),
       ),

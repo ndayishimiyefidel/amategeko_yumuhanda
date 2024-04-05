@@ -88,11 +88,11 @@ class _ForgotState extends State<Forgot> {
                     }
                     return 'This is not a valid email';
                   },
-                  cursorColor: kPrimaryColor,
+                  cursorColor: kPrimaryGreenColor,
                   decoration: const InputDecoration(
                     icon: Icon(
                       Icons.email,
-                      color: kPrimaryColor,
+                      color: kPrimaryGreenColor,
                     ),
                     hintText: "Your Email",
                     border: InputBorder.none,
@@ -107,7 +107,7 @@ class _ForgotState extends State<Forgot> {
                   borderRadius: BorderRadius.circular(30),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor),
+                        backgroundColor: kPrimaryGreenColor),
                     onPressed: () {
                       requestResetLink();
                     },
@@ -132,7 +132,7 @@ class _ForgotState extends State<Forgot> {
                 children: <Widget>[
                   const Text(
                     "Already have an Account ? ",
-                    style: TextStyle(color: kPrimaryColor),
+                    style: TextStyle(color: kPrimaryGreenColor),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -148,7 +148,7 @@ class _ForgotState extends State<Forgot> {
                     child: const Text(
                       "Sign In",
                       style: TextStyle(
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

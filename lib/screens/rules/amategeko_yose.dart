@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+
 class AmategekoYose extends StatefulWidget {
   const AmategekoYose({Key? key}) : super(key: key);
 
@@ -78,20 +79,20 @@ class _AmategekoYoseState extends State<AmategekoYose> {
           ),
         ),
         actions: [
-      CustomButton(
-      text: "Amabwiriza",
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => AmabwirizaList(),
-          ),
-        );
-      },
-    )
+          CustomButton(
+            text: "Amabwiriza",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         elevation: 0.0,
       ),
       body: Column(
@@ -141,7 +142,7 @@ class FileTile extends StatelessWidget {
           Card(
             shape: RoundedRectangleBorder(
               side: BorderSide(
-                color: kPrimaryColor,
+                color: kPrimaryGreenColor,
                 width: size.width * 0.003,
               ),
               borderRadius: BorderRadius.circular(5.0),
@@ -159,7 +160,7 @@ class FileTile extends StatelessWidget {
                   ),
                 );
               },
-              splashColor: kPrimaryColor,
+              splashColor: kPrimaryGreenColor,
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.only(

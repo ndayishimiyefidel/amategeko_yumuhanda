@@ -123,7 +123,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
         }
       } else {
         // Handle HTTP request errors
-        print("failed to connect to server");
+        print("failed to connect to servers");
       }
     } catch (e) {
       // Handle exceptions
@@ -386,7 +386,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                               borderRadius: BorderRadius.circular(30),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
+                                    backgroundColor: kPrimaryGreenColor),
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
@@ -497,7 +497,7 @@ class _QuizTileState extends State<QuizTile> {
           Card(
             shape: RoundedRectangleBorder(
               side: BorderSide(
-                color: kPrimaryColor,
+                color: kPrimaryGreenColor,
                 width: size.width * 0.006,
               ),
               borderRadius: BorderRadius.circular(5.0),
@@ -536,7 +536,7 @@ class _QuizTileState extends State<QuizTile> {
                         borderRadius: BorderRadius.circular(10),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
+                            backgroundColor: kPrimaryGreenColor,
                             side:
                                 const BorderSide(color: Colors.green, width: 1),
                           ),

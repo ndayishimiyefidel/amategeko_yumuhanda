@@ -14,7 +14,8 @@ class EditQuestion extends StatefulWidget {
       option4,
       quizTitle;
 
-  const EditQuestion({super.key, 
+  const EditQuestion({
+    super.key,
     required this.quizId,
     required this.question,
     required this.questionUrl,
@@ -60,7 +61,6 @@ class _EditQuestionState extends State<EditQuestion> {
     });
   }
 
-  
   @override
   void initState() {
     super.initState();
@@ -88,7 +88,7 @@ class _EditQuestionState extends State<EditQuestion> {
         decoration: const InputDecoration(
           icon: Icon(
             Icons.question_answer_outlined,
-            color: kPrimaryColor,
+            color: kPrimaryGreenColor,
           ),
           hintText: "Type Question.. ",
           border: InputBorder.none,
@@ -203,10 +203,8 @@ class _EditQuestionState extends State<EditQuestion> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-        
-          },
+          style: ElevatedButton.styleFrom(backgroundColor: kPrimaryGreenColor),
+          onPressed: () {},
           child: const Text(
             "EDIT QUESTION",
             textAlign: TextAlign.center,
@@ -254,7 +252,7 @@ class _EditQuestionState extends State<EditQuestion> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(
@@ -300,41 +298,41 @@ class _EditQuestionState extends State<EditQuestion> {
                               ? (pickedFile == null)
                                   ? Container()
                                   : Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                          // display new updated image
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                                  Radius.circular(125.0)),
-                                          clipBehavior: Clip.hardEdge,
-                                          // display new updated image
-                                          child: Image.file(
-                                            pickedFile!,
-                                            width: 200.0,
-                                            height: 200.0,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ],
-                                  )
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Material(
+                                            // display new updated image
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(125.0)),
+                                            clipBehavior: Clip.hardEdge,
+                                            // display new updated image
+                                            child: Image.file(
+                                              pickedFile!,
+                                              width: 200.0,
+                                              height: 200.0,
+                                              fit: BoxFit.cover,
+                                            )),
+                                      ],
+                                    )
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.network(
-                                        widget.questionUrl.toString(),
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.network(
+                                          widget.questionUrl.toString(),
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(

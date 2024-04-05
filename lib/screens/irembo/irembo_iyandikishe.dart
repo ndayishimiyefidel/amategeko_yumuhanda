@@ -8,12 +8,11 @@ class IremboSignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         title: Text('KWIYANDIKISHA'),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         centerTitle: true,
       ),
-
       body: SignUp(),
     );
   }

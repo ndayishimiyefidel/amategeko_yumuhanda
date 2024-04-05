@@ -7,9 +7,9 @@ import '../utils/insttruction.dart';
 class AmabwirizaList extends StatelessWidget {
   void shareApp() {
     const String playStoreLink =
-        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
+        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko11";
 
-    final String message =
+    const String message =
         "Iyi application  yitwa RWANDA TRAFFIC RULE ni nziza iri kuri play store igizwe n'ibibazo n'ibisubizo babaza muri examin ya provisoire iga examin zose zirimo kuko bazakubaza imwe muri zo cyangwa baterure ibibazo 20 muri application Ni karibu kuri mwe mwese mushaka Provisoire mukoresheje uburyo bworoshye kandi bwizewe yangiriye akamaro Nawe yakugirira umumaro cyane kanda hano  $playStoreLink";
 
     // Share the message containing the link (with or without referral code)
@@ -23,8 +23,8 @@ class AmabwirizaList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('AMABWIRIZA'),
-        backgroundColor: kPrimaryColor,
+        title: const Text('AMABWIRIZA'),
+        backgroundColor: kPrimaryGreenColor,
         centerTitle: true,
       ),
       body: Padding(
@@ -33,14 +33,14 @@ class AmabwirizaList extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Ikaze kuri RWANDA TRAFFIC RULE:',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               InstructionItem(
                 title: '1. UBUSOBANURO BWA APPLICATION',
                 description:
@@ -59,13 +59,13 @@ class AmabwirizaList extends StatelessWidget {
               InstructionItem(
                 title: '4.KWISHYURA KUGIRA NGO IBIZAMINI BYOSE BIFUNGUKE',
                 description:
-                    '1. Nkuko nabisobanuye bwa mbere exam yambere ni ubuntu izindi 20 bisaba kwishyura 1500 RWF kuri 0788659575/0728877442 cg kuri MOMO PAY:329494 ibaruye kuri ALEXIS.\n 2.Iyo umaze kwishyura uhite ureba niba ufite connection (internet) ugahita ufungura exam ugakanda ahanditse saba code  ya application mwibara ryuburu ubundi ugakanda ahanditse saba code mwibara rya umuhondo ugahita usubira inyuma ugategereza iminota itanu ugatangira ukiga usanga byafungutse.',
+                    '1. Nkuko nabisobanuye bwa mbere exam yambere ni ubuntu izindi 20 bisaba kwishyura 5000 RWF kuri 0782877442/0728877442 cg kuri MOMO PAY:329494 ibaruye kuri ALEXIS.\n 2.Iyo umaze kwishyura uhite ureba niba ufite connection (internet) ugahita ufungura exam ugakanda ahanditse saba code  ya application mwibara ryuburu ubundi ugakanda ahanditse saba code mwibara rya umuhondo ugahita usubira inyuma ugategereza iminota itanu ugatangira ukiga usanga byafungutse.',
               ),
               InstructionItems(
                 title: '4. IBINDI BISABANURO BIRAMBUYE',
-                phoneNumbers: ['0788659575', '0728877442'],
+                phoneNumbers: const ['0782877442', '0738469060'],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               ListTile(
@@ -103,6 +103,7 @@ class InstructionItem extends StatelessWidget {
   final String description;
 
   InstructionItem({
+    super.key,
     required this.title,
     required this.description,
   });
@@ -114,16 +115,16 @@ class InstructionItem extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           description,
-          style: TextStyle(fontSize: 14),
+          style: const TextStyle(fontSize: 14),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
       ],
     );
   }

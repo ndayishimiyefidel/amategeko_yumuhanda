@@ -150,12 +150,12 @@ class _SignInState extends State<SignIn> {
                           GestureDetector(
                             onTap: () async {
                               await FlutterPhoneDirectCaller.callNumber(
-                                  "0788659575");
+                                  "0782877442");
                             },
                             child: const Text(
-                              "0788659575",
+                              "0782877442",
                               style: TextStyle(
-                                color: kPrimaryColor,
+                                color: kPrimaryGreenColor,
                                 fontSize: 18,
                               ),
                             ),
@@ -163,12 +163,12 @@ class _SignInState extends State<SignIn> {
                           GestureDetector(
                             onTap: () async {
                               await FlutterPhoneDirectCaller.callNumber(
-                                  "0728877442");
+                                  "0738469060");
                             },
                             child: const Text(
-                              "0728877442",
+                              "0738469060",
                               style: TextStyle(
-                                color: kPrimaryColor,
+                                color: kPrimaryGreenColor,
                                 fontSize: 18,
                               ),
                             ),
@@ -199,12 +199,12 @@ class _SignInState extends State<SignIn> {
 
                     return null;
                   },
-                  cursorColor: kPrimaryColor,
+                  cursorColor: kPrimaryGreenColor,
                   decoration: const InputDecoration(
                     hintText: "Andika nimero yawe",
                     icon: Icon(
                       Icons.call,
-                      color: kPrimaryColor,
+                      color: kPrimaryGreenColor,
                     ),
                     border: InputBorder.none,
                   ),
@@ -218,7 +218,7 @@ class _SignInState extends State<SignIn> {
                   borderRadius: BorderRadius.circular(30),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor),
+                        backgroundColor: kPrimaryGreenColor),
                     onPressed: () {
                       loginUser();
                     },
@@ -244,9 +244,9 @@ class _SignInState extends State<SignIn> {
                       children: <Widget>[
                         const Flexible(
                           child: Text(
-                            "Niba uri mushya Kanda hano handitse iyandikishe ukurikize amabwiriza",
+                            "Niba uri mushya Kanda hano handitse iyandikishe ukurikize amabwiriza?",
                             style: TextStyle(
-                              color: kPrimaryColor,
+                              color: kPrimaryGreenColor,
                               fontSize: 16,
                             ),
                           ),
@@ -266,7 +266,7 @@ class _SignInState extends State<SignIn> {
                             child: const Text(
                               "IYANDIKISHE",
                               style: TextStyle(
-                                color: kPrimaryColor,
+                                color: kPrimaryGreenColor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),

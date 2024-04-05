@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '788538011169',
     projectId: 'rwanda-traffic-rules',
     storageBucket: 'rwanda-traffic-rules.appspot.com',
-    iosBundleId: 'com.amategeko.amategeko',
+    iosBundleId: 'com.amategeko.amategeko11',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -76,6 +76,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '788538011169',
     projectId: 'rwanda-traffic-rules',
     storageBucket: 'rwanda-traffic-rules.appspot.com',
-    iosBundleId: 'com.amategeko.amategeko',
+    iosBundleId: 'com.amategeko.amategeko11',
   );
 }

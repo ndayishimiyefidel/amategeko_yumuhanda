@@ -112,9 +112,9 @@ class _SplashScreenState extends State<SplashScreen>
       textType: TextType.ColorizeAnimationText,
       textStyle: const TextStyle(fontSize: 40.0, fontFamily: 'Courgette'),
       colors: const [
-        kPrimaryColor,
+        kPrimaryGreenColor,
         kPrimaryLightColor,
-        kPrimaryColor,
+        kPrimaryGreenColor,
       ],
       backgroundColor: Colors.white,
     );

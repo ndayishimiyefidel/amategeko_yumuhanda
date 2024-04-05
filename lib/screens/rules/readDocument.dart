@@ -27,7 +27,7 @@ class _ReadFileState extends State<ReadFile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: <Widget>[
           IconButton(
             onPressed: () {

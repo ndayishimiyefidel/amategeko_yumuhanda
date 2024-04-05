@@ -141,7 +141,9 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
           MaterialPageRoute(
             builder: (context) {
               return Results(
-                  correct: _correct, incorrect: _incorrect, total: total);
+                  correct: _correct,
+                  incorrect: _incorrect,
+                  total: allQuestionList.length);
             },
           ),
         );
@@ -189,7 +191,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
           builder: (context) => Results(
             correct: _correct,
             incorrect: _incorrect,
-            total: total,
+            total: allQuestionList.length,
           ),
         ),
       );
@@ -241,7 +243,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
-        backgroundColor: kPrimaryColor,
+        backgroundColor: kPrimaryGreenColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -270,7 +272,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
                         textAlign: TextAlign.start,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: kPrimaryColor,
+                          color: kPrimaryGreenColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -288,7 +290,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
                       const Icon(
                         Icons.punch_clock,
                         size: 30,
-                        color: kPrimaryColor,
+                        color: kPrimaryGreenColor,
                       ),
                       Countdown(
                           animation: StepTween(begin: limitTime, end: 0)
@@ -371,7 +373,9 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
                   context,
                   MaterialPageRoute(
                     builder: (context) => Results(
-                        correct: _correct, incorrect: _incorrect, total: total),
+                        correct: _correct,
+                        incorrect: _incorrect,
+                        total: allQuestionList.length),
                   ),
                 );
               },
