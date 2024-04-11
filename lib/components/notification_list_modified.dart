@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
@@ -50,11 +52,14 @@ class _ModifiedUsersNotificationListState
   void initState() {
     super.initState();
     getCurrUser(); //get login data
-    requestPermission(); //request permission
-    loadFCM(); //load fcm
-    listenFCM(); //li st fcm
-    //get admin token
-    FirebaseMessaging.instance.subscribeToTopic("Traffic-Notification");
+    if (!kIsWeb && Platform.isAndroid) {
+      requestPermission(); //request permission
+      loadFCM(); //load fcm
+      listenFCM(); //li st fcm
+      //get admin token
+
+      FirebaseMessaging.instance.subscribeToTopic("Traffic-Notification");
+    }
   }
 
   getCurrUser() async {

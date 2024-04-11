@@ -30,6 +30,47 @@ class _NotificationTab2State extends State<NotificationTab2> {
   int totalRows = 0;
   int to = 10; // Initial range, fetch the first 10 records
 
+  // Future<void> fetchAbadafiteCode() async {
+  //   final apiUrl = API.fetchAbadafiteCode + "?from=$from&to=$to";
+  //   isLoading = true;
+
+  //   try {
+  //     final response = await http.get(Uri.parse(apiUrl));
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+
+  //       if (data['success'] == true) {
+  //         if (!mounted) return;
+  //         setState(() {
+  //           if (from == 0) {
+  //             // If it's the first load, clear the list
+  //             allUsersList.clear();
+  //           }
+
+  //           // Append the new data to the existing list
+  //           allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+  //           if (!mounted) return;
+  //           setState(() {
+  //             isLoading = false;
+  //             totalRows = int.tryParse(data['total'])!.toInt();
+  //           });
+  //           print("notification list:$allUsersList");
+
+  //           // Update 'from' and 'to' for the next load
+  //           from = to;
+  //           to += 10; // Fetch the next 10 records
+  //         });
+  //       } else {
+  //         print("Failed to execute query");
+  //       }
+  //     } else {
+  //       throw Exception('Failed to load data from the API');
+  //     }
+  //   } catch (e) {
+  //     print("Error occurs: $e");
+  //   }
+  // }
   Future<void> fetchAbadafiteCode() async {
     final apiUrl = API.fetchAbadafiteCode + "?from=$from&to=$to";
     isLoading = true;
@@ -38,33 +79,42 @@ class _NotificationTab2State extends State<NotificationTab2> {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final String responseBody = response.body;
 
-        if (data['success'] == true) {
-          if (!mounted) return;
-          setState(() {
-            if (from == 0) {
-              // If it's the first load, clear the list
-              allUsersList.clear();
-            }
+        if (responseBody.isNotEmpty) {
+          final data = json.decode(responseBody);
 
-            // Append the new data to the existing list
-            allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
+          if (data['success'] == true) {
             if (!mounted) return;
             setState(() {
-              isLoading = false;
-              totalRows = int.tryParse(data['total'])!.toInt();
-            });
+              if (from == 0) {
+                // If it's the first load, clear the list
+                allUsersList.clear();
+              }
 
-            // Update 'from' and 'to' for the next load
-            from = to;
-            to += 10; // Fetch the next 10 records
-          });
+              // Append the new data to the existing list
+              allUsersList
+                  .addAll(List<Map<String, dynamic>>.from(data['data']));
+              if (!mounted) return;
+              setState(() {
+                isLoading = false;
+                totalRows = int.tryParse(data['total'])!.toInt();
+              });
+              print("notification list:$allUsersList");
+
+              // Update 'from' and 'to' for the next load
+              from = to;
+              to += 10; // Fetch the next 10 records
+            });
+          } else {
+            print("Failed to execute query");
+          }
         } else {
-          print("Failed to execute query");
+          print("Empty response body");
         }
       } else {
-        throw Exception('Failed to load data from the API');
+        throw Exception(
+            'Failed to load data from the API: ${response.statusCode}');
       }
     } catch (e) {
       print("Error occurs: $e");
@@ -119,6 +169,7 @@ class _NotificationTab2State extends State<NotificationTab2> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               final data = allUsersList[index];
+                              print("response data:$data");
                               return UsersNotificationList(
                                 name: data["name"] ?? '',
                                 time: data["createdAt"],
@@ -146,7 +197,6 @@ class _NotificationTab2State extends State<NotificationTab2> {
                           child: const Text("Load More"),
                         ),
                       ),
-                    
                   ],
                 ),
               )

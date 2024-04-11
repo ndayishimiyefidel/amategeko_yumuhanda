@@ -51,15 +51,14 @@ class _UserNotificationState extends State<UserNotification> {
     preferences = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      currentuserid = preferences.getString("uid")!;
-      currentusername = preferences.getString("name")!;
-      userRole = preferences.getString("role")!;
-      phone = preferences.getString("phone")!;
-      userToken = preferences.getString("fcmToken")!;
+      currentuserid = preferences.getString("uid");
+      currentusername = preferences.getString("name");
+      userRole = preferences.getString("role");
+      phone = preferences.getString("phone").toString();
+      userToken = preferences.getString("fcmToken").toString();
+      print("FCM TOKEN $userToken");
+      checkQuizCode(currentuserid.toString());
     });
-    print("FCM TOKEN $userToken");
-
-    checkQuizCode(currentuserid.toString());
   }
 
   Future<void> checkQuizCode(String userId) async {
@@ -265,6 +264,7 @@ class _UserNotificationState extends State<UserNotification> {
 
         if (data['success'] == true) {
           // Append the new data to the existing list
+          if (!mounted) return;
           setState(() {
             allUsersList.addAll(List<Map<String, dynamic>>.from(data['data']));
             isloading = false;

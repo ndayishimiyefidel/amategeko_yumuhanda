@@ -254,14 +254,14 @@ class _SignInState extends State<SignIn> {
                         Flexible(
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const SignUpScreen();
-                                  },
-                                ),
-                              );
+                              scheduleMicrotask(() {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SignUpScreen(),
+                                  ),
+                                );
+                              });
                             },
                             child: const Text(
                               "IYANDIKISHE",

@@ -65,7 +65,7 @@ class _OpenQuizState extends State<OpenQuiz>
   bool isQuizVisible = true;
   ScreenshotCallback? screenshotCallback;
   late AnimationController _controller;
-  final limitTime = 1200 * 60;
+  final limitTime = 1200;
   int currentPageIndex = 0;
   QuestionModel getQuestionModelFromLocalData(
       Map<String, dynamic> questionData) {

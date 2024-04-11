@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
@@ -55,25 +57,28 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
   @override
   void initState() {
     super.initState();
-    getCurrUser(); //get login data
-    requestPermission(); //request permission
-    loadFCM(); //load fcm
-    listenFCM(); //li st fcm
-    //get admin token
-    FirebaseMessaging.instance.subscribeToTopic("Traffic-Notification");
+    getCurrUser();
+    //get login data
+    if (!kIsWeb && Platform.isAndroid) {
+      requestPermission(); //request permission
+      loadFCM(); //load fcm
+      listenFCM(); //li st fcm
+      //get admin token
+      FirebaseMessaging.instance.subscribeToTopic("Traffic-Notification");
+    }
   }
 
   getCurrUser() async {
     preferences = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      currentuserid = preferences.getString("uid")!;
-      currentusername = preferences.getString("name")!;
-      currentUserPhone = preferences.getString("phone")!;
+      currentuserid = preferences.getString("uid").toString();
+      currentusername = preferences.getString("name").toString();
+      currentUserPhone = preferences.getString("phone").toString();
       userRole = preferences.getString("role");
-      fcmToken = preferences.getString("fcmToken")!;
+      fcmToken = preferences.getString("fcmToken").toString();
+      print("Fcm Token:$fcmToken");
     });
-    print("Fcm Token:$fcmToken");
   }
 
   @override
@@ -97,8 +102,10 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
     var dateTimeFormat1 = DateFormat('dd/MM/yyyy, hh:mm a').format(date1);
     return InkWell(
       onTap: () {},
-      child: Container(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 5, bottom: 10),
+      child: Card(
+        margin: EdgeInsets.all(8),
+        // height: MediaQuery.of(context).size.height * 0.8,
+        // padding: const EdgeInsets.only(left: 16, right: 16, top: 5, bottom: 10),
         child: Row(
           children: <Widget>[
             Expanded(
