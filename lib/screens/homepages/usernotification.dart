@@ -132,7 +132,7 @@ class _UserNotificationState extends State<UserNotification> {
     const sabaCodeUrl = API.sabaCode;
     const int exam = 0;
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 5000 kuri 0782877442 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
@@ -202,10 +202,10 @@ class _UserNotificationState extends State<UserNotification> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
+                                      "*182*8*1*847318*5000#");
                                 },
                                 child: const Text(
-                                  "Ishyura 1500 Rwf.",
+                                  "Ishyura 5000 Rwf.",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,

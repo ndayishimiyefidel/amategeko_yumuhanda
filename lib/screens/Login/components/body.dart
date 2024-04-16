@@ -163,10 +163,10 @@ class _SignInState extends State<SignIn> {
                           GestureDetector(
                             onTap: () async {
                               await FlutterPhoneDirectCaller.callNumber(
-                                  "0738469060");
+                                  "0722877442");
                             },
                             child: const Text(
-                              "0738469060",
+                              "0722877442",
                               style: TextStyle(
                                 color: kPrimaryGreenColor,
                                 fontSize: 18,

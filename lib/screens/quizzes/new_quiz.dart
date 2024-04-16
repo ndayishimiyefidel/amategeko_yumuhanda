@@ -229,7 +229,7 @@ class _NewQuizState extends State<NewQuiz> {
                                     const Column(
                                       children: [
                                         Text(
-                                          "1.Kugirango examen zifunguke ubanza kwishyura 5000 rwf kuri 0782877442/0728877442  cyangwa ukanze mu ibara ry'umukara cyangwa ukanze *182*8*1*847318*5000# kuri momo pay ibaruye kuri ALEXIS",
+                                          "1.Kugirango examen zifunguke ubanza kwishyura 5000 rwf kuri 0782877442/0722877442  cyangwa ukanze mu ibara ry'umukara cyangwa ukanze *182*8*1*847318*5000# kuri momo pay ibaruye kuri ALEXIS",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -262,7 +262,7 @@ class _NewQuizState extends State<NewQuiz> {
                                           '4. Iyo wishyuye ukoresheje nimero itari muri application cg ukanze uhanditse saba code  utafunguye connection uhamagara kuri izi nimero tugufungurira: ',
                                       phoneNumbers: const [
                                         '0782877442',
-                                        '0738469060'
+                                        '0722877442'
                                       ],
                                     ),
                                   ],
@@ -650,7 +650,7 @@ class _QuizTileState extends State<QuizTile> {
                                               children: [
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'ubururu usabe code ifungura exam ariko urebe niba ufite connection.",
+                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'umukara usabe code ifungura exam ariko urebe niba ufite connection.",
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight:

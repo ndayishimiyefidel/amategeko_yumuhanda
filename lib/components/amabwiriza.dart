@@ -59,11 +59,11 @@ class AmabwirizaList extends StatelessWidget {
               InstructionItem(
                 title: '4.KWISHYURA KUGIRA NGO IBIZAMINI BYOSE BIFUNGUKE',
                 description:
-                    '1. Nkuko nabisobanuye bwa mbere exam yambere ni ubuntu izindi 20 bisaba kwishyura 5000 RWF kuri 0782877442/0728877442 cg kuri MOMO PAY:329494 ibaruye kuri ALEXIS.\n 2.Iyo umaze kwishyura uhite ureba niba ufite connection (internet) ugahita ufungura exam ugakanda ahanditse saba code  ya application mwibara ryuburu ubundi ugakanda ahanditse saba code mwibara rya umuhondo ugahita usubira inyuma ugategereza iminota itanu ugatangira ukiga usanga byafungutse.',
+                    '1. Nkuko nabisobanuye bwa mbere exam yambere ni ubuntu izindi 20 bisaba kwishyura 5000 RWF kuri 0782877442/0722877442 cg kuri MOMO PAY:847318 ibaruye kuri ALEXIS.\n 2.Iyo umaze kwishyura uhite ureba niba ufite connection (internet) ugahita ufungura exam ugakanda ahanditse saba code  ya application mwibara ryuburu ubundi ugakanda ahanditse saba code mwibara rya umuhondo ugahita usubira inyuma ugategereza iminota itanu ugatangira ukiga usanga byafungutse.',
               ),
               InstructionItems(
                 title: '4. IBINDI BISABANURO BIRAMBUYE',
-                phoneNumbers: const ['0782877442', '0738469060'],
+                phoneNumbers: const ['0782877442', '0722877442'],
               ),
               const SizedBox(
                 height: 10,

@@ -139,7 +139,6 @@ class _SignUpState extends State<SignUp> {
                 if (fcmToken != null) {
                   await preferences.setString("fcmToken", fcmToken!);
                 }
-                // ignore: use_build_context_synchronously
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -331,10 +330,10 @@ class _SignUpState extends State<SignUp> {
                             GestureDetector(
                               onTap: () async {
                                 await FlutterPhoneDirectCaller.callNumber(
-                                    "0788659575");
+                                    "0782877442");
                               },
                               child: const Text(
-                                "0788659575",
+                                "0782877442",
                                 style: TextStyle(
                                   color: kPrimaryGreenColor,
                                   fontSize: 18,
@@ -344,10 +343,10 @@ class _SignUpState extends State<SignUp> {
                             GestureDetector(
                               onTap: () async {
                                 await FlutterPhoneDirectCaller.callNumber(
-                                    "0728877442");
+                                    "0722877442");
                               },
                               child: const Text(
-                                "0728877442",
+                                "0722877442",
                                 style: TextStyle(
                                   color: kPrimaryGreenColor,
                                   fontSize: 18,
