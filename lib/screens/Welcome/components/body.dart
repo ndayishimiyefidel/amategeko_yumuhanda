@@ -56,7 +56,7 @@ class _BodyState extends State<Body> {
             const Padding(
               padding: EdgeInsets.only(left: 15, right: 15),
               child: Text(
-                "MURAKAZA NEZA KURI APULIKASIYO Y'AMATEGEKO Y'UMUHANDA",
+                "WELCOME TO THE ROAD RULES APP",
                 style: TextStyle(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -73,7 +73,7 @@ class _BodyState extends State<Body> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "ICYITONDERWA:",
+                    "NOTICE:",
                     style: TextStyle(
                       fontSize: 22,
                       color: Colors.red,
