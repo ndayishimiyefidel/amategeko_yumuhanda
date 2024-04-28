@@ -247,7 +247,7 @@ class _NewQuizState extends State<NewQuiz> {
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam",
+                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse tangira ikizamini",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -650,7 +650,7 @@ class _QuizTileState extends State<QuizTile> {
                                               children: [
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'umukara usabe code ifungura exam ariko urebe niba ufite connection.",
+                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'umukara usabe code ifungura Ikizamini ariko urebe niba ufite connection.",
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight:
@@ -678,8 +678,8 @@ class _QuizTileState extends State<QuizTile> {
                             children: [
                               Text(
                                 widget.userRole == "Admin"
-                                    ? "Fungur Exam"
-                                    : "Tangira Exam",
+                                    ? "Fungura Ikizamini"
+                                    : "tangira ikizamini",
                                 style: const TextStyle(
                                     color: Colors.white,
                                     letterSpacing: 2,

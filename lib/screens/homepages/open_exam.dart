@@ -109,12 +109,11 @@ class _OpenExamPageState extends State<OpenExamPage>
           ),
           appBar: AppBar(
             title: const Text(
-              "Exam Page",
+              "Hitamo ururimi",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.normal,
-                letterSpacing: 1.25,
-                fontSize: 24,
+                fontSize: 14,
               ),
             ),
             leading: IconButton(

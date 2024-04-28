@@ -89,11 +89,11 @@ class _GroupListState extends State<GroupList> {
         child: Column(
           children: [
             FileTile(
-                linkUrl: "https://chat.whatsapp.com/EqHwyLVDT6Z6FdRnLFibmu",
-                groupName: "Amategeko yumuhanda VIP1"),
+                linkUrl: "https://chat.whatsapp.com/HXcmOD9ytduEr3cUR7jTgE",
+                groupName: "Amategeko yumuhanda"),
             FileTile(
-                linkUrl: "https://chat.whatsapp.com/JHfdbKSYVFz1s5jlTKfpcm",
-                groupName: "Amategeko yumuhanda VIP2")
+                linkUrl: "https://chat.whatsapp.com/ImcYethznSp9l2CAIfgbaN",
+                groupName: "Amategeko yumuhanda VIP")
           ],
         ),
       )),

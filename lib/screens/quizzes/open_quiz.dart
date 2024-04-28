@@ -65,7 +65,7 @@ class _OpenQuizState extends State<OpenQuiz>
   bool isQuizVisible = true;
   ScreenshotCallback? screenshotCallback;
   late AnimationController _controller;
-  final limitTime = 1200 * 60;
+  final limitTime = 1200;
   int currentPageIndex = 0;
   QuestionModel getQuestionModelFromLocalData(
       Map<String, dynamic> questionData) {
@@ -248,7 +248,7 @@ class _OpenQuizState extends State<OpenQuiz>
         );
       },
       label: const Text(
-        'Soza Exam',
+        'soza ikizamini',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 16,
@@ -272,7 +272,7 @@ class _OpenQuizState extends State<OpenQuiz>
       if (currentPageIndex == (widget.questions.length) - 1) {
         if (!mounted) return;
         setState(() {
-          btnText = "Soza Exam";
+          btnText = "soza ikizamini";
         });
       }
       if (!mounted) return;

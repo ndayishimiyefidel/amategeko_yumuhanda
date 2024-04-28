@@ -1,7 +1,7 @@
 name: amategeko
 description: A new Flutter project.
 publish_to: 'none' 
-version: 1.0.0+48
+version: 1.0.0+1
 #this offline version
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -58,8 +58,8 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  # image_path: "assets/icons/logo.png"
-  image_path: "assets/logo1.jpg"
+  image_path: "assets/icons/logo-app.png"
+  # image_path: "assets/logo1.jpg"
 
 flutter:
   uses-material-design: true

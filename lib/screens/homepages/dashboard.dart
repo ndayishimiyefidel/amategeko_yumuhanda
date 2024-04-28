@@ -189,7 +189,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               }
                             },
                             child: const DashboardCard(
-                              name: "Exams",
+                              name: "Ibizamini",
                               imgpath: "rnp.jpg",
                             ),
                           ),

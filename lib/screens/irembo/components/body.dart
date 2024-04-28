@@ -731,7 +731,7 @@ class _SignUpState extends State<SignUp> {
                             currentusername, "Exams");
                       },
                       child: const Text(
-                        "Saba Code ifungura exam",
+                        "Saba Code iFungura Ikizamini",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,

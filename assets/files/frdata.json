@@ -172,7 +172,7 @@
             "quizId": "1",
             "examType": "Paid",
             "title": "Exam",
-            "examImgUrl": "assets/examimages/exam10.png",
+            "examImgUrl": "assets/examimages/exam10.jpg",
             "questions": [
                 {
                     "question": "1. Les autobus destinés au transport des écoliers peuvent être munis de deux feux oranges clignotants pour signaler l’arrêt et de recommander la prudence. Ces feux sont placés :",
@@ -516,7 +516,7 @@
             "quizId": "3",
             "examType": "Paid",
             "title": "Free Exam",
-            "examImgUrl": "assets/examimages/exam3.png",
+            "examImgUrl": "assets/examimages/exam3.jpg",
             "questions": [
                 {
                     "question": "1. Si le chargement est constitué de céréale, café perchet, charbon de bois, cotton non égrené, poille, herbe branchages ou fourrage en vrac à l’exclusion de balles comprimées sa largeur peut atteindre des mesures suivantes:",
@@ -852,7 +852,7 @@
             "quizId": "5",
             "examType": "Paid",
             "title": "Exam",
-            "examImgUrl": "assets/examimages/exam5.png",
+            "examImgUrl": "assets/examimages/exam5.jpg",
             "questions": [
                 {
                     "question": "1. Un panneau additionnel indiquant le terrain de camping et de caravane est caractérisé par les couleurs suivantes:",
@@ -1524,7 +1524,7 @@
             "quizId": "9",
             "examType": "Paid",
             "title": "Exam",
-            "examImgUrl": "assets/examimages/exam9.png",
+            "examImgUrl": "assets/examimages/exam9.jpg",
             "questions": [
                 {
                     "question": "1. Votre téléphone portable sonne pendant votre voyage. Que pouvez-vous faire?",
@@ -1712,7 +1712,7 @@
             "quizId": "10",
             "examType": "Paid",
             "title": "Exam",
-            "examImgUrl": "assets/examimages/exam10.png",
+            "examImgUrl": "assets/examimages/exam10.jpg",
             "questions": [
                 {
                     "question": "1. Sur une chaussée à deux bandes, à quoi sert la bande de gauche ?",
@@ -1900,7 +1900,7 @@
             "quizId": "11",
             "examType": "Paid",
             "title": "Exam",
-            "examImgUrl": "assets/examimages/exam11.png",
+            "examImgUrl": "assets/examimages/exam11.jpg",
             "questions": [
                 {
                     "question": "1. Ce signal signifie?",
@@ -3028,7 +3028,7 @@
             "quizId": "17",
             "examType": "Paid",
             "title": "Exam",
-            "examImgUrl": "assets/examimages/exam17.png",
+            "examImgUrl": "assets/examimages/exam17.jpg",
             "questions": [
                 {
                     "question": "1. Ce signal signifie:",

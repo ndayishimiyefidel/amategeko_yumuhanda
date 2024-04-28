@@ -3,7 +3,7 @@
     {
       "quizId": "177",
       "examType": "Free",
-      "title": "Exam y'ubuntu(Free)",
+      "title": "Ikizamini cy'ubuntu(Free)",
       "examImgUrl": "assets/examimages/free.jpg",
       "questions": [
         {
@@ -568,7 +568,7 @@
       "quizId": "3",
       "examType": "Paid",
       "title": "Exam",
-      "examImgUrl": "assets/examimages/exam3.png",
+      "examImgUrl": "assets/examimages/exam3.jpg",
       "questions": [
         {
           "question": "1. Iyo nta mategeko awugabanya by’umwihariko, umuvuduko ntarengwa ku modoka zitwara abagenzi mu buryo bwa rusange ni:",
@@ -944,7 +944,7 @@
       "quizId": "5",
       "examType": "Paid",
       "title": "Exam",
-      "examImgUrl": "assets/examimages/exam5.png",
+      "examImgUrl": "assets/examimages/exam5.jpg",
       "questions": [
         {
           "question": "1. Amatara ndangacyerekezo agomba kuba agizwe n’ibintu bifashe ku rumuri rumyasa, biringaniye ku buryo bigira umubare utari igiharwe ku mpande z’imbere n’inyuma z’ikinyabiziga ayo matara aba afite amabara akurikira:",
@@ -1884,7 +1884,7 @@
       "quizId": "10",
       "examType": "Paid",
       "title": "Exam",
-      "examImgUrl": "assets/examimages/exam10.png",
+      "examImgUrl": "assets/examimages/exam10.jpg",
       "questions": [
         {
           "question": "1. Mu gihe telefone yawe ihamagawe utwaye imodoka wakora iki?",
@@ -2072,7 +2072,7 @@
       "quizId": "11",
       "examType": "Paid",
       "title": "Exam",
-      "examImgUrl": "assets/examimages/exam11.png",
+      "examImgUrl": "assets/examimages/exam11.jpg",
       "questions": [
         {
           "question": "1. Inzira nyabagendwa ifite ibyerekezo bibiri, uruhande rw’ibumoso rudufasha iki?",
@@ -2260,7 +2260,7 @@
       "quizId": "12",
       "examType": "Paid",
       "title": "Exam",
-      "examImgUrl": "assets/examimages/exam12.png",
+      "examImgUrl": "assets/examimages/exam12.jpg",
       "questions": [
         {
           "question": "1. Iki cyapa gisobanura iki?",
@@ -3200,7 +3200,7 @@
       "quizId": "17",
       "examType": "Paid",
       "title": "Exam",
-      "examImgUrl": "assets/examimages/exam17.png",
+      "examImgUrl": "assets/examimages/exam17.jpg",
       "questions": [
         {
           "question": "1. Mu gihe hari undi muyobozi w’ikinyabiziga ugukurikiye watangiye kukunyuraho:",

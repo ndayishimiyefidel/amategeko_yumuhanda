@@ -318,7 +318,7 @@ class _UserNotificationState extends State<UserNotification> {
                                           height: size.height * 0.1,
                                         ),
                                         const Text(
-                                          "Nta kode ufite ifungura exam saba code",
+                                          "Nta kode ufite iFungura Ikizamini saba code",
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: Colors.red,
@@ -347,7 +347,7 @@ class _UserNotificationState extends State<UserNotification> {
                                                     "Exams");
                                               },
                                               child: const Text(
-                                                "Saba Code ifungura exam",
+                                                "Saba Code iFungura Ikizamini",
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 18,

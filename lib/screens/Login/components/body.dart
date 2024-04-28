@@ -282,7 +282,7 @@ class _SignInState extends State<SignIn> {
               GestureDetector(
                 onTap: () {
                   _launchURL(
-                      "https://doc-hosting.flycricket.io/rwanda-traffic-rules-privacy-policy/4ffe9e57-7316-45d0-b5aa-7749fa65ea19/privacy");
+                      "https://www.freeprivacypolicy.com/live/4327b7ea-6cfa-4312-9d4a-61e11b24962e");
                 },
                 child: const Text(
                   "Privacy Policy",
@@ -391,38 +391,42 @@ class _SignInState extends State<SignIn> {
 
             if (userRole == "Admin" ||
                 userRole == "Ambassador" ||
-                userRole == "Caller") {
+                userRole == "Caller" ||
+                userRole == "User") {
+              //   setState(() {
+              //     Navigator.push(context, route);
+              //   });
+              // } else {
+              //   if (userData.containsKey("deviceId") &&
+              //       userData["deviceId"] != null) {
+              //     final String userDeviceId = userData['deviceId'];
+              //     if (userDeviceId == deviceId) {
+              //       setState(() {
+              //         Navigator.push(context, route);
+              //       });
+              //     } else if (kIsWeb) {
+              //       setState(() {
+              //         Navigator.push(context, route);
+              //       });
+              //     } else {
+              //       Fluttertoast.showToast(
+              //         msg:
+              //             "Ntabwo mwiyandikishije mukoreshe iyi telephone, nimukoreshe telephone mwakoresheje mwiyandikisha",
+              //         textColor: Colors.red,
+              //         fontSize: 14,
+              //       );
+              //     }
+              //   } else {
+              //     Fluttertoast.showToast(
+              //       msg:
+              //           "Ntabwo kwinjira bishoboka ongera wiyandikishe ukanze ahanditse iyandikishe!",
+              //       textColor: Colors.red,
+              //       fontSize: 12,
+              //     );
+              //   }
               setState(() {
                 Navigator.push(context, route);
               });
-            } else {
-              if (userData.containsKey("deviceId") &&
-                  userData["deviceId"] != null) {
-                final String userDeviceId = userData['deviceId'];
-                if (userDeviceId == deviceId) {
-                  setState(() {
-                    Navigator.push(context, route);
-                  });
-                } else if (kIsWeb) {
-                  setState(() {
-                    Navigator.push(context, route);
-                  });
-                } else {
-                  Fluttertoast.showToast(
-                    msg:
-                        "Ntabwo mwiyandikishije mukoreshe iyi telephone, nimukoreshe telephone mwakoresheje mwiyandikisha",
-                    textColor: Colors.red,
-                    fontSize: 14,
-                  );
-                }
-              } else {
-                Fluttertoast.showToast(
-                  msg:
-                      "Ntabwo kwinjira bishoboka ongera wiyandikishe ukanze ahanditse iyandikishe!",
-                  textColor: Colors.red,
-                  fontSize: 12,
-                );
-              }
             }
           } else {
             // Login failed
