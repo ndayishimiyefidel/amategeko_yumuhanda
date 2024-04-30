@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../backend/apis/db_connection.dart';
@@ -8,6 +9,7 @@ import '../../utils/constants.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 
+// Replace hardcoded text with variables
 class CourseContent extends StatefulWidget {
   final String courseId;
   final isNew;
@@ -97,15 +99,15 @@ class _CourseContentState extends State<CourseContent> {
 
         if (jsonResponse['created'] == true) {
           // Handle successful creation
-          Fluttertoast.showToast(msg: 'Course content created successfully');
-          print('Course content created successfully');
+          Fluttertoast.showToast(msg: AppText.courseContentCreatedSuccessfully);
+          print(AppText.courseContentCreatedSuccessfully);
           setState(() {
             _courseDescription = '';
           });
         } else {
           // Handle failure to create course content
-          print('Failed to create course content');
-          Fluttertoast.showToast(msg: 'Failed to create course content');
+          print(AppText.failedToCreateCourseContent);
+          Fluttertoast.showToast(msg: AppText.failedToCreateCourseContent);
         }
         if (!mounted) return;
         setState(() {
@@ -144,15 +146,15 @@ class _CourseContentState extends State<CourseContent> {
             _descriptionController.text = value!;
           },
           textInputAction: TextInputAction.next,
-          decoration: const InputDecoration(
-            hintText: "Enter content",
+          decoration: InputDecoration(
+            hintText: AppText.enterContent,
             border: InputBorder.none,
           ),
           onChanged: (val) {
             _courseDescription = val;
           },
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          validator: (input) => input!.isEmpty ? 'Enter course content' : null,
+          validator: (input) => input!.isEmpty ? AppText.enterContent : null,
         ),
       ),
     );
@@ -168,11 +170,14 @@ class _CourseContentState extends State<CourseContent> {
           onPressed: () {
             uploadFiles();
           },
-          child: const Text(
-            "Add Content",
+          child: Text(
+            AppText.addContent,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -181,13 +186,13 @@ class _CourseContentState extends State<CourseContent> {
       appBar: AppBar(
         leading: IconButton(
           color: Colors.white,
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: Icon(Icons.arrow_back_ios),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          "Course Content",
+        title: Text(
+          AppText.courseContent,
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,
@@ -197,7 +202,7 @@ class _CourseContentState extends State<CourseContent> {
         backgroundColor: kPrimaryColor,
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.notifications,
               color: Colors.white,
               size: 25,
@@ -224,11 +229,12 @@ class _CourseContentState extends State<CourseContent> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Create Course Content",
+                    AppText.createCourseContent,
                     style: TextStyle(
-                        fontSize: 25,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
+                      fontSize: 25,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   courseDescriptionField,
                   SizedBox(
@@ -236,30 +242,31 @@ class _CourseContentState extends State<CourseContent> {
                   ),
                   ElevatedButton(
                     onPressed: pickAudioFiles,
-                    child: Text('Pick Audio Files'),
+                    child: Text(AppText.pickAudioFiles),
                   ),
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: pickImageFiles,
-                    child: Text('Pick Image Files'),
+                    child: Text(AppText.pickImageFiles),
                   ),
                   SizedBox(height: 16),
                   if (_selectedAudioFiles.isNotEmpty ||
                       _selectedImageFiles.isNotEmpty)
                     Text(
-                        'Selected Files: ${_selectedAudioFiles.length + _selectedImageFiles.length}'),
+                        '${AppText.selectedFiles}${_selectedAudioFiles.length + _selectedImageFiles.length}'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Expanded(
-                          child: Column(
-                        children: [
-                          createCourse,
-                          _isLoading == true
-                              ? CircularProgressIndicator()
-                              : SizedBox(),
-                        ],
-                      ))
+                        child: Column(
+                          children: [
+                            createCourse,
+                            _isLoading == true
+                                ? CircularProgressIndicator()
+                                : SizedBox(),
+                          ],
+                        ),
+                      )
                     ],
                   )
                 ],

@@ -9,6 +9,7 @@ import '../../utils/constants.dart';
 import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 import '../quizzes/exam_english.dart';
 import '../quizzes/examen_fr.dart';
 import '../quizzes/exams.dart';
@@ -110,7 +111,7 @@ class _OpenExamPageState extends State<OpenExamPage>
           ),
           appBar: AppBar(
             title: const Text(
-              "Exam Page",
+              AppText.openPage,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.normal,
@@ -130,7 +131,7 @@ class _OpenExamPageState extends State<OpenExamPage>
             ),
             actions: [
               CustomButton(
-                text: "Amabwiriza",
+                text: AppText.appRules,
                 onPressed: () {
                   Navigator.push(
                     context,

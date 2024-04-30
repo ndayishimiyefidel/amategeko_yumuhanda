@@ -17,6 +17,7 @@ import '../../../ads/reward_video_manager.dart';
 import '../../../backend/apis/db_connection.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
+import '../../../widgets/apptext.dart';
 import 'check_deviceid.dart';
 import 'package:http/http.dart' as http;
 
@@ -112,7 +113,7 @@ class _SignInState extends State<SignIn> {
             children: <Widget>[
               SizedBox(height: size.height * 0.1),
               const Text(
-                "KWINJIRA MURI APULIKASIYO",
+                AppText.loginTitle,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: size.height * 0.03),
@@ -126,7 +127,7 @@ class _SignInState extends State<SignIn> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "ICYITONDERWA:",
+                      AppText.noticeTitle,
                       style: TextStyle(
                         fontSize: 22,
                         color: Colors.red,
@@ -135,7 +136,7 @@ class _SignInState extends State<SignIn> {
                     ),
                     SizedBox(height: size.height * 0.02),
                     const Text(
-                      "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wahamagara kuri izi nimero zikurikira:",
+                      AppText.noticeIssueContent,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
@@ -201,7 +202,7 @@ class _SignInState extends State<SignIn> {
                   },
                   cursorColor: kPrimaryColor,
                   decoration: const InputDecoration(
-                    hintText: "Andika nimero yawe",
+                    hintText: AppText.phoneHintText,
                     icon: Icon(
                       Icons.call,
                       color: kPrimaryColor,
@@ -223,7 +224,7 @@ class _SignInState extends State<SignIn> {
                       loginUser();
                     },
                     child: const Text(
-                      "Emeza",
+                      AppText.loginButton,
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 22,
@@ -244,7 +245,7 @@ class _SignInState extends State<SignIn> {
                       children: <Widget>[
                         const Flexible(
                           child: Text(
-                            "Niba uri mushya Kanda hano handitse iyandikishe ukurikize amabwiriza",
+                            AppText.messageSignUp,
                             style: TextStyle(
                               color: kPrimaryColor,
                               fontSize: 16,
@@ -264,7 +265,7 @@ class _SignInState extends State<SignIn> {
                               });
                             },
                             child: const Text(
-                              "IYANDIKISHE",
+                              AppText.registerButton,
                               style: TextStyle(
                                 color: kPrimaryColor,
                                 fontWeight: FontWeight.bold,
@@ -410,7 +411,7 @@ class _SignInState extends State<SignIn> {
                 } else {
                   Fluttertoast.showToast(
                     msg:
-                        "Ntabwo mwiyandikishije mukoreshe iyi telephone, nimukoreshe telephone mwakoresheje mwiyandikisha",
+                        "You are not registered to use this phone, use the phone you used to register",
                     textColor: Colors.red,
                     fontSize: 14,
                   );
@@ -418,7 +419,7 @@ class _SignInState extends State<SignIn> {
               } else {
                 Fluttertoast.showToast(
                   msg:
-                      "Ntabwo kwinjira bishoboka ongera wiyandikishe ukanze ahanditse iyandikishe!",
+                      "Unable to login please register again by clicking the register button!",
                   textColor: Colors.red,
                   fontSize: 12,
                 );
@@ -430,7 +431,7 @@ class _SignInState extends State<SignIn> {
               isLoading = false;
             });
             Fluttertoast.showToast(
-              msg: loginResult['message'] ?? "Ntabwo mwiyandikishe",
+              msg: loginResult['message'] ?? "You are not registered",
               textColor: Colors.red,
               fontSize: 18,
             );

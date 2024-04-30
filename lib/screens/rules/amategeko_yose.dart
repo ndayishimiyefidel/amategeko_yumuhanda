@@ -1,12 +1,14 @@
 import 'package:amategeko/components/amabwiriza.dart';
 import 'package:amategeko/screens/rules/readDocument.dart';
 import 'package:amategeko/screens/rules/uploadDocument.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+
 class AmategekoYose extends StatefulWidget {
   const AmategekoYose({Key? key}) : super(key: key);
 
@@ -25,12 +27,12 @@ class _AmategekoYoseState extends State<AmategekoYose> {
         children: const [
           FileTile(
             assetPath: 'assets/files/IGAZETI_YA_LETA.pdf',
-            fileName: 'IGAZETI YA LETA',
+            fileName: AppText.gvt,
             fileSize: '502 KB',
           ),
           FileTile(
             assetPath: 'assets/files/alexisibyapa.pdf',
-            fileName: 'IBYAPA BY ALEXIS',
+            fileName: AppText.ibyapa,
             fileSize: '753 KB',
           ),
 
@@ -59,7 +61,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
       ),
       appBar: AppBar(
         title: const Text(
-          "Documents",
+          AppText.documentTitle,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -78,17 +80,17 @@ class _AmategekoYoseState extends State<AmategekoYose> {
           ),
         ),
         actions: [
-      CustomButton(
-      text: "Amabwiriza",
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => AmabwirizaList(),
-          ),
-        );
-      },
-    )
+          CustomButton(
+            text: AppText.appRules,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,
@@ -191,7 +193,7 @@ class FileTile extends StatelessWidget {
                                   height: size.height * 0.01,
                                 ),
                                 Text(
-                                  "File Size: $fileSize",
+                                  "${AppText.fileSize}: $fileSize",
                                   textAlign: TextAlign.start,
                                   style: const TextStyle(
                                     fontSize: 16,

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 
 class GroupList extends StatefulWidget {
   const GroupList({Key? key}) : super(key: key);
@@ -69,7 +70,7 @@ class _GroupListState extends State<GroupList> {
         ),
         actions: [
           CustomButton(
-            text: "Amabwiriza",
+            text: AppText.appRules,
             onPressed: () {
               Navigator.push(
                 context,

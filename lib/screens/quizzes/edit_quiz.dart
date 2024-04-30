@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../utils/constants.dart';
+import '../../widgets/apptext.dart';
 import '../homepages/notificationtab.dart';
 
 class EditQuiz extends StatefulWidget {
@@ -210,7 +211,7 @@ class _EditQuizState extends State<EditQuiz> {
           },
         ),
         title: const Text(
-          "Edit Quiz",
+          AppText.editButton,
           style:
           TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),

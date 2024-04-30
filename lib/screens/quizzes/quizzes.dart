@@ -1,4 +1,5 @@
 import 'package:amategeko/screens/quizzes/new_quiz.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,12 +8,11 @@ import '../../widgets/MainDrawer.dart';
 import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
 
-
 class Quizzes extends StatefulWidget {
   const Quizzes({super.key});
 
   @override
- State createState() => _QuizzesState();
+  State createState() => _QuizzesState();
 }
 
 class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
@@ -27,7 +27,7 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
       ),
       appBar: AppBar(
         title: const Text(
-          "Exam & Quiz",
+          AppText.exams,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -90,8 +90,8 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
                       unselectedLabelColor: Colors.black26,
                       indicatorColor: Colors.black,
                       tabs: [
-                        Tab(text: 'Exam'),
-                        Tab(text: 'Quiz'),
+                        Tab(text: AppText.exams),
+                        Tab(text: AppText.quiz),
                       ],
                     ),
                   ),
@@ -101,10 +101,10 @@ class _QuizzesState extends State<Quizzes> with SingleTickerProviderStateMixin {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                     ),
-                    child:  TabBarView(
+                    child: TabBarView(
                       children: <Widget>[
                         NewQuiz(),
-                       // OldQuiz(),
+                        // OldQuiz(),
                       ],
                     ),
                   ),

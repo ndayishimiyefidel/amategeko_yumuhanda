@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/constants.dart';
+import '../../../widgets/apptext.dart';
 import '../../Login/login_screen.dart';
 import '../../Signup/signup_screen.dart';
 import 'background.dart';
@@ -56,7 +57,7 @@ class _BodyState extends State<Body> {
             const Padding(
               padding: EdgeInsets.only(left: 15, right: 15),
               child: Text(
-                "WELCOME TO THE ROAD RULES APP",
+                AppText.welcomeMessage,
                 style: TextStyle(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -73,7 +74,7 @@ class _BodyState extends State<Body> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "NOTICE:",
+                    AppText.noticeTitle,
                     style: TextStyle(
                       fontSize: 22,
                       color: Colors.red,
@@ -81,8 +82,7 @@ class _BodyState extends State<Body> {
                     ),
                   ),
                   Text(
-                    "Niba uri mushya kuri iyi apulikasiyo kanda "
-                    "kuri buto ibanza yitwa iyandikishe,Naho niba usanzwe ufite konti kanda ahanditse injira",
+                    AppText.noticeContent,
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 18,
@@ -106,7 +106,7 @@ class _BodyState extends State<Body> {
                     signupNavigator();
                   },
                   child: const Text(
-                    "Iyandikishe",
+                    AppText.registerButton,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -128,7 +128,7 @@ class _BodyState extends State<Body> {
                     loginNavigator();
                   },
                   child: const Text(
-                    "Injira",
+                    AppText.loginButton,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 16,

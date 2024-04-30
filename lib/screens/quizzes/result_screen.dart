@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
+import '../../widgets/apptext.dart';
 import '../homepages/notificationtab.dart';
 
 class Results extends StatefulWidget {
@@ -71,7 +72,7 @@ class _ResultsState extends State<Results> {
           },
         ),
         title: const Text(
-          "Results",
+          AppText.Results,
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,
@@ -105,7 +106,7 @@ class _ResultsState extends State<Results> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "You have $status ",
+                AppText.statusMessage(status),
                 style: const TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -125,7 +126,9 @@ class _ResultsState extends State<Results> {
                 height: 8,
               ),
               Text(
-                "You have Answered ${widget.correct}  correctly and ${widget.incorrect} incorrectly",
+                AppText.answeredSummaryMessage
+                    .replaceAll('%d', '${widget.correct}')
+                    .replaceAll('%d', '${widget.incorrect}'),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -138,11 +141,11 @@ class _ResultsState extends State<Results> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  //showRewardedAd();
+                  showRewardedAd();
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => const Exams()));
                 },
-                child: const Text("Go Home"),
+                child: const Text(AppText.goHomeBtn),
               )
             ],
           ),

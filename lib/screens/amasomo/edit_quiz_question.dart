@@ -8,6 +8,7 @@ import '../../utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../widgets/apptext.dart';
 import 'open_modified_quiz.dart';
 
 class Edit1Question extends StatefulWidget {
@@ -144,7 +145,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
           } else {
             // Handle failure to create course content
             print('Failed to create course content');
-            Fluttertoast.showToast(msg: 'Failed to create course content');
+            Fluttertoast.showToast(msg: AppText.courseCreationFailed);
           }
           if (!mounted) return;
           setState(() {
@@ -185,7 +186,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
             Icons.question_answer_outlined,
             color: kPrimaryColor,
           ),
-          hintText: "Type Question.. ",
+          hintText: AppText.typeQuestionHint,
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -204,7 +205,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          hintText: "correct option.. ",
+          hintText: AppText.correctAnswerHint,
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -224,7 +225,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          hintText: "option 2.. ",
+          hintText: "${AppText.optionHint} 2.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -243,7 +244,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.next,
         decoration: InputDecoration(
-          hintText: "option 3.. ",
+          hintText: "${AppText.optionHint} 3.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -262,7 +263,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
-          hintText: "option 4.. ",
+          hintText: "${AppText.optionHint} 4.. ",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -281,7 +282,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
         },
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
-          hintText: "correct answer.. ",
+          hintText: "${AppText.correctAnswerHint}",
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -302,7 +303,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
             uploadQuizData();
           },
           child: const Text(
-            "EDIT QUESTION",
+            AppText.editButton,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
@@ -322,7 +323,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
             Navigator.pop(context);
           },
           child: const Text(
-            "SUBMIT",
+            AppText.submitButton,
             style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -341,7 +342,7 @@ class _Edit1QuestionState extends State<Edit1Question> {
           },
         ),
         title: const Text(
-          "Edit Questions",
+          AppText.editButton,
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,

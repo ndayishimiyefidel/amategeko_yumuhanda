@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -145,15 +146,16 @@ class _IsomoPageState extends State<IsomoPage> {
             Icons.title_outlined,
             color: kPrimaryColor,
           ),
-          hintText: "Course Title",
+          hintText: AppText.courseTitleLabel,
           border: InputBorder.none,
         ),
         onChanged: (val) {
           courseTitle = val;
         },
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        validator: (input) =>
-            input != null && input.length < 5 ? 'Enter course title' : null,
+        validator: (input) => input != null && input.length < 5
+            ? 'Enter ${AppText.courseTitleLabel}'
+            : null,
       ),
     );
     //quiz desc
@@ -168,7 +170,7 @@ class _IsomoPageState extends State<IsomoPage> {
         },
         textInputAction: TextInputAction.next,
         decoration: const InputDecoration(
-          hintText: "Enter Course Descrition...",
+          hintText: AppText.courseDescHint,
           border: InputBorder.none,
         ),
         onChanged: (val) {
@@ -197,7 +199,7 @@ class _IsomoPageState extends State<IsomoPage> {
           });
         },
         decoration: InputDecoration(
-          labelText: "Course Type",
+          labelText: AppText.courseTypeHint,
           icon: Icon(
             Icons.select_all_outlined,
             color: kPrimaryColor,
@@ -219,7 +221,7 @@ class _IsomoPageState extends State<IsomoPage> {
             createCourse();
           },
           child: const Text(
-            "Create Course",
+            AppText.createCourse,
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
@@ -238,7 +240,7 @@ class _IsomoPageState extends State<IsomoPage> {
           },
         ),
         title: const Text(
-          "Ishuri Online Course",
+          AppText.onlineSch,
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
@@ -281,7 +283,7 @@ class _IsomoPageState extends State<IsomoPage> {
                     height: size.height * 0.05,
                   ),
                   const Text(
-                    "Create course.",
+                    AppText.createCourse,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 22,

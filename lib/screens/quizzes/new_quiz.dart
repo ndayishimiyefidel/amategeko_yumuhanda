@@ -10,6 +10,7 @@ import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../utils/insttruction.dart';
 import '../../widgets/ProgressWidget.dart';
+import '../../widgets/apptext.dart';
 import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
 
@@ -195,7 +196,7 @@ class _NewQuizState extends State<NewQuiz> {
                 label: const Row(
                   children: [
                     Text(
-                      "Saba Code ya application",
+                      AppText.appcodeText,
                       style: TextStyle(
                         fontSize: 18,
                       ),
@@ -211,7 +212,7 @@ class _NewQuizState extends State<NewQuiz> {
                             title: Column(
                               children: [
                                 Text(
-                                  "REQUEST CODE",
+                                  AppText.requestCode,
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -223,7 +224,7 @@ class _NewQuizState extends State<NewQuiz> {
                                     Column(
                                       children: [
                                         Text(
-                                          "1.Kugirango examen zifunguke ubanza kwishyura 1500 rwf kuri 0788659575/0728877442  cyangwa ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay ibaruye kuri ALEXIS",
+                                          AppText.firstInstruction,
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -232,7 +233,7 @@ class _NewQuizState extends State<NewQuiz> {
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "2.Iyo Umanze kwishyura ukanda hano hasi handitse saba kode mu ibara ry'umuhondo ibi byose ubikora wafunguye connection",
+                                          AppText.secondInstruction,
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -241,7 +242,7 @@ class _NewQuizState extends State<NewQuiz> {
                                           textAlign: TextAlign.start,
                                         ),
                                         Text(
-                                          "3.Hanyuma ugategereza hagati y'iminota 2 kugeza kuri 5 ubundi ugasubira inyuma ugakanda ahanditse Tangira Exam",
+                                          AppText.thirdInstruction,
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -252,8 +253,7 @@ class _NewQuizState extends State<NewQuiz> {
                                       ],
                                     ),
                                     InstructionItems(
-                                      title:
-                                          '4. Iyo wishyuye ukoresheje nimero itari muri application cg ukanze uhanditse saba code  utafunguye connection uhamagara kuri izi nimero tugufungurira: ',
+                                      title: AppText.fourthInstruction,
                                       phoneNumbers: [
                                         '0788659575',
                                         '0728877442'
@@ -269,12 +269,12 @@ class _NewQuizState extends State<NewQuiz> {
                                     backgroundColor: Colors.yellow,
                                     elevation: 3),
                                 onPressed: () async {
-                                  //saba code
+                                  // Request code action
                                   requestCode(userToken, currentuserid,
                                       currentusername, "Exam");
                                 },
                                 child: const Text(
-                                  "Saba Code",
+                                  AppText.requestCodeButton,
                                   style: TextStyle(
                                       color: Colors.black87,
                                       fontSize: 20,
@@ -290,12 +290,12 @@ class _NewQuizState extends State<NewQuiz> {
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.green),
                                     onPressed: () async {
-                                      //direct phone call
+                                      // Direct phone call action
                                       await FlutterPhoneDirectCaller.callNumber(
                                           "*182*8*1*329494*1500#");
                                     },
                                     child: const Text(
-                                      "Kanda hano *182*8*1*329494*1500# wishyure",
+                                      AppText.directPhoneCallButton,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -318,10 +318,9 @@ class _NewQuizState extends State<NewQuiz> {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
-    String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-    String notificationTitle = "Requesting Quiz Code";
+    String body = AppText.requestCodeBody(senderName, phone);
+
+    String notificationTitle = AppText.requestCodeTitle;
 
     try {
       final response = await http.post(
@@ -331,23 +330,25 @@ class _NewQuizState extends State<NewQuiz> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        //print('Response Body: $data');
         if (data['success'] == true) {
           showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Your request have been already sent,Please wait the team is processing it."),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(
+                  AppText.requestCodeSuccessMessage,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(AppText.requestCodeSuccessCloseButtonText),
+                  )
+                ],
+              );
+            },
+          );
         } else {
           try {
             final res = await http.post(
@@ -360,87 +361,85 @@ class _NewQuizState extends State<NewQuiz> {
                 "ex_type": exam.toString()
               },
             );
-            print(res.body);
 
             if (res.statusCode == 200) {
               final data = json.decode(res.body);
-              print('Response Body: $data');
               if (data['requestSent'] == true) {
-                //handle if not sent
                 sendPushMessage(userToken, body, notificationTitle);
                 isLoading = false;
 
                 Size size = MediaQuery.of(context).size;
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: const Text(
-                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                        actions: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            width: size.width * 0.7,
-                            height: size.height * 0.07,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
-                                onPressed: () async {
-                                  //direct phone call
-                                  await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
-                                },
-                                child: const Text(
-                                  "Ishyura 1500 Rwf.",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text(
+                        AppText.requestCodeSuccessAlertMessage,
+                      ),
+                      actions: [
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          width: size.width * 0.7,
+                          height: size.height * 0.07,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                              ),
+                              onPressed: () async {
+                                await FlutterPhoneDirectCaller.callNumber(
+                                    "*182*8*1*329494*1500#");
+                              },
+                              child: Text(
+                                AppText.requestCodeSuccessButtonText,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Okay"))
-                        ],
-                      );
-                    });
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child:
+                              Text(AppText.requestCodeSuccessCloseButtonText),
+                        )
+                      ],
+                    );
+                  },
+                );
               } else {
                 Fluttertoast.showToast(
-                  msg: "Faild to request code",
+                  msg: AppText.requestCodeErrorMessage,
                   textColor: Colors.red,
                   fontSize: 10,
                 );
               }
             } else {
               Fluttertoast.showToast(
-                msg: "Faild to connect to api",
+                msg: "Failed to connect to the API",
                 textColor: Colors.red,
                 fontSize: 10,
               );
             }
           } catch (e) {
-            // Handle exceptions
             print("Error: $e");
-            // You can show an error message or perform other error handling as needed
           }
         }
       } else {
         Fluttertoast.showToast(
-          msg: "Faild to connect to api",
+          msg: "Failed to connect to the API",
           textColor: Colors.red,
           fontSize: 10,
         );
       }
     } catch (e) {
-      // Handle exceptions
       print("Error: $e");
-      // You can show an error message or perform other error handling as needed
     }
   }
 }
@@ -644,7 +643,7 @@ class _QuizTileState extends State<QuizTile> {
                                               children: [
                                                 SizedBox(height: 10),
                                                 Text(
-                                                  "kugirango exam zifunguke kanda hepfo mwibara ry'ubururu usabe code ifungura exam ariko urebe niba ufite connection.",
+                                                  AppText.accessMessage,
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight:
@@ -672,8 +671,8 @@ class _QuizTileState extends State<QuizTile> {
                             children: [
                               Text(
                                 widget.userRole == "Admin"
-                                    ? "Fungur Exam"
-                                    : "Tangira Exam",
+                                    ? AppText.openExam
+                                    : AppText.startExam,
                                 style: const TextStyle(
                                     color: Colors.white,
                                     letterSpacing: 2,

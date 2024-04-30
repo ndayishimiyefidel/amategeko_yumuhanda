@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../backend/apis/db_connection.dart';
 import '../../components/chat_for_users_list.dart';
+import '../../widgets/apptext.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -142,7 +143,7 @@ class _UserListState extends State<UserList> {
                             isLoading = true;
                             fetchAllUsers(); // Load more records
                           },
-                          child: const Text("Load More"),
+                          child: const Text(AppText.loadMore),
                         ),
                       ),
                   ],

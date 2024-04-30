@@ -3,15 +3,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 import '../homepages/notificationtab.dart';
 import 'create_quiz.dart';
-
 
 class OnlyQuiz extends StatefulWidget {
   const OnlyQuiz({super.key});
 
   @override
-State createState() => _OnlyQuizState();
+  State createState() => _OnlyQuizState();
 }
 
 class _OnlyQuizState extends State<OnlyQuiz>
@@ -27,7 +27,7 @@ class _OnlyQuizState extends State<OnlyQuiz>
       ),
       appBar: AppBar(
         title: const Text(
-          "Quiz",
+          AppText.quiz,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,

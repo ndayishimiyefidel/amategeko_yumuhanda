@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:amategeko/utils/generate_code.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:amategeko/enume/models/question_model.dart';
@@ -121,7 +122,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
 
   bool btnPressed = false;
   late PageController _controller1;
-  String btnText = "Next";
+  String btnText = AppText.name;
   String btnTextPrevious = "Previous";
   bool answered = false;
 
@@ -152,7 +153,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
     super.initState();
   }
 
-  // onPressed callback for the "Next" button.
+  // onPressed callback for the AppText.name button.
   void onNextPressed() {
     if (currentPageIndex < (allQuestionList.length) - 1) {
       currentPageIndex++;
@@ -174,7 +175,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
       );
       if (currentPageIndex == (allQuestionList.length) - 1) {
         setState(() {
-          btnText = "Soza Quiz";
+          btnText = AppText.finishExam;
         });
       }
       setState(() {
@@ -200,7 +201,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
   void onPreviousPressed() {
     if (currentPageIndex > 0) {
       setState(() {
-        btnText = "Next";
+        btnText = AppText.name;
       });
       // If there are previous questions, move to the previous question.
       currentPageIndex--; // Decrement the current page index
@@ -237,7 +238,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
           },
         ),
         title: const Text(
-          "Gukora Imyitozo",
+          AppText.takeTest,
           style:
               TextStyle(letterSpacing: 1.25, fontSize: 24, color: Colors.white),
         ),
@@ -359,7 +360,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
               ],
             )
           : Container(
-              child: Center(child: Text("No quiz available for this course")),
+              child: Center(child: Text(AppText.noCourse)),
             ),
 
       //floating action button
@@ -376,7 +377,7 @@ class _OpenModifiedQuizState extends State<OpenModifiedQuiz>
                 );
               },
               label: const Text(
-                "Soza Imyitozo",
+                AppText.finishExam,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
@@ -647,7 +648,7 @@ class _ModifiedQuizPlayTileState extends State<ModifiedQuizPlayTile> {
           ),
           isInCorrectOption
               ? Text(
-                  "Igisubizo cy'ukuri ni: ${widget.questionModel.correctOption}",
+                  "${AppText.correctAns}: ${widget.questionModel.correctOption}",
                   style: const TextStyle(
                       fontSize: 12,
                       color: Colors.green,

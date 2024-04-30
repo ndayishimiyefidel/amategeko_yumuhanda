@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:amategeko/screens/amasomo/create_question.dart';
 import 'package:amategeko/screens/amasomo/open_modified_quiz.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -144,7 +145,7 @@ class _CourseContentsState extends State<CourseContents> {
                         children: [
                           if (allCoursesList.isEmpty)
                             const Center(
-                              child: Text("no courses available right now!"),
+                              child: Text(AppText.noCourse),
                             )
                           else
                             Column(
@@ -190,7 +191,7 @@ class _CourseContentsState extends State<CourseContents> {
                                   isLoading = true;
                                   fetchAllCourseContent(); // Load more records
                                 },
-                                child: const Text("Load More"),
+                                child: const Text(AppText.loadMore),
                               ),
                             ),
                         ],
@@ -218,7 +219,7 @@ class _CourseContentsState extends State<CourseContents> {
                               ),
                             );
                           },
-                          child: const Text("Create Quiz"),
+                          child: const Text(AppText.createQuiz),
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -232,7 +233,7 @@ class _CourseContentsState extends State<CourseContents> {
                               ),
                             );
                           },
-                          child: const Text("Fungura Imyitozo"),
+                          child: const Text(AppText.openExercise),
                         ),
                       ],
                     )
@@ -247,7 +248,7 @@ class _CourseContentsState extends State<CourseContents> {
                           ),
                         );
                       },
-                      child: const Text("Kora Imyitozo"),
+                      child: const Text(AppText.doExercise),
                     ),
             ],
           ),

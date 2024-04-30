@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../utils/constants.dart';
+import '../../widgets/apptext.dart';
 import '../homepages/notificationtab.dart';
 
 class UploadDocuments extends StatefulWidget {
@@ -59,7 +60,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
            
           },
           child: Text(
-            widget.isNew == true ? "Upload Doc" : "Update Doc",
+            widget.isNew == true ? "Upload Doc" : "${AppText.update} Doc",
             style: const TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -78,7 +79,7 @@ class _UploadDocumentsState extends State<UploadDocuments> {
           },
         ),
         title: Text(
-          widget.isNew == true ? "Upload Docs" : "Update Docs",
+          widget.isNew == true ? "Upload Docs" : "${AppText.update} Docs",
           style: const TextStyle(letterSpacing: 1.25, fontSize: 24),
         ),
         backgroundColor: kPrimaryColor,

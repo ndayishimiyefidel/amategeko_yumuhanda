@@ -9,6 +9,8 @@ import '../../widgets/MainDrawer.dart';
 import '../../widgets/ProgressWidget.dart';
 import 'package:http/http.dart' as http;
 
+import '../../widgets/apptext.dart';
+
 class UserSettings extends StatelessWidget {
   UserSettings({super.key});
 
@@ -24,7 +26,7 @@ class UserSettings extends StatelessWidget {
       ),
       appBar: AppBar(
         title: const Text(
-          "Account Settings",
+          AppText.accountTitle,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -296,7 +298,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'Personal Information',
+                                          AppText.personalInfo,
                                           style: TextStyle(
                                               fontSize: 18.0,
                                               fontWeight: FontWeight.bold),
@@ -324,7 +326,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'Name',
+                                          AppText.name,
                                           style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold),
@@ -343,7 +345,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       child: TextField(
                                         readOnly: true,
                                         decoration: const InputDecoration(
-                                          hintText: "Enter Your Name",
+                                          hintText: AppText.nameHintText,
                                         ),
                                         controller: nameTextEditingController,
                                         enabled: !_status,
@@ -369,7 +371,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'Telephone',
+                                          AppText.telephone,
                                           style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold),
@@ -388,7 +390,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       child: TextField(
                                         readOnly: true,
                                         decoration: const InputDecoration(
-                                            hintText: "Enter Phone number"),
+                                            hintText: AppText.phoneHintText),
                                         enabled: !_status,
                                         controller: phoneTextEditingController,
                                         focusNode: phoneFocusNode,
@@ -412,7 +414,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         Text(
-                                          'password',
+                                          AppText.password,
                                           style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold),
@@ -431,7 +433,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       child: TextField(
                                         readOnly: true,
                                         decoration: InputDecoration(
-                                          hintText: "Enter Password",
+                                          hintText: AppText.passwordHint,
                                         ),
                                         controller:
                                             passwordTextEditingController,
@@ -494,7 +496,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                 ),
-                child: const Text("Update"),
+                child: const Text(AppText.update),
                 // style: new RoundedRectangleBorder(
                 //     borderRadius: new BorderRadius.circular(20.0)),
               ),
@@ -521,7 +523,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                 ),
-                child: const Text("Cancel"),
+                child: const Text(AppText.cancel),
                 // shape: new RoundedRectangleBorder(
                 //     borderRadius: new BorderRadius.circular(20.0)),
               ),

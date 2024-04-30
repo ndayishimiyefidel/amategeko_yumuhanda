@@ -1,6 +1,7 @@
 import 'package:amategeko/screens/SplashScreen.dart';
 import 'package:amategeko/utils/constants.dart';
 import 'package:amategeko/utils/utils.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rwanda Traffic Rule',
+      title: AppText.appName,
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       scaffoldMessengerKey: messengerKey,
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'), // English US
         Locale('en', 'GB'), // English UK
       ],
+
       theme: ThemeData(
         primaryColor: kPrimaryColor,
         scaffoldBackgroundColor: Colors.white,

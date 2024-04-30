@@ -13,6 +13,7 @@ import 'dart:convert';
 import '../../../components/text_field_container.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
+import '../../../widgets/apptext.dart';
 import '../../irembo/components/background.dart';
 
 class SignUp extends StatefulWidget {
@@ -209,36 +210,37 @@ class _SignUpState extends State<SignUp> {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
-    String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-    String notificationTitle = "Requesting Quiz Code";
+    String body = AppText.requestCodeBody(senderName, phone);
+
+    String notificationTitle = AppText.requestCodeTitle;
 
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: {'userId': currentuserid, "ex_type": exam.toString()},
+        body: {'userId': currentuserid, 'ex_type': exam.toString()},
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        //print('Response Body: $data');
         if (data['success'] == true) {
           showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Your request have been already sent,Please wait the team is processing it."),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(
+                  AppText.requestCodeSuccessMessage,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(AppText.requestCodeSuccessCloseButtonText),
+                  )
+                ],
+              );
+            },
+          );
         } else {
           try {
             final res = await http.post(
@@ -251,87 +253,85 @@ class _SignUpState extends State<SignUp> {
                 "ex_type": exam.toString()
               },
             );
-            print(res.body);
 
             if (res.statusCode == 200) {
               final data = json.decode(res.body);
-              print('Response Body: $data');
               if (data['requestSent'] == true) {
-                //handle if not sent
                 sendPushMessage(userToken, body, notificationTitle);
                 isloading = false;
 
                 Size size = MediaQuery.of(context).size;
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: const Text(
-                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                        actions: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            width: size.width * 0.7,
-                            height: size.height * 0.07,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
-                                onPressed: () async {
-                                  //direct phone call
-                                  await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
-                                },
-                                child: const Text(
-                                  "Ishyura 1500 Rwf.",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text(
+                        AppText.requestCodeSuccessAlertMessage,
+                      ),
+                      actions: [
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          width: size.width * 0.7,
+                          height: size.height * 0.07,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                              ),
+                              onPressed: () async {
+                                await FlutterPhoneDirectCaller.callNumber(
+                                    "*182*8*1*329494*1500#");
+                              },
+                              child: Text(
+                                AppText.requestCodeSuccessButtonText,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Okay"))
-                        ],
-                      );
-                    });
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child:
+                              Text(AppText.requestCodeSuccessCloseButtonText),
+                        )
+                      ],
+                    );
+                  },
+                );
               } else {
                 Fluttertoast.showToast(
-                  msg: "Faild to request code",
+                  msg: AppText.requestCodeErrorMessage,
                   textColor: Colors.red,
                   fontSize: 10,
                 );
               }
             } else {
               Fluttertoast.showToast(
-                msg: "Faild to connect to api",
+                msg: "Failed to connect to the API",
                 textColor: Colors.red,
                 fontSize: 10,
               );
             }
           } catch (e) {
-            // Handle exceptions
             print("Error: $e");
-            // You can show an error message or perform other error handling as needed
           }
         }
       } else {
         Fluttertoast.showToast(
-          msg: "Faild to connect to api",
+          msg: "Failed to connect to the API",
           textColor: Colors.red,
           fontSize: 10,
         );
       }
     } catch (e) {
-      // Handle exceptions
       print("Error: $e");
-      // You can show an error message or perform other error handling as needed
     }
   }
 
@@ -346,10 +346,10 @@ class _SignUpState extends State<SignUp> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(height: size.height * 0.1),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                   child: Text(
-                    "IYANDIKISHE  GUKORERA URUHUSHYA RWO GUTWARA IBINYABIZIGA",
+                    AppText.registerHeaderText,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ),
@@ -358,8 +358,8 @@ class _SignUpState extends State<SignUp> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "ICYITONDERWA:",
+                      Text(
+                        AppText.noticeTitle,
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.red,
@@ -367,8 +367,8 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       SizedBox(height: size.height * 0.02),
-                      const Text(
-                        "Niba ufite ikibazo kijyanye no gukorera uruhurwa rw'agateganyo(provoire) cg rwa burundi(permit) kandi ukaba ukeneye ubufasha mukwiyandikisha  wahamagara kuri izi nimero zikurikira:",
+                      Text(
+                        AppText.noticeIssueContent,
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 16,
@@ -385,7 +385,7 @@ class _SignUpState extends State<SignUp> {
                                 await FlutterPhoneDirectCaller.callNumber(
                                     "0726656615");
                               },
-                              child: const Text(
+                              child: Text(
                                 "0726656615",
                                 style: TextStyle(
                                   color: kPrimaryColor,
@@ -398,7 +398,7 @@ class _SignUpState extends State<SignUp> {
                                 await FlutterPhoneDirectCaller.callNumber(
                                     "0785460748");
                               },
-                              child: const Text(
+                              child: Text(
                                 "0785460748",
                                 style: TextStyle(
                                   color: kPrimaryColor,
@@ -432,7 +432,7 @@ class _SignUpState extends State<SignUp> {
                       });
                     },
                     decoration: InputDecoration(
-                      labelText: "Hitamo ubwoko bw'uruhushya ushaka gukorera",
+                      labelText: AppText.selectLicenseType,
                       icon: Icon(
                         Icons.select_all_outlined,
                         color: kPrimaryColor,
@@ -448,33 +448,31 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       name = val;
-                      // ignore: avoid_print
                       print(name);
                     },
                     validator: (nameValue) {
                       if (nameValue!.isEmpty) {
-                        return 'This field is mandatory';
+                        return AppText.nameFieldRequired;
                       }
                       if (nameValue.length < 3) {
-                        return 'name must be at least 3+ characters ';
+                        return AppText.nameLengthError;
                       }
                       const String p = "^[a-zA-Z\\s]+";
                       RegExp regExp = RegExp(p);
 
                       if (regExp.hasMatch(nameValue)) {
-                        // So, the email is valid
                         return null;
                       }
 
-                      return 'This is not a valid name';
+                      return AppText.invalidName;
                     },
                     cursorColor: kPrimaryColor,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       icon: Icon(
                         Icons.person,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika Amazina",
+                      hintText: AppText.nameHintText,
                       border: InputBorder.none,
                     ),
                   ),
@@ -486,29 +484,27 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       id = val;
-                      // ignore: avoid_print
                       print(id);
                     },
                     validator: (id) {
                       if (id!.isEmpty) {
-                        return 'This field is mandatory';
+                        return AppText.idFieldRequired;
                       } else if (id.length != 16) {
-                        return 'id must be at equal to 16 digits ';
+                        return AppText.invalidIdLength;
                       }
                       return null;
                     },
                     cursorColor: kPrimaryColor,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       icon: Icon(
                         Icons.numbers,
                         color: kPrimaryColor,
                       ),
-                      hintText: "NIMERO Y'INDANGAMUNTU YAWE",
+                      hintText: AppText.idHintText,
                       border: InputBorder.none,
                     ),
                   ),
                 ),
-
                 selectedValue != "Permit"
                     ? SizedBox()
                     : TextFieldContainer(
@@ -518,31 +514,25 @@ class _SignUpState extends State<SignUp> {
                           textInputAction: TextInputAction.next,
                           onChanged: (val) {
                             codeP = val;
-                            // ignore: avoid_print
                             print(codeP);
                           },
                           validator: (codeP) {
                             if (codeP!.isEmpty) {
-                              return 'This field is mandatory';
+                              return AppText.codeFieldRequired;
                             }
-                            //  else if (id.length != 19) {
-                            //   return 'id must be at equal to 19 alpha-numeric characters';
-                            // }
                             return null;
                           },
                           cursorColor: kPrimaryColor,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             icon: Icon(
                               Icons.code,
                               color: kPrimaryColor,
                             ),
-                            hintText: "ANDIKA CODE YA PROVISOIRE",
+                            hintText: AppText.provisionalCodeHint,
                             border: InputBorder.none,
                           ),
                         ),
                       ),
-
-                //category
                 selectedValue.toString() != "Permit"
                     ? SizedBox()
                     : TextFieldContainer(
@@ -580,7 +570,7 @@ class _SignUpState extends State<SignUp> {
                             });
                           },
                           decoration: InputDecoration(
-                            labelText: "Hitamo Category",
+                            labelText: AppText.selectCategory,
                             icon: Icon(
                               Icons.select_all_outlined,
                               color: kPrimaryColor,
@@ -596,33 +586,31 @@ class _SignUpState extends State<SignUp> {
                     textInputAction: TextInputAction.next,
                     onChanged: (val) {
                       phoneNumber = val;
-                      // ignore: avoid_print
                       print(phoneNumber);
                     },
                     validator: (phoneValue) {
                       if (phoneValue!.isEmpty) {
-                        return 'This field is mandatory';
+                        return AppText.phoneFieldRequired;
                       }
                       if (phoneValue.length != 10) {
-                        return 'name must be at least 10 digits ';
+                        return AppText.invalidPhoneNumberLength;
                       }
                       const String p = "^07[2,389]\\d{7}";
                       RegExp regExp = RegExp(p);
 
                       if (regExp.hasMatch(phoneValue)) {
-                        // So, the email is valid
                         return null;
                       }
 
-                      return 'This is not a valid name';
+                      return AppText.invalidPhoneNumber;
                     },
                     cursorColor: kPrimaryColor,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       icon: Icon(
                         Icons.phone,
                         color: kPrimaryColor,
                       ),
-                      hintText: "ANDIKA TELEPHONE",
+                      hintText: AppText.phoneNumberHintText,
                       border: InputBorder.none,
                     ),
                   ),
@@ -650,8 +638,8 @@ class _SignUpState extends State<SignUp> {
                         }
                       });
                     },
-                    decoration: const InputDecoration(
-                      labelText: "Select Region",
+                    decoration: InputDecoration(
+                      labelText: AppText.selectRegion,
                       icon: Icon(
                         Icons.location_on_outlined,
                         color: Colors.blue,
@@ -674,8 +662,8 @@ class _SignUpState extends State<SignUp> {
                         selectedDistrict = value!;
                       });
                     },
-                    decoration: const InputDecoration(
-                      labelText: "Select District",
+                    decoration: InputDecoration(
+                      labelText: AppText.selectDistrict,
                       icon: Icon(
                         Icons.location_on_outlined,
                         color: Colors.blue,
@@ -684,19 +672,19 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 35),
                   child: Text(
-                    "Kanda hano hasi wishyure aya service (1000 Rwf) bagufashe",
+                    AppText.servicePaymentInstruction,
                     style: TextStyle(fontSize: 14, color: Colors.blueAccent),
                     textAlign: TextAlign.start,
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 5,
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  margin: EdgeInsets.symmetric(vertical: 10),
                   width: size.width * 0.5,
                   height: size.height * 0.06,
                   child: ClipRRect(
@@ -707,8 +695,8 @@ class _SignUpState extends State<SignUp> {
                       onPressed: () {
                         _registerUser();
                       },
-                      child: const Text(
-                        "Ishyura 1000 Rwf",
+                      child: Text(
+                        AppText.payFee,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -718,7 +706,7 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  margin: EdgeInsets.symmetric(vertical: 10),
                   width: size.width * 0.7,
                   height: size.height * 0.06,
                   child: ClipRRect(
@@ -730,8 +718,8 @@ class _SignUpState extends State<SignUp> {
                         requestCode(userToken, currentuserid.toString(),
                             currentusername, "Exams");
                       },
-                      child: const Text(
-                        "Saba Code ifungura exam",
+                      child: Text(
+                        AppText.requestExamsCode,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,

@@ -5,6 +5,7 @@ import 'package:splash_screen_view/SplashScreenView.dart';
 import 'dart:convert';
 import '../backend/apis/db_connection.dart';
 import '../utils/constants.dart';
+import '../widgets/apptext.dart';
 import 'HomeScreen.dart';
 import 'Welcome/welcome_screen.dart';
 import 'package:http/http.dart' as http;
@@ -108,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
           : const WelcomeScreen(),
       duration: 5500,
       imageSrc: "assets/images/icon_new.png",
-      text: "Amategeko y'Umuhanda",
+      text: AppText.appName,
       textType: TextType.ColorizeAnimationText,
       textStyle: const TextStyle(fontSize: 40.0, fontFamily: 'Courgette'),
       colors: const [

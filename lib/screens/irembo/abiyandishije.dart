@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../backend/apis/db_connection.dart';
+import '../../widgets/apptext.dart';
 
 class Abiyandikishe extends StatefulWidget {
   const Abiyandikishe({super.key});
@@ -108,7 +109,7 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
       ),
       appBar: AppBar(
         title: const Text(
-          "Abashaka Kwiyandikisha",
+          AppText.registerButton,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -196,7 +197,7 @@ class _AbiyandikisheState extends State<Abiyandikishe> {
                             isLoading = true;
                             fetchAllUsers(); // Load more records
                           },
-                          child: const Text("Load More"),
+                          child: const Text(AppText.loadMore),
                         ),
                       ),
                   ],

@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../ads/interestial_ad.dart';
 import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
+import '../../widgets/apptext.dart';
 import '../../widgets/count_down.dart';
 import '../homepages/noficationtab1.dart';
 
@@ -100,8 +101,8 @@ class _OpenQuizState extends State<OpenQuiz>
   }
 
   bool btnPressed = false;
-  String btnText = "Next";
-  String btnTextPrevious = "Previous";
+  String btnText = AppText.next;
+  String btnTextPrevious = AppText.previous;
   bool answered = false;
   late PageController _controller1;
 
@@ -193,10 +194,10 @@ class _OpenQuizState extends State<OpenQuiz>
         ),
         title: Text(
           widget.examType == 'English'
-              ? 'Take the Test'
+              ? AppText.takeTest
               : (widget.examType == 'French'
                   ? 'Passer l\'examen'
-                  : 'Gukora Ikizamini'),
+                  : AppText.takeTest),
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,
@@ -247,7 +248,7 @@ class _OpenQuizState extends State<OpenQuiz>
         );
       },
       label: const Text(
-        'Soza Exam',
+        AppText.finishExam,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 16,
@@ -271,7 +272,7 @@ class _OpenQuizState extends State<OpenQuiz>
       if (currentPageIndex == (widget.questions.length) - 1) {
         if (!mounted) return;
         setState(() {
-          btnText = "Soza Exam";
+          btnText = AppText.finishExam;
         });
       }
       if (!mounted) return;
@@ -298,7 +299,7 @@ class _OpenQuizState extends State<OpenQuiz>
     if (currentPageIndex > 0) {
       if (!mounted) return;
       setState(() {
-        btnText = "Next";
+        btnText = AppText.next;
       });
       // If there are previous questions, move to the previous question.
       currentPageIndex--; //
@@ -319,7 +320,7 @@ class _OpenQuizState extends State<OpenQuiz>
       color: Colors.black, // or any other color to cover the screen
       child: const Center(
         child: Text(
-          'Screenshots and screen videos are not allowed.',
+          AppText.screnshootText,
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -338,7 +339,7 @@ class _OpenQuizState extends State<OpenQuiz>
             Padding(
               padding: const EdgeInsets.only(right: 30, top: 10),
               child: Text(
-                "Exam No:${widget.quizNumber}",
+                "${AppText.examNo}:${widget.quizNumber}",
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontSize: 20,
@@ -355,15 +356,15 @@ class _OpenQuizState extends State<OpenQuiz>
               child: Text(
                 widget.questions.isEmpty
                     ? widget.examType == 'English'
-                        ? 'TQ: No question for this exam!'
+                        ? 'TQ: ${AppText.noQuestion}'
                         : (widget.examType == 'French'
                             ? 'TQ: Pas de question pour cet examen !'
-                            : 'TQ: Nta bibazo biri kuri iki kizamini!')
+                            : 'TQ:  ${AppText.noQuestion}')
                     : widget.examType == 'English'
                         ? 'TQ: ${widget.questions.length} question(s)'
                         : (widget.examType == 'French'
                             ? 'TQ: ${widget.questions.length} question(s)'
-                            : 'TQ: ${widget.questions.length} ikibazo'),
+                            : 'TQ: ${widget.questions.length}'),
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                   fontSize: 18,
@@ -506,10 +507,10 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
                   padding: const EdgeInsets.only(left: 0),
                   child: Text(
                     widget.examType == 'English'
-                        ? 'NB: Choosing to press on the knee as in the provisional exam on the machine happens!'
+                        ? '${AppText.chooseMsg}'
                         : (widget.examType == 'French'
                             ? 'NB: Choisir d\'appuyer sur le genou comme dans l\'examen provisoire sur la machine se produit!'
-                            : 'NB: Guhitamo ukanda mu kavi nkuko muri exam ya provisoire kuri machine biba bimeze!'),
+                            : '${AppText.chooseMsg}'),
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontSize: 12,
@@ -715,10 +716,10 @@ class _QuizPlayTileState extends State<QuizPlayTile> {
           isInCorrectOption
               ? Text(
                   widget.examType == 'English'
-                      ? "The correct answer is: ${widget.questionModel.correctOption}"
+                      ? "${AppText.correctAns}: ${widget.questionModel.correctOption}"
                       : (widget.examType == 'French'
                           ? "La réponse correcte est : ${widget.questionModel.correctOption}"
-                          : "Igisubizo cy'ukuri ni: ${widget.questionModel.correctOption}"),
+                          : "${AppText.correctAns}: ${widget.questionModel.correctOption}"),
                   style: const TextStyle(
                       fontSize: 12,
                       color: Colors.green,

@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../screens/Signup/signup_screen.dart';
 import '../screens/amasomo/prayer.dart';
 import '../screens/homepages/dashboard.dart';
+import 'apptext.dart';
 
 class MainDrawer extends StatefulWidget {
   final String? userRole;
@@ -98,19 +99,18 @@ class _MainDrawerState extends State<MainDrawer> {
     if (widget.userRole == "Ambassador") {
       // Include the referral code for Ambassadors in the link
       String appLinkWithReferral = "$appUrl?referral=${widget.referralCode}";
-      message =
-          "Iyi application igizwe n'ibibazo n'ibisubizo babaza muri examin ya provisoire iga examin zose zirimo kuko bazakubaza imwe muri zo $appLinkWithReferral";
+      message = "${AppText.playStoreMessage1} $appLinkWithReferral";
     } else {
       // Use the standard link without the referral code
-      message =
-          "Iyi application igizwe n'ibibazo n'ibisubizo babaza muri examin ya provisoire iga examin zose zirimo kuko bazakubaza imwe muri zo $playStoreLink";
+      message = "${AppText.playStoreMessage1} $playStoreLink";
     }
 
     // Share the message containing the link (with or without referral code)
     Share.share(
       message,
-      subject:
-          widget.userRole != "Ambassador" ? 'Share App!' : 'Share your Code',
+      subject: widget.userRole != "Ambassador"
+          ? '${AppText.shareApp}!'
+          : '${AppText.shareCode}',
     );
   }
 
@@ -143,7 +143,7 @@ class _MainDrawerState extends State<MainDrawer> {
               bottom: 5,
             ),
             title: const Text(
-              "Home",
+              AppText.home,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -170,7 +170,7 @@ class _MainDrawerState extends State<MainDrawer> {
               bottom: 5,
             ),
             title: const Text(
-              "Quiz",
+              AppText.quiz,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -197,7 +197,7 @@ class _MainDrawerState extends State<MainDrawer> {
               bottom: 5,
             ),
             title: const Text(
-              "Profile",
+              AppText.profile,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -220,13 +220,13 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
             title: widget.userRole == "Ambassador"
                 ? const Text(
-                    "Share code",
+                    AppText.shareCode,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   )
                 : const Text(
-                    "Share App",
+                    AppText.shareApp,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -257,7 +257,7 @@ class _MainDrawerState extends State<MainDrawer> {
               bottom: 5,
             ),
             title: const Text(
-              "Prayer",
+              AppText.prayer,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -283,7 +283,7 @@ class _MainDrawerState extends State<MainDrawer> {
               bottom: 5,
             ),
             title: const Text(
-              "Delete Account",
+              AppText.deleteAccount,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -293,18 +293,4 @@ class _MainDrawerState extends State<MainDrawer> {
       ),
     );
   }
-
-  // Future<void> deleteUser(String docId) async {
-  //   await auth.currentUser!.delete().then((value) => {
-  //         FirebaseFirestore.instance
-  //             .collection("Users")
-  //             .doc(docId)
-  //             .delete()
-  //             .then((value) => {
-  //                   UserStateMethods().logoutuser(context),
-  //                   // ignore: avoid_print
-  //                   print("User deleted"),
-  //                 })
-  //       });
-  // }
 }

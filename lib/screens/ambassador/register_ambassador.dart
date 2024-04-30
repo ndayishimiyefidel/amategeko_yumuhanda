@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 import '../homepages/noficationtab1.dart';
 import 'components/body.dart';
 
@@ -20,7 +21,7 @@ class RegisterAmbassadorScreen extends StatelessWidget {
       ),
       appBar: AppBar(
         title: const Text(
-          "Register Ambassador",
+          AppText.regAmb,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,

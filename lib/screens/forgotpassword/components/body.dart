@@ -1,3 +1,4 @@
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import '../../../utils/constants.dart';
@@ -57,7 +58,7 @@ class _ForgotState extends State<Forgot> {
             children: <Widget>[
               SizedBox(height: size.height * 0.03),
               const Text(
-                "REQUEST PASSWORD RESET LINK",
+                AppText.requestPasswordLink,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: size.height * 0.03),
@@ -146,7 +147,7 @@ class _ForgotState extends State<Forgot> {
                       );
                     },
                     child: const Text(
-                      "Sign In",
+                      AppText.loginButton,
                       style: TextStyle(
                         color: kPrimaryColor,
                         fontWeight: FontWeight.bold,
@@ -168,74 +169,6 @@ class _ForgotState extends State<Forgot> {
         isLoading = true;
       });
       preferences = await SharedPreferences.getInstance();
-
-      // await _firestore
-      //     .collection('Users')
-      //     .where('email', isEqualTo: emailAddress)
-      //     .get()
-      //     .then((value) async {
-      //   if (value.size == 1) {
-      //     _authService.forgotPassword(emailAddress).then((value) {
-      //       setState(() {
-      //         isLoading = false;
-      //         showDialog(
-      //             context: context,
-      //             builder: (context) {
-      //               return AlertDialog(
-      //                 content: const Text(
-      //                   "Reset Password Link sent successfully to your email,please check it",
-      //                   style: TextStyle(
-      //                     color: Colors.green,
-      //                     fontSize: 14,
-      //                   ),
-      //                 ),
-      //                 actions: [
-      //                   ElevatedButton(
-      //                       onPressed: () {
-      //                         setState(() {
-      //                           isLoading = false;
-      //                         });
-      //                         Navigator.of(context).pop();
-      //                         _formkey.currentState!.reset();
-      //                         emailEditingController.clear();
-      //                       },
-      //                       child: const Text("Ok"))
-      //                 ],
-      //               );
-      //             });
-      //       });
-      //     });
-      //   } else {
-      //     setState(() {
-      //       isLoading = false;
-      //       showDialog(
-      //           context: context,
-      //           builder: (context) {
-      //             return AlertDialog(
-      //               content: const Text(
-      //                 "Email does not exist, please double check your email and try again",
-      //                 style: TextStyle(
-      //                   color: Colors.red,
-      //                   fontSize: 14,
-      //                 ),
-      //               ),
-      //               actions: [
-      //                 ElevatedButton(
-      //                     onPressed: () {
-      //                       setState(() {
-      //                         isLoading = false;
-      //                       });
-      //                       Navigator.of(context).pop();
-      //                       _formkey.currentState!.reset();
-      //                       emailEditingController.clear();
-      //                     },
-      //                     child: const Text("Close"))
-      //               ],
-      //             );
-      //           });
-      //     });
-      //   }
-      // });
     }
   }
 }

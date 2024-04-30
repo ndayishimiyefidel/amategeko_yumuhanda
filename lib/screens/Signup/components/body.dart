@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:amategeko/backend/apis/db_connection.dart';
 import 'package:amategeko/enume/models/user_model.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -293,7 +294,7 @@ class _SignUpState extends State<SignUp> {
               children: <Widget>[
                 SizedBox(height: size.height * 0.1),
                 const Text(
-                  "IYANDIKISHE Nk'UMUNTU MUSHYA USHAKA KWIGA",
+                  AppText.signUpTitle,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: size.height * 0.03),
@@ -308,7 +309,7 @@ class _SignUpState extends State<SignUp> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        "ICYITONDERWA:",
+                        AppText.noticeTitle,
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.red,
@@ -317,7 +318,7 @@ class _SignUpState extends State<SignUp> {
                       ),
                       SizedBox(height: size.height * 0.02),
                       const Text(
-                        "Niba ufite ikibazo mugukoesha iyi apulikasiyo kandi ukaba ukeneye ubufasha wahamagara kuri izi nimero zikurikira:",
+                        AppText.noticeContent,
                         style: TextStyle(
                           color: Colors.grey,
                           fontSize: 16,
@@ -396,7 +397,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.person,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika amazina yawe",
+                      hintText: AppText.nameHintText,
                       border: InputBorder.none,
                     ),
                   ),
@@ -433,7 +434,7 @@ class _SignUpState extends State<SignUp> {
                         Icons.phone_outlined,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika Nimero ya Telefoni yawe",
+                      hintText: AppText.phoneHintText,
                       border: InputBorder.none,
                     ),
                   ),
@@ -487,10 +488,10 @@ class _SignUpState extends State<SignUp> {
                         _registerUser();
                       },
                       child: const Text(
-                        "Emeza",
+                        AppText.registerButton,
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -509,7 +510,7 @@ class _SignUpState extends State<SignUp> {
                           children: <Widget>[
                             Flexible(
                               child: const Text(
-                                "Niba usanzwe wigira muri application kanda hano handitse injira. ",
+                                AppText.messageSignUp,
                                 style: TextStyle(color: kPrimaryColor),
                               ),
                             ),
@@ -525,7 +526,7 @@ class _SignUpState extends State<SignUp> {
                                 );
                               },
                               child: const Text(
-                                "INJIRA",
+                                AppText.loginButton,
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: kPrimaryColor,

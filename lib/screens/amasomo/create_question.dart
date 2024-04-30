@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
+import '../../widgets/apptext.dart';
 
 class CreateQuestion extends StatefulWidget {
   final String courseId;
@@ -29,10 +30,8 @@ class _CreateQuestionState extends State<CreateQuestion> {
   String option3 = "", option4 = "";
   String questionUrl = "";
   String correctAnswer = "";
-  String explainedText = "";
   List<File> _selectedImageFiles = [];
 
-  //adding controller
   final TextEditingController questionController = TextEditingController();
   final TextEditingController correctController = TextEditingController();
   final TextEditingController questionExplainedController =
@@ -73,7 +72,6 @@ class _CreateQuestionState extends State<CreateQuestion> {
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-      // Check if there are selected image files
       if (_selectedImageFiles.isNotEmpty) {
         for (var imageFile in _selectedImageFiles) {
           request.files.add(
@@ -96,9 +94,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
         var jsonResponse = json.decode(responseData);
 
         if (jsonResponse['created'] == true) {
-          // Handle successful creation
-          Fluttertoast.showToast(msg: 'Quizcreated successfully');
-          print('Quiz created successfully');
+          Fluttertoast.showToast(msg: AppText.quizCreatedSuccess);
           setState(() {
             _formkey.currentState!.reset();
             questionController.clear();
@@ -109,9 +105,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
             correctController.clear();
           });
         } else {
-          // Handle failure to create course content
-          print('Failed to create course content');
-          Fluttertoast.showToast(msg: 'Failed to create course content');
+          Fluttertoast.showToast(msg: AppText.quizCreationFailed);
         }
         if (!mounted) return;
         setState(() {
@@ -137,154 +131,89 @@ class _CreateQuestionState extends State<CreateQuestion> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     final questionField = TextFieldContainer(
       child: TextFormField(
-        autofocus: false,
-        controller: questionController,
-        keyboardType: TextInputType.text,
-        onSaved: (value) {
-          questionController.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           icon: Icon(
             Icons.question_answer_outlined,
             color: kPrimaryColor,
           ),
-          hintText: "Type Question...",
+          hintText: AppText.typeQuestionHint,
           border: InputBorder.none,
         ),
         onChanged: (val) {
           question = val;
         },
-        autovalidateMode: AutovalidateMode.disabled,
-        validator: (input) => input!.isEmpty ? 'Enter question' : null,
+        validator: (input) => input!.isEmpty ? AppText.questionError : null,
       ),
     );
-    //quiz title field
+
     final option1Field = TextFieldContainer(
       child: TextFormField(
-        autofocus: false,
-        controller: option1Controller,
-        onSaved: (value) {
-          option1Controller.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: const InputDecoration(
-          hintText: "Option",
+        decoration: InputDecoration(
+          hintText: "${AppText.optionHint} 1",
           border: InputBorder.none,
         ),
         onChanged: (val) {
           option1 = val;
         },
-        autovalidateMode: AutovalidateMode.disabled,
-        validator: (input) => input!.isEmpty ? 'Enter option 1' : null,
+        validator: (input) => input!.isEmpty ? AppText.optionError : null,
       ),
     );
-    //quiz desc
+
     final option2Field = TextFieldContainer(
       child: TextFormField(
-        autofocus: false,
-        controller: option2Controller,
-        keyboardType: TextInputType.text,
-        onSaved: (value) {
-          option2Controller.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: const InputDecoration(
-          hintText: "Option 2",
+        decoration: InputDecoration(
+          hintText: "${AppText.optionHint} 2",
           border: InputBorder.none,
         ),
         onChanged: (val) {
           option2 = val;
         },
-        autovalidateMode: AutovalidateMode.disabled,
-        validator: (input) => input!.isEmpty ? 'Enter option 2' : null,
+        validator: (input) => input!.isEmpty ? AppText.optionError : null,
       ),
     );
+
     final option3Field = TextFieldContainer(
       child: TextFormField(
-        autofocus: false,
-        controller: option3Controller,
-        keyboardType: TextInputType.text,
-        onSaved: (value) {
-          option3Controller.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: const InputDecoration(
-          hintText: "Option 3",
+        decoration: InputDecoration(
+          hintText: "${AppText.optionHint} 3",
           border: InputBorder.none,
         ),
         onChanged: (val) {
           option3 = val;
         },
-        autovalidateMode: AutovalidateMode.disabled,
-        validator: (input) => input!.isEmpty ? 'Enter option 3' : null,
+        validator: (input) => input!.isEmpty ? AppText.optionError : null,
       ),
     );
+
     final option4Field = TextFieldContainer(
       child: TextFormField(
-        autofocus: false,
-        controller: option4Controller,
-        keyboardType: TextInputType.text,
-        onSaved: (value) {
-          option4Controller.text = value!;
-        },
-        textInputAction: TextInputAction.next,
-        decoration: const InputDecoration(
-          hintText: "Option 4",
+        decoration: InputDecoration(
+          hintText: "${AppText.optionHint} 4",
           border: InputBorder.none,
         ),
         onChanged: (val) {
           option4 = val;
         },
-        autovalidateMode: AutovalidateMode.disabled,
-        validator: (input) => input!.isEmpty ? 'Enter option 4' : null,
+        validator: (input) => input!.isEmpty ? AppText.optionError : null,
       ),
     );
+
     final correctField = TextFieldContainer(
       child: TextFormField(
-        autofocus: false,
-        controller: correctController,
-        keyboardType: TextInputType.text,
-        onSaved: (value) {
-          correctController.text = value!;
-        },
-        textInputAction: TextInputAction.done,
-        decoration: const InputDecoration(
-          hintText: "Andika igisubizo cyukuri",
+        decoration: InputDecoration(
+          hintText: AppText.correctAnswerHint,
           border: InputBorder.none,
         ),
         onChanged: (val) {
           correctAnswer = val;
         },
-        autovalidateMode: AutovalidateMode.disabled,
-        validator: (input) =>
-            input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
+        validator: (input) => input!.isEmpty ? AppText.correctAns : null,
       ),
     );
 
-    // final explaineField = TextFieldContainer(
-    //   child: TextFormField(
-    //     autofocus: false,
-    //     controller: questionExplainedController,
-    //     keyboardType: TextInputType.text,
-    //     onSaved: (value) {
-    //       correctController.text = value!;
-    //     },
-    //     textInputAction: TextInputAction.done,
-    //     decoration: const InputDecoration(
-    //       hintText: "Andika icyo igazeti ivuaga",
-    //       border: InputBorder.none,
-    //     ),
-    //     onChanged: (val) {
-    //       explainedText = val;
-    //     },
-    //     autovalidateMode: AutovalidateMode.disabled,
-    //     // validator: (input) =>
-    //     //     input!.isEmpty ? 'Andika igisubizo cyukuri' : null,
-    //   ),
-    // );
     final addquestionBtn = SizedBox(
       width: size.width * 0.4,
       height: size.height * 0.05,
@@ -295,8 +224,8 @@ class _CreateQuestionState extends State<CreateQuestion> {
           onPressed: () {
             uploadCourseQuizData();
           },
-          child: const Text(
-            "Save Question",
+          child: Text(
+            AppText.saveQuestionButton,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
@@ -304,6 +233,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
         ),
       ),
     );
+
     final addsubmitBtn = Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       width: size.width * 0.5,
@@ -320,8 +250,8 @@ class _CreateQuestionState extends State<CreateQuestion> {
               ),
             );
           },
-          child: const Text(
-            "SUBMIT",
+          child: Text(
+            AppText.submitButton,
             style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -330,27 +260,20 @@ class _CreateQuestionState extends State<CreateQuestion> {
         ),
       ),
     );
+
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          color: Colors.white,
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text(
-          "Add Questions",
+        title: Text(
+          AppText.addQuestionsTitle,
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,
             color: Colors.white,
           ),
         ),
-        backgroundColor: kPrimaryColor,
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.notifications,
               color: Colors.white,
               size: 25,
@@ -377,7 +300,7 @@ class _CreateQuestionState extends State<CreateQuestion> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Course Title : ${widget.courseTitle}",
+                    "${AppText.courseTitleLabel} : ${widget.courseTitle}",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -387,60 +310,6 @@ class _CreateQuestionState extends State<CreateQuestion> {
                     height: size.height * 0.05,
                   ),
                   questionField,
-                  SizedBox(
-                    height: size.height * 0.03,
-                  ),
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(0.0),
-                    child: Center(
-                      child: Stack(
-                        children: <Widget>[
-                          (_selectedImageFiles.isEmpty)
-                              ? Container()
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Material(
-                                        // display new updated image
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(125.0)),
-                                        clipBehavior: Clip.hardEdge,
-                                        // display new updated image
-                                        child: Image.file(
-                                          _selectedImageFiles.first,
-                                          width: 200.0,
-                                          height: 200.0,
-                                          fit: BoxFit.cover,
-                                        )),
-                                  ],
-                                ),
-                          GestureDetector(
-                            onTap: pickImageFiles,
-                            child: Padding(
-                                padding: (_selectedImageFiles.isEmpty)
-                                    ? const EdgeInsets.only(
-                                        top: 0.0, right: 170.0)
-                                    : const EdgeInsets.only(
-                                        top: 150.0, right: 120.0),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 25.0,
-                                      child: Icon(
-                                        Icons.photo,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  ],
-                                )),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
                   SizedBox(
                     height: size.height * 0.03,
                   ),
@@ -464,12 +333,8 @@ class _CreateQuestionState extends State<CreateQuestion> {
                   SizedBox(
                     height: size.height * 0.05,
                   ),
-                  // explaineField,
-                  // SizedBox(
-                  //   height: size.height * 0.05,
-                  // ),
                   _isLoading
-                      ? const CircularProgressIndicator()
+                      ? CircularProgressIndicator()
                       : Container(
                           child: null,
                         ),
@@ -477,17 +342,18 @@ class _CreateQuestionState extends State<CreateQuestion> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Expanded(
-                          child: Column(
-                        children: [
-                          addquestionBtn,
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          addsubmitBtn,
-                        ],
-                      ))
+                        child: Column(
+                          children: [
+                            addquestionBtn,
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            addsubmitBtn,
+                          ],
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),

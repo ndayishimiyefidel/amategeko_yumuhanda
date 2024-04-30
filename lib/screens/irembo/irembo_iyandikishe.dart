@@ -1,5 +1,6 @@
 import 'package:amategeko/screens/irembo/components/body.dart';
 import 'package:amategeko/utils/constants.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter/material.dart';
 
 class IremboSignUpScreen extends StatelessWidget {
@@ -9,7 +10,7 @@ class IremboSignUpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
-        title: Text('KWIYANDIKISHA'),
+        title: Text(AppText.registerButton),
         backgroundColor: kPrimaryColor,
         centerTitle: true,
       ),

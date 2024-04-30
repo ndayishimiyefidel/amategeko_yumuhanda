@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../backend/apis/db_connection.dart';
 import '../../components/notification_list.dart';
+import '../../widgets/apptext.dart';
 
 class NotificationTab2 extends StatefulWidget {
   const NotificationTab2({super.key});
@@ -194,7 +195,7 @@ class _NotificationTab2State extends State<NotificationTab2> {
                             isLoading = true;
                             fetchAbadafiteCode(); // Load more records
                           },
-                          child: const Text("Load More"),
+                          child: const Text(AppText.loadMore),
                         ),
                       ),
                   ],

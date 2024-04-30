@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:amategeko/components/text_field_container.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../utils/constants.dart';
@@ -9,7 +10,10 @@ class AddQuestion extends StatefulWidget {
   final bool isNew;
 
   const AddQuestion(
-      {super.key, required this.quizId, required this.quizTitle, required this.isNew});
+      {super.key,
+      required this.quizId,
+      required this.quizTitle,
+      required this.isNew});
 
   @override
   State<AddQuestion> createState() => _AddQuestionState();
@@ -48,18 +52,15 @@ class _AddQuestionState extends State<AddQuestion> {
     });
   }
 
-  
-
   @override
   void initState() {
     super.initState();
   }
 
- 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-   
+
     final questionField = TextFieldContainer(
       child: TextFormField(
         autofocus: false,
@@ -173,9 +174,7 @@ class _AddQuestionState extends State<AddQuestion> {
         borderRadius: BorderRadius.circular(30),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-          onPressed: () {
-           
-          },
+          onPressed: () {},
           child: const Text(
             "SAVE QUESTION",
             textAlign: TextAlign.center,
@@ -216,7 +215,7 @@ class _AddQuestionState extends State<AddQuestion> {
           },
         ),
         title: const Text(
-          "Add Questions",
+          AppText.addQuestionsTitle,
           style: TextStyle(
             letterSpacing: 1.25,
             fontSize: 24,
@@ -275,22 +274,22 @@ class _AddQuestionState extends State<AddQuestion> {
                           (pickedFile == null)
                               ? Container()
                               : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Material(
-                                      // display new updated image
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(125.0)),
-                                      clipBehavior: Clip.hardEdge,
-                                      // display new updated image
-                                      child: Image.file(
-                                        pickedFile!,
-                                        width: 200.0,
-                                        height: 200.0,
-                                        fit: BoxFit.cover,
-                                      )),
-                                ],
-                              ),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                        // display new updated image
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(125.0)),
+                                        clipBehavior: Clip.hardEdge,
+                                        // display new updated image
+                                        child: Image.file(
+                                          pickedFile!,
+                                          width: 200.0,
+                                          height: 200.0,
+                                          fit: BoxFit.cover,
+                                        )),
+                                  ],
+                                ),
                           GestureDetector(
                             onTap: selectsFile,
                             child: Padding(

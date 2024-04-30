@@ -10,6 +10,7 @@ import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../utils/generate_code.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 import 'UserList.dart';
 import 'UserList100.dart';
 import 'package:http/http.dart' as http;
@@ -52,7 +53,7 @@ class _AllUsersState extends State<AllUsers>
         ),
         title: userRole == "Admin" || userRole == "Caller"
             ? const Text(
-                'User List',
+                AppText.userList,
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
               )
             : const Text(
@@ -95,8 +96,8 @@ class _AllUsersState extends State<AllUsers>
                             unselectedLabelColor: Colors.black26,
                             indicatorColor: Colors.black,
                             tabs: [
-                              Tab(text: 'New Users'),
-                              Tab(text: 'Old Users'),
+                              Tab(text: AppText.newUsers),
+                              Tab(text: AppText.oldUsers),
                             ],
                           ),
                         ),

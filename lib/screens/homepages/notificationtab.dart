@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 import '../homepages/noficationtab1.dart';
 import 'package:http/http.dart' as http;
 import '../homepages/notificationtab2.dart';
@@ -88,8 +89,8 @@ class _NotificationsState extends State<Notifications>
                             unselectedLabelColor: Colors.black26,
                             indicatorColor: Colors.black,
                             tabs: [
-                              Tab(text: 'Abadafite kode'),
-                              Tab(text: 'Abafite kode'),
+                              Tab(text: AppText.userNocode),
+                              Tab(text: AppText.userWithCode),
                             ],
                           ),
                         ),
@@ -270,8 +271,8 @@ class DataSearch extends SearchDelegate {
             suggestionList[index]["code"] != ""
                 ? RichText(
                     text: TextSpan(
-                      text: suggestionList[index]["code"] ?? ''
-                          .substring(0, query.length),
+                      text: suggestionList[index]["code"] ??
+                          ''.substring(0, query.length),
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,

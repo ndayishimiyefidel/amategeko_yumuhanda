@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+import '../../widgets/apptext.dart';
 import 'create_quiz.dart';
 
 class Exams extends StatefulWidget {
@@ -27,7 +28,7 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
       ),
       appBar: AppBar(
         title: const Text(
-          "Exams",
+          AppText.exams,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.normal,
@@ -46,17 +47,17 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
           ),
         ),
         actions: [
-         CustomButton(
-          text: "Amabwiriza",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => AmabwirizaList(),
-              ),
-            );
-          },
-        )
+          CustomButton(
+            text: AppText.appRules,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,
@@ -97,7 +98,6 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
       phone = preferences.getString("phone")!;
-    
     });
   }
 

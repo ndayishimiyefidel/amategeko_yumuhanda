@@ -1,4 +1,5 @@
 import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/apptext.dart';
 // import 'package:amategeko/screens/ambassador/view_referrals.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:flutter/material.dart';
@@ -117,7 +118,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           appBar: AppBar(
             title: const Text(
-              "Dashboard",
+              AppText.dashboard,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.normal,
@@ -137,7 +138,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
             actions: [
               CustomButton(
-                text: "Amabwiriza",
+                text: AppText.appRules,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -189,7 +190,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               }
                             },
                             child: const DashboardCard(
-                              name: "Exams",
+                              name: AppText.exams,
                               imgpath: "rnp.jpg",
                             ),
                           ),
@@ -218,7 +219,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               }
                             },
                             child: const DashboardCard(
-                              name: "Ishuri online",
+                              name: AppText.onlineSch,
                               imgpath: "mwarimu.jpg",
                             ),
                           ),
@@ -270,7 +271,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               );
                             },
                             child: const DashboardCard(
-                              name: "IGAZETTE",
+                              name: AppText.igazette,
                               imgpath: "traffic.png",
                             ),
                           ),
@@ -290,7 +291,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               );
                             },
                             child: const DashboardCard(
-                              name: "Group Whatsapp",
+                              name: AppText.group,
                               imgpath: "wgroup.jpg",
                             ),
                           ),
@@ -325,7 +326,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     );
                                   },
                                   child: const DashboardCard(
-                                    name: "Notifications",
+                                    name: AppText.Notifications,
                                     imgpath: "notification.png",
                                   ),
                                 ),
@@ -344,7 +345,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         ));
                                   },
                                   child: const DashboardCard(
-                                    name: "All User",
+                                    name: AppText.allUsers,
                                     imgpath: "images/icon1.jpg",
                                   ),
                                 ),
@@ -364,7 +365,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     );
                                   },
                                   child: const DashboardCard(
-                                    name: "Iyandikishe",
+                                    name: AppText.registerButton,
                                     imgpath: 'irembo.jpg',
                                   ),
                                 ),
@@ -382,7 +383,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         ));
                                   },
                                   child: const DashboardCard(
-                                    name: "All User",
+                                    name: AppText.allUsers,
                                     imgpath: "images/icon1.jpg",
                                   ),
                                 ),
@@ -418,7 +419,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     );
                                   },
                                   child: const DashboardCard(
-                                    name: "Abiyandikishe",
+                                    name: AppText.Registered,
                                     imgpath: "irembo.jpg",
                                   ),
                                 ),
@@ -440,7 +441,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     // );
                                   },
                                   child: const DashboardCard(
-                                    name: "My Referrals",
+                                    name: AppText.myReferral,
                                     imgpath: "wgroup.jpg",
                                   ),
                                 ),
@@ -479,7 +480,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     // );
                                   },
                                   child: const DashboardCard(
-                                    name: "My Referrals",
+                                    name: AppText.myReferral,
                                     imgpath: "wgroup.jpg",
                                   ),
                                 ),

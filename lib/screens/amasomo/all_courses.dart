@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ProgressWidget.dart';
+import '../../widgets/apptext.dart';
 import '../../widgets/fcmWidget.dart';
 import 'course_content.dart';
 import 'isomo_page.dart';
@@ -155,7 +156,7 @@ class _AllCourseState extends State<AllCourse> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Ishuri Online",
+            AppText.onlineSch,
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -175,7 +176,7 @@ class _AllCourseState extends State<AllCourse> {
           ),
           actions: [
             CustomButton(
-              text: "Amabwiriza",
+              text: AppText.appRules,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -202,7 +203,7 @@ class _AllCourseState extends State<AllCourse> {
                     children: [
                       if (allCoursesList.isEmpty)
                         const Center(
-                          child: Text("no courses available right now!"),
+                          child: Text(AppText.noCourse),
                         )
                       else
                         Column(
@@ -241,7 +242,7 @@ class _AllCourseState extends State<AllCourse> {
                               isLoading = true;
                               fetchAllCourses(); // Load more records
                             },
-                            child: const Text("Load More"),
+                            child: const Text(AppText.loadMore),
                           ),
                         ),
                     ],
@@ -256,7 +257,7 @@ class _AllCourseState extends State<AllCourse> {
                 label: const Row(
                   children: [
                     Text(
-                      "Create Course",
+                      AppText.createCourse,
                       style: TextStyle(
                         fontSize: 18,
                       ),
@@ -280,10 +281,9 @@ class _AllCourseState extends State<AllCourse> {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
-    String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-    String notificationTitle = "Requesting Quiz Code";
+    String body = AppText.requestCodeBody(senderName, phone);
+
+    String notificationTitle = AppText.requestCodeTitle;
 
     try {
       final response = await http.post(
@@ -293,23 +293,25 @@ class _AllCourseState extends State<AllCourse> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        //print('Response Body: $data');
         if (data['success'] == true) {
           showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                      "Your request have been already sent,Please wait the team is processing it."),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Close"))
-                  ],
-                );
-              });
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(
+                  AppText.requestCodeSuccessMessage,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(AppText.requestCodeSuccessCloseButtonText),
+                  )
+                ],
+              );
+            },
+          );
         } else {
           try {
             final res = await http.post(
@@ -322,87 +324,85 @@ class _AllCourseState extends State<AllCourse> {
                 "ex_type": exam.toString()
               },
             );
-            print(res.body);
 
             if (res.statusCode == 200) {
               final data = json.decode(res.body);
-              print('Response Body: $data');
               if (data['requestSent'] == true) {
-                //handle if not sent
                 sendPushMessage(userToken, body, notificationTitle);
                 isLoading = false;
 
                 Size size = MediaQuery.of(context).size;
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: const Text(
-                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
-                        actions: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            width: size.width * 0.7,
-                            height: size.height * 0.07,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: kPrimaryColor),
-                                onPressed: () async {
-                                  //direct phone call
-                                  await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
-                                },
-                                child: const Text(
-                                  "Ishyura 1500 Rwf.",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text(
+                        AppText.requestCodeSuccessAlertMessage,
+                      ),
+                      actions: [
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          width: size.width * 0.7,
+                          height: size.height * 0.07,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                              ),
+                              onPressed: () async {
+                                await FlutterPhoneDirectCaller.callNumber(
+                                    "*182*8*1*329494*1500#");
+                              },
+                              child: Text(
+                                AppText.requestCodeSuccessButtonText,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                           ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Okay"))
-                        ],
-                      );
-                    });
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child:
+                              Text(AppText.requestCodeSuccessCloseButtonText),
+                        )
+                      ],
+                    );
+                  },
+                );
               } else {
                 Fluttertoast.showToast(
-                  msg: "Faild to request code",
+                  msg: AppText.requestCodeErrorMessage,
                   textColor: Colors.red,
                   fontSize: 10,
                 );
               }
             } else {
               Fluttertoast.showToast(
-                msg: "Faild to connect to api",
+                msg: "Failed to connect to the API",
                 textColor: Colors.red,
                 fontSize: 10,
               );
             }
           } catch (e) {
-            // Handle exceptions
             print("Error: $e");
-            // You can show an error message or perform other error handling as needed
           }
         }
       } else {
         Fluttertoast.showToast(
-          msg: "Faild to connect to api",
+          msg: "Failed to connect to the API",
           textColor: Colors.red,
           fontSize: 10,
         );
       }
     } catch (e) {
-      // Handle exceptions
       print("Error: $e");
-      // You can show an error message or perform other error handling as needed
     }
   }
 }
@@ -552,7 +552,7 @@ class _CourseTileState extends State<CourseTile> {
                                           );
                                         },
                                         child: const Text(
-                                          "Add Content",
+                                          AppText.addContent,
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 18,
@@ -584,7 +584,7 @@ class _CourseTileState extends State<CourseTile> {
                                               "course deleted successfully!");
                                         },
                                         child: const Text(
-                                          "Delete course",
+                                          AppText.deleteCourse,
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize: 16,
@@ -645,14 +645,14 @@ class _CourseTileState extends State<CourseTile> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      content: const Text(
-                          "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
+                      content: const Text(AppText.payMessageAlert),
                       actions: [
                         TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: const Text("Close"))
+                            child: const Text(
+                                AppText.requestCodeSuccessCloseButtonText))
                       ],
                     );
                   });

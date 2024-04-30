@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../components/text_field_container.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/ProgressWidget.dart';
+import '../../../widgets/apptext.dart';
 import '../../Login/components/check_deviceid.dart';
 import '../../Signup/components/background.dart';
 
@@ -101,7 +102,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
                   child: Text(
-                    "REGISTER AMBASSADOR OR WORKER",
+                    AppText.addAmb,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -118,7 +119,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                       Row(
                         children: [
                           Radio<String>(
-                            value: 'Ambassador',
+                            value: AppText.amb,
                             groupValue: selectedUserRole,
                             onChanged: (value) {
                               setState(() {
@@ -126,13 +127,13 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                               });
                             },
                           ),
-                          const Text('Ambassador'),
+                          const Text(AppText.amb),
                         ],
                       ),
                       Row(
                         children: [
                           Radio<String>(
-                            value: 'Caller',
+                            value: AppText.caller,
                             groupValue: selectedUserRole,
                             onChanged: (value) {
                               setState(() {
@@ -140,7 +141,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                               });
                             },
                           ),
-                          const Text('Caller'),
+                          const Text(AppText.caller),
                         ],
                       ),
                     ],
@@ -179,7 +180,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                         Icons.person,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika amazina ye",
+                      hintText: AppText.nameHintText,
                       border: InputBorder.none,
                     ),
                   ),
@@ -214,7 +215,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                         Icons.phone_outlined,
                         color: kPrimaryColor,
                       ),
-                      hintText: "Andika Telefoni ye",
+                      hintText: AppText.phoneHintText,
                       border: InputBorder.none,
                     ),
                   ),
@@ -244,7 +245,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                     },
                     cursorColor: kPrimaryColor,
                     decoration: InputDecoration(
-                      hintText: "Andika telephone nanone",
+                      hintText: AppText.phoneHintText,
                       icon: const Icon(
                         Icons.lock,
                         color: kPrimaryColor,
@@ -284,7 +285,7 @@ class _SignUpAmbassadorState extends State<SignUpAmbassador> {
                         }
                       },
                       child: const Text(
-                        "Register",
+                        AppText.registerButton,
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 22,
