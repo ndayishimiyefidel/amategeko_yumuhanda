@@ -160,7 +160,7 @@ class _SignUpState extends State<SignUp> {
                 if (registrationResult['registered'] == true) {
                   await FlutterPhoneDirectCaller.callNumber(
                       "*182*8*1*644209*1000#");
-                  Fluttertoast.showToast(msg: "Ubusabe bwawe bwakiriwe neza");
+                  Fluttertoast.showToast(msg: AppText.requestSent);
 
                   Navigator.pop(context);
                 } else {

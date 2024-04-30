@@ -158,7 +158,7 @@ class _NotificationTab2State extends State<NotificationTab2> {
                   children: [
                     if (allUsersList.isEmpty)
                       const Center(
-                        child: Text("Nta muntu udafite code"),
+                        child: Text(AppText.noUser),
                       )
                     else
                       Column(

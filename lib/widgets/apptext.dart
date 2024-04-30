@@ -181,7 +181,7 @@ class AppText {
   static const String doExercise = "Do Exercise";
   static const String openExercise = "Open Exercise";
   static const String prayerMsg =
-      "Hello, my name is Teacher Alexis NSHIMIYIMANA. We welcome you to this application. permit us to have a good harvest. It will provide us with minerals (school fees) and everything we need. God hears us and gives us time. GOD TUZATSINDAN.B: everyone who is in this application and wants to enter it is a teacher, professor, doctor, doctor, businessman, student, soldier, policeman, office workers, and all others in your honor LET US PRAY God is our trust, the Lord God in heaven we praise you and we rejoice for your kindness that you have done to us and that you have protected us today and beyond And that you continue to protect us without the enemy's will and breathe into us the SPIRIT of life But first forgive us for all our sins that we have committed and offended you so that our prayer reaches you like a sweet smelling incense, As we show you our exams. You are the one who gives us success. Help us prepare well for what we study. Take everything we need. etc.,... you will protect us from accidents and cast out demons and demons from our lives and ours in the name of JESUS, we ask that you will do EVERYTHING.";
+      "Hello, my name is Teacher Alexis NSHIMIYIMANA. We welcome you to this application. permit us to have a good harvest. It will provide us with minerals (school fees) and everything we need. God hears us and gives us time.  everyone who is in this application and wants to enter it is a teacher, professor,  doctor, businessman, student, soldier, policeman, office workers, and all others in your honor LET US PRAY God is our trust, the Lord God in heaven we praise you and we rejoice for your kindness that you have done to us and that you have protected us today and beyond And that you continue to protect us without the enemy's will and breathe into us the SPIRIT of life But first forgive us for all our sins that we have committed and offended you so that our prayer reaches you like a sweet smelling incense, As we show you our exams. You are the one who gives us success. Help us prepare well for what we study. Take everything we need. etc.,... you will protect us from accidents and cast out demons and demons from our lives and ours in the name of JESUS, we ask that you will do EVERYTHING.";
   static const String createQuiz = "Create Quiz";
 
   static const String requestPasswordLink = "REQUEST PASSWORD RESET LINK";
@@ -246,5 +246,10 @@ class AppText {
   static const String courseTypeHint = "Course Type";
   //Course Type
   static const String addQuestionsTitle = "Add Questions";
+  static const String noUser = "Nobody has a code";
   static const String courseDescHint = "Enter Course Descrition...";
+  static const String noCode =
+      "You don't have a code to unlock the exam, request a code";
+  static const String requestSent =
+      "Your request has been successfully received, To get the code to enter the exam you must first pay.";
 }

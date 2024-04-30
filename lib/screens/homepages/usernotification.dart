@@ -10,6 +10,8 @@ import '../../components/notification_list.dart';
 import '../../utils/constants.dart';
 import 'package:http/http.dart' as http;
 
+import '../../widgets/apptext.dart';
+
 class UserNotification extends StatefulWidget {
   const UserNotification({super.key});
 
@@ -183,8 +185,7 @@ class _UserNotificationState extends State<UserNotification> {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        content: const Text(
-                            "Ubusabe bwawe bwakiriwe neza, Kugirango ubone kode ikwinjiza muri exam banza wishyure."),
+                        content: const Text(AppText.requestSent),
                         actions: [
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 10),
@@ -314,7 +315,7 @@ class _UserNotificationState extends State<UserNotification> {
                                           height: size.height * 0.1,
                                         ),
                                         const Text(
-                                          "Nta kode ufite ifungura exam saba code",
+                                          AppText.noCode,
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: Colors.red,
@@ -343,7 +344,7 @@ class _UserNotificationState extends State<UserNotification> {
                                                     "Exams");
                                               },
                                               child: const Text(
-                                                "Saba Code ifungura exam",
+                                                AppText.appcodeText,
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 18,

@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../backend/apis/db_connection.dart';
 import '../../utils/constants.dart';
 import '../../widgets/MainDrawer.dart';
+
 import '../../widgets/apptext.dart';
 import '../homepages/noficationtab1.dart';
 import 'package:http/http.dart' as http;
@@ -48,11 +49,11 @@ class _NotificationsState extends State<Notifications>
         ),
         title: userRole == "Admin" || userRole == "Caller"
             ? const Text(
-                'Notifications',
+                AppText.Notifications,
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
               )
             : const Text(
-                'My Notifications',
+               AppText.Notifications,
                 style: TextStyle(letterSpacing: 1.25, fontSize: 24),
               ),
         backgroundColor: kPrimaryColor,
