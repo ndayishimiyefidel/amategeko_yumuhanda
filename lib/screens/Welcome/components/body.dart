@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../ads/interestial_ad.dart';
+import '../../../ads/reward_video_manager.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/apptext.dart';
 import '../../Login/login_screen.dart';
@@ -21,6 +23,9 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
+
+    RewardedVideoAdManager.loadRewardAd();
+    adManager.loadInterstitialAd();
   }
 
   loginNavigator() {
@@ -43,6 +48,28 @@ class _BodyState extends State<Body> {
         },
       ),
     );
+  }
+
+  final InterestialAds adManager = InterestialAds();
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  void _showInterstitialAd() {
+    // Show the interstitial ad when needed
+    adManager.showInterstitialAd();
+  }
+
+  @override
+  void dispose() {
+    RewardedVideoAdManager.dispose();
+    adManager.dispose();
+    super.dispose();
   }
 
   @override
@@ -102,6 +129,7 @@ class _BodyState extends State<Body> {
                   style:
                       ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
                   onPressed: () {
+                    _showInterstitialAd();
                     setState(() {});
                     signupNavigator();
                   },
@@ -125,6 +153,7 @@ class _BodyState extends State<Body> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: kPrimaryLightColor),
                   onPressed: () {
+                    showRewardedAd();
                     loginNavigator();
                   },
                   child: const Text(

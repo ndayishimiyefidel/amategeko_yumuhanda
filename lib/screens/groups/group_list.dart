@@ -94,7 +94,7 @@ class _GroupListState extends State<GroupList> {
                 groupName: "Amategeko yumuhanda VIP1"),
             FileTile(
                 linkUrl: "https://chat.whatsapp.com/JHfdbKSYVFz1s5jlTKfpcm",
-                groupName: "Amategeko yumuhanda VIP2")
+                groupName: "Amategeko yumuhanda VIP2"),
           ],
         ),
       )),

@@ -393,7 +393,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                       "*182*8*1*329494*5000#");
                                 },
                                 child: const Text(
-                                  "Ishyura 5000 Rwf.",
+                                  "pay 5000 Rwf.",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,

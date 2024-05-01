@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../backend/apis/db_connection.dart';
 import '../utils/generate_code.dart';
+import '../widgets/apptext.dart';
 import '../widgets/fcmWidget.dart';
 
 class UsersNotificationList extends StatefulWidget {
@@ -333,7 +334,7 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
                 context,
                 widget.docId,
                 url,
-                "Gushyiraho igihe uzarangira kwiga byakunze",
+                "setting time successfully",
                 _selectedDate!.millisecondsSinceEpoch.toString())
             .then((value) => _isLoading = false);
         //_updateEndTimeInFirestore();
@@ -343,9 +344,9 @@ class _UsersNotificationListState extends State<UsersNotificationList> {
 
   //get fcm token
   _getToken() async {
-    String body =
-        "Mwiriwe neza ${widget.name}, ubu ngubu wemerewe gukora ibizamini byose ntankomyi kuko wamaze kwishyura.\n Murakoze mukomeze kwiga neza";
-    String notificationTitle = "Quiz App Generating Code";
+    String body = AppText.requestCodeBody(widget.name, "");
+
+    String notificationTitle = AppText.requestCodeTitle;
     sendPushMessage(fcmToken, body, notificationTitle);
   }
 

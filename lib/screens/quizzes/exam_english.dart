@@ -1,4 +1,5 @@
 import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/apptext.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,7 +47,7 @@ class _ExamEnglishState extends State<ExamEnglish>
         ),
         actions: [
           CustomButton(
-            text: "Rules",
+            text: AppText.appRules,
             onPressed: () {
               Navigator.push(
                 context,

@@ -4,6 +4,7 @@ import 'package:amategeko/widgets/apptext.dart';
 import 'package:amategeko/widgets/custom_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../ads/banner_widget.dart';
 import '../../ads/interestial_ad.dart';
 import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
@@ -169,7 +170,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              ////showRewardedAd();
+                              showRewardedAd();
 
                               if (adShown) {
                                 Navigator.push(
@@ -229,7 +230,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
-              // const AdBannerWidget(),
+              const AdBannerWidget(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30.0, 10, 30, 10),
                 child: Container(
@@ -261,7 +262,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   ),
                                 );
                               }
-                              // //showRewardedAd();
+                              showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -281,7 +282,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               delayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              //_showInterstitialAd();
+                              _showInterstitialAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -316,7 +317,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    //_showInterstitialAd();
+                                    _showInterstitialAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -336,7 +337,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     delayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    //showRewardedAd();
+                                    showRewardedAd();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -409,7 +410,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    //_showInterstitialAd();
+                                    _showInterstitialAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -429,16 +430,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (BuildContext context) =>
-                                    //         ViewReferrals(
-                                    //             referralCode:
-                                    //                 referralCode.toString(),
-                                    //             refUid: currentuserid),
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            AllUsers(),
+                                      ),
+                                    );
                                   },
                                   child: const DashboardCard(
                                     name: AppText.myReferral,
@@ -468,16 +466,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (BuildContext context) =>
-                                    //         ViewReferrals(
-                                    //             referralCode:
-                                    //                 referralCode.toString(),
-                                    //             refUid: currentuserid),
-                                    //   ),
-                                    // );
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            AllUsers(),
+                                      ),
+                                    );
                                   },
                                   child: const DashboardCard(
                                     name: AppText.myReferral,

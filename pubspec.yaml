@@ -1,7 +1,7 @@
 name: amategeko
 description: A new Flutter project.
 publish_to: 'none' 
-version: 1.0.0+48
+version: 1.0.0+50
 #this offline version
 environment:
   sdk: '>=2.18.2 <3.0.0'

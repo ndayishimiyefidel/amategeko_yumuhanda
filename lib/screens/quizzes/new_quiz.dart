@@ -13,6 +13,8 @@ import '../../widgets/ProgressWidget.dart';
 import '../../widgets/apptext.dart';
 import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
+import '../../ads/interestial_ad.dart';
+import '../../ads/reward_video_manager.dart';
 
 class NewQuiz extends StatefulWidget {
   const NewQuiz({Key? key}) : super(key: key);
@@ -36,6 +38,7 @@ class _NewQuizState extends State<NewQuiz> {
   late String phone;
   String userToken = "";
   bool hasCode = false;
+  final InterestialAds adManager = InterestialAds();
   @override
   void initState() {
     _messaging.getToken().then((value) {});
@@ -47,12 +50,9 @@ class _NewQuizState extends State<NewQuiz> {
     listenFCM(); //list fcm
     getToken(); //get admin token
     FirebaseMessaging.instance;
+    //load ads
+    adManager.loadInterstitialAd();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   getCurrUserData() async {
@@ -176,6 +176,17 @@ class _NewQuizState extends State<NewQuiz> {
     );
   }
 
+  void _showInterstitialAd() {
+    // Show the interstitial ad when needed
+    adManager.showInterstitialAd();
+  }
+
+  @override
+  void dispose() {
+    adManager.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -269,6 +280,8 @@ class _NewQuizState extends State<NewQuiz> {
                                     backgroundColor: Colors.yellow,
                                     elevation: 3),
                                 onPressed: () async {
+                                  //show ad here
+                                  _showInterstitialAd();
                                   // Request code action
                                   requestCode(userToken, currentuserid,
                                       currentusername, "Exam");
@@ -485,6 +498,25 @@ class _QuizTileState extends State<QuizTile> {
   bool _isLoading = false;
   bool isAlreadyOpened = false;
   late SharedPreferences preferences;
+  @override
+  void initState() {
+    RewardedVideoAdManager.loadRewardAd();
+    super.initState();
+  }
+
+  void showRewardedAd() {
+    bool adShown = RewardedVideoAdManager.showRewardAd();
+
+    if (!adShown) {
+      print('Rewarded Ad is not loaded yet.');
+    }
+  }
+
+  @override
+  void dispose() {
+    RewardedVideoAdManager.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -540,6 +572,7 @@ class _QuizTileState extends State<QuizTile> {
                                 const BorderSide(color: Colors.green, width: 1),
                           ),
                           onPressed: () async {
+                            showRewardedAd();
                             if (widget.quizType == "Free" ||
                                 widget.userRole == "Admin") {
                               Navigator.push(
@@ -613,7 +646,7 @@ class _QuizTileState extends State<QuizTile> {
                                     isAlreadyOpened = await preferences.setBool(
                                         "isOpened", true);
 
-                                    print("Response Data $isAlreadyOpened");
+                                    // print("Response Data $isAlreadyOpened");
 
                                     Navigator.push(
                                       context,

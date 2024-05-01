@@ -130,10 +130,9 @@ class _UserNotificationState extends State<UserNotification> {
     final url = API.requestCode;
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
-    String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
-        "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
-    String notificationTitle = "Requesting Quiz Code";
+    String body = AppText.requestCodeBody(senderName, phone);
+ 
+    String notificationTitle = AppText.requestCodeTitle;
 
     try {
       final response = await http.post(

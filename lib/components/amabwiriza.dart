@@ -1,3 +1,4 @@
+import 'package:amategeko/ads/banner_widget.dart';
 import 'package:amategeko/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
@@ -87,7 +88,8 @@ class AmabwirizaList extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
+              ),
+              const AdBannerWidget(),
             ],
           ),
         ),

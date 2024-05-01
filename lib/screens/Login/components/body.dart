@@ -343,7 +343,7 @@ class _SignInState extends State<SignIn> {
           if (loginResult['success'] == true) {
             ///update fcm
             // Successful login
-            // showRewardedAd();
+            showRewardedAd();
             final userData = loginResult;
             final String userRole = userData['role'];
 

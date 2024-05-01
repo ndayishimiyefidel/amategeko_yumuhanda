@@ -54,40 +54,43 @@ class _AllCourseState extends State<AllCourse> {
 
   Future<void> fetchAllCourses() async {
     final apiUrl = API.courseList + "?from=$from&to=$to";
-    isLoading = true;
+    setState(() {
+      isLoading = true;
+    });
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print(data);
+        final String responseBody = response.body;
+        print("Response data: $responseBody"); // Log the response body
+
+        if (responseBody.isEmpty) {
+          throw Exception('Response body is empty');
+        }
+
+        final dynamic data = json.decode(responseBody);
+        print("Parsed data: $data"); // Log the parsed data
 
         if (data['success'] == true) {
           if (!mounted) return;
           setState(() {
             if (from == 0) {
-              // If it's the first load, clear the list
               allCoursesList.clear();
             }
-            // Append the new data to the existing list
             allCoursesList
                 .addAll(List<Map<String, dynamic>>.from(data['data']));
-            if (!mounted) return;
-            setState(() {
-              isLoading = false;
-              totalRows = int.tryParse(data['total'])!.toInt();
-            });
-
-            // Update 'from' and 'to' for the next load
+            isLoading = false;
+            totalRows = int.tryParse(data['total'])!.toInt();
             from = to;
-            to += 10; // Fetch the next 10 records
+            to += 10;
           });
         } else {
-          print("Failed to execute query");
+          print("Failed to execute query: ${data['message']}");
         }
       } else {
-        throw Exception('Failed to load data from the API');
+        throw Exception(
+            'Failed to load data from the API. Status code: ${response.statusCode}');
       }
     } catch (e) {
       print("Error occurs: $e");

@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../ads/interestial_ad.dart';
-import '../../ads/reward_video_manager.dart';
+
 import '../../utils/constants.dart';
 import '../../widgets/apptext.dart';
 import '../../widgets/count_down.dart';
@@ -54,7 +53,7 @@ class _OpenQuizState extends State<OpenQuiz>
 
   late SharedPreferences preferences;
   String? userRole;
-  final InterestialAds adManager = InterestialAds();
+
   getCurrUserData() async {
     preferences = await SharedPreferences.getInstance();
     if (!mounted) return;
@@ -116,9 +115,6 @@ class _OpenQuizState extends State<OpenQuiz>
     _controller1 = PageController(initialPage: 0);
     //call current data
     getCurrUserData();
-    //load ads
-    RewardedVideoAdManager.loadRewardAd();
-    adManager.loadInterstitialAd();
 
     _controller = AnimationController(
         vsync: this, duration: Duration(seconds: limitTime));
@@ -153,19 +149,6 @@ class _OpenQuizState extends State<OpenQuiz>
     });
   }
 
-  void showRewardedAd() {
-    bool adShown = RewardedVideoAdManager.showRewardAd();
-
-    if (!adShown) {
-      print('Rewarded Ad is not loaded yet.');
-    }
-  }
-
-  void _showInterstitialAd() {
-    // Show the interstitial ad when needed
-    adManager.showInterstitialAd();
-  }
-
   @override
   void dispose() {
     if (_controller.isAnimating || _controller.isCompleted) {
@@ -175,8 +158,6 @@ class _OpenQuizState extends State<OpenQuiz>
       screenshotCallback!.dispose();
     }
     _controller1.dispose();
-    adManager.dispose();
-    RewardedVideoAdManager.dispose();
     super.dispose();
   }
 
@@ -235,7 +216,6 @@ class _OpenQuizState extends State<OpenQuiz>
     return FloatingActionButton.extended(
       backgroundColor: kPrimaryLightColor,
       onPressed: () {
-        // showRewardedAd();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -280,7 +260,6 @@ class _OpenQuizState extends State<OpenQuiz>
         btnPressed = false;
       });
     } else {
-      // _showInterstitialAd();
       Navigator.push(
         context,
         MaterialPageRoute(
