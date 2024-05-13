@@ -1,15 +1,15 @@
-import 'package:amategeko/screens/accounts/AccountSettingsPage.dart';
-import 'package:amategeko/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uni_links/uni_links.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../screens/Signup/signup_screen.dart';
 import '../screens/amasomo/prayer.dart';
+import 'package:uni_links/uni_links.dart';
+import '../screens/quizzes/new_quiz.dart';
+import 'package:share_plus/share_plus.dart';
 import '../screens/homepages/dashboard.dart';
+import '../screens/Signup/signup_screen.dart';
+import 'package:amategeko/utils/constants.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amategeko/screens/accounts/AccountSettingsPage.dart';
 
 class MainDrawer extends StatefulWidget {
   final String? userRole;
@@ -151,14 +151,14 @@ class _MainDrawerState extends State<MainDrawer> {
           ),
           ListTile(
             onTap: () {
-              // SchedulerBinding.instance.addPostFrameCallback((_) {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (BuildContext context) => const OldQuiz(),
-              //     ),
-              //   );
-              // });
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => NewQuiz(),
+                  ),
+                );
+              });
             },
             leading: Image.asset(
               "assets/exam.png",
@@ -170,7 +170,7 @@ class _MainDrawerState extends State<MainDrawer> {
               bottom: 5,
             ),
             title: const Text(
-              "Quiz",
+              "Exam",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
