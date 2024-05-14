@@ -1,17 +1,16 @@
-// ignore_for_file: unnecessary_null_comparison, avoid_print
-import 'package:amategeko/screens/quizzes/quizzes.dart';
-import 'package:amategeko/screens/rules/amategeko_yose.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import '../utils/constants.dart';
+import '../enume/user_state.dart';
+import 'homepages/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../enume/user_state.dart';
-import '../resources/user_state_methods.dart';
-import '../utils/constants.dart';
-import 'accounts/AccountSettingsPage.dart';
-import 'homepages/dashboard.dart';
 import 'homepages/notificationtab.dart';
+import 'accounts/AccountSettingsPage.dart';
+import '../resources/user_state_methods.dart';
+import 'package:amategeko/screens/quizzes/exams.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amategeko/screens/rules/amategeko_yose.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+// ignore_for_file: unnecessary_null_comparison, avoid_print
 
 class HomeScreen extends StatefulWidget {
   final String currentuserid;
@@ -130,7 +129,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = <Widget>[
     const Home(), //index 0
-    const Quizzes(), //index 1
+    const Exams(), //index 1
     const Notifications(), //index 2// index 3
     const AmategekoYose(), //index 4
     UserSettings(), //index 5

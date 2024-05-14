@@ -1,12 +1,10 @@
-import 'package:amategeko/components/amabwiriza.dart';
-import 'package:amategeko/screens/quizzes/new_quiz.dart';
-import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/MainDrawer.dart';
-import 'create_quiz.dart';
+import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
+import 'package:amategeko/screens/quizzes/new_quiz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Exams extends StatefulWidget {
   const Exams({super.key});
@@ -21,7 +19,7 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       key: scaffoldKey,
-      drawer: const Drawer(
+      drawer: Drawer(
         elevation: 0,
         child: MainDrawer(),
       ),
@@ -46,17 +44,17 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
           ),
         ),
         actions: [
-         CustomButton(
-          text: "Amabwiriza",
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => AmabwirizaList(),
-              ),
-            );
-          },
-        )
+          CustomButton(
+            text: "Amabwiriza",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,
@@ -65,21 +63,21 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
       body: const NewQuiz(),
       //floating button
 
-      floatingActionButton: userRole == "Admin"
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return const CreateQuiz();
-                    },
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
+      // floatingActionButton: userRole == "Admin"
+      //     ? FloatingActionButton(
+      //         onPressed: () {
+      //           Navigator.push(
+      //             context,
+      //             MaterialPageRoute(
+      //               builder: (context) {
+      //                 return const CreateQuiz();
+      //               },
+      //             ),
+      //           );
+      //         },
+      //         child: const Icon(Icons.add),
+      //       )
+      //     : null,
     );
   }
 
@@ -97,7 +95,6 @@ class _ExamsState extends State<Exams> with SingleTickerProviderStateMixin {
       currentusername = preferences.getString("name")!;
       userRole = preferences.getString("role")!;
       phone = preferences.getString("phone")!;
-    
     });
   }
 

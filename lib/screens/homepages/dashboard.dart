@@ -1,22 +1,23 @@
-import 'package:amategeko/components/amabwiriza.dart';
-// import 'package:amategeko/screens/ambassador/view_referrals.dart';
-import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../ads/interestial_ad.dart';
-import '../../ads/reward_video_manager.dart';
+import 'open_exam.dart';
+import 'notificationtab.dart';
+import '../accounts/users.dart';
+import '../groups/group_list.dart';
 import '../../utils/constants.dart';
+import '../amasomo/all_courses.dart';
+import '../../ads/banner_widget.dart';
+import '../irembo/abiyandishije.dart';
+import '../rules/amategeko_yose.dart';
+import 'package:flutter/material.dart';
+import '../../ads/interestial_ad.dart';
+import '../../widgets/MainDrawer.dart';
 import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
-import '../../widgets/MainDrawer.dart';
-import '../accounts/users.dart';
-import '../amasomo/all_courses.dart';
-import '../groups/group_list.dart';
-import '../irembo/abiyandishije.dart';
 import '../irembo/irembo_iyandikishe.dart';
-import '../rules/amategeko_yose.dart';
-import 'notificationtab.dart';
-import 'open_exam.dart';
+import '../../ads/reward_video_manager.dart';
+import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:amategeko/screens/ambassador/view_referrals.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -168,7 +169,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               muchDelayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              ////showRewardedAd();
+                              showRewardedAd();
 
                               if (adShown) {
                                 Navigator.push(
@@ -200,6 +201,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           child: Bouncing(
                             onPress: () {
                               if (adShown) {
+                                showRewardedAd();
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -228,7 +230,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
-              // const AdBannerWidget(),
+              const AdBannerWidget(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30.0, 10, 30, 10),
                 child: Container(
@@ -260,7 +262,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   ),
                                 );
                               }
-                              // //showRewardedAd();
+                              showRewardedAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -280,7 +282,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               delayedAnimation.value * width, 0, 0),
                           child: Bouncing(
                             onPress: () {
-                              //_showInterstitialAd();
+                              _showInterstitialAd();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -315,7 +317,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    //_showInterstitialAd();
+                                    _showInterstitialAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -335,7 +337,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     delayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    //showRewardedAd();
+                                    showRewardedAd();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -355,6 +357,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     delayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
+                                    showRewardedAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -374,6 +377,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     delayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
+                                    showRewardedAd();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -408,7 +412,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                     muchDelayedAnimation.value * width, 0, 0),
                                 child: Bouncing(
                                   onPress: () {
-                                    //_showInterstitialAd();
+                                    _showInterstitialAd();
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -423,28 +427,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                               ),
-                              Transform(
-                                transform: Matrix4.translationValues(
-                                    muchDelayedAnimation.value * width, 0, 0),
-                                child: Bouncing(
-                                  onPress: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (BuildContext context) =>
-                                    //         ViewReferrals(
-                                    //             referralCode:
-                                    //                 referralCode.toString(),
-                                    //             refUid: currentuserid),
-                                    //   ),
-                                    // );
-                                  },
-                                  child: const DashboardCard(
-                                    name: "My Referrals",
-                                    imgpath: "wgroup.jpg",
-                                  ),
-                                ),
-                              ),
+                              // Transform(
+                              //   transform: Matrix4.translationValues(
+                              //       muchDelayedAnimation.value * width, 0, 0),
+                              //   child: Bouncing(
+                              //     onPress: () {
+                              //       // Navigator.push(
+                              //       //   context,
+                              //       //   MaterialPageRoute(
+                              //       //     builder: (BuildContext context) =>
+                              //       //         ViewReferrals(
+                              //       //             referralCode:
+                              //       //                 referralCode.toString(),
+                              //       //             refUid: currentuserid),
+                              //       //   ),
+                              //       // );
+                              //     },
+                              //     child: const DashboardCard(
+                              //       name: "My Referrals",
+                              //       imgpath: "wgroup.jpg",
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -462,28 +466,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Transform(
-                                transform: Matrix4.translationValues(
-                                    muchDelayedAnimation.value * width, 0, 0),
-                                child: Bouncing(
-                                  onPress: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (BuildContext context) =>
-                                    //         ViewReferrals(
-                                    //             referralCode:
-                                    //                 referralCode.toString(),
-                                    //             refUid: currentuserid),
-                                    //   ),
-                                    // );
-                                  },
-                                  child: const DashboardCard(
-                                    name: "My Referrals",
-                                    imgpath: "wgroup.jpg",
-                                  ),
-                                ),
-                              ),
+                              // Transform(
+                              //   transform: Matrix4.translationValues(
+                              //       muchDelayedAnimation.value * width, 0, 0),
+                              //   child: Bouncing(
+                              //     onPress: () {
+                              //       // Navigator.push(
+                              //       //   context,
+                              //       //   MaterialPageRoute(
+                              //       //     builder: (BuildContext context) =>
+                              //       //         ViewReferrals(
+                              //       //             referralCode:
+                              //       //                 referralCode.toString(),
+                              //       //             refUid: currentuserid),
+                              //       //   ),
+                              //       // );
+                              //     },
+                              //     child: const DashboardCard(
+                              //       name: "My Referrals",
+                              //       imgpath: "wgroup.jpg",
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),

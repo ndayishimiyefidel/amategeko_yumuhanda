@@ -25,6 +25,7 @@ class API {
   static const generatecode = "$hostUser/generateCode.php";
   static const deleteCode = "$hostUser/deleteCode.php";
   static const deleteUser = "$hostUser/deleteUser.php";
+  static const deleteSingleUser = "$hostUser/deleteSingleUser.php";
   static const deleteIremboUser = "$hostUser/deleteIremboUser.php";
   static const setLimitTime = "$hostUser/setLimitTime.php";
   static const addedToClass = "$hostUser/addedToClass.php";

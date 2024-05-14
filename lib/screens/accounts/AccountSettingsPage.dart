@@ -1,13 +1,13 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../backend/apis/db_connection.dart';
-import '../../resources/user_state_methods.dart';
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/MainDrawer.dart';
-import '../../widgets/ProgressWidget.dart';
 import 'package:http/http.dart' as http;
+import '../../widgets/ProgressWidget.dart';
+import '../../backend/apis/db_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../resources/user_state_methods.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSettings extends StatelessWidget {
   UserSettings({super.key});
@@ -245,25 +245,25 @@ class SettingsScreenState extends State<SettingsScreen> {
                                     )),
                               ],
                             ),
-                            GestureDetector(
-                              onTap: () {},
-                              child: const Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 150.0, right: 120.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      CircleAvatar(
-                                        backgroundColor: Colors.red,
-                                        radius: 25.0,
-                                        child: Icon(
-                                          Icons.camera_alt,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    ],
-                                  )),
-                            )
+                            // GestureDetector(
+                            //   onTap: () {},
+                            //   child: const Padding(
+                            //       padding:
+                            //           EdgeInsets.only(top: 150.0, right: 120.0),
+                            //       child: Row(
+                            //         mainAxisAlignment: MainAxisAlignment.center,
+                            //         children: <Widget>[
+                            //           CircleAvatar(
+                            //             backgroundColor: Colors.red,
+                            //             radius: 25.0,
+                            //             child: Icon(
+                            //               Icons.camera_alt,
+                            //               color: Colors.white,
+                            //             ),
+                            //           )
+                            //         ],
+                            //       )),
+                            // )
                           ],
                         ),
                       ),
@@ -307,7 +307,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
-                                        _status ? _getEditIcon() : Container(),
+                                        // _status ? _getEditIcon() : Container(),
                                       ],
                                     )
                                   ],
@@ -532,22 +532,22 @@ class SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _getEditIcon() {
-    return GestureDetector(
-      child: const CircleAvatar(
-        backgroundColor: Colors.red,
-        radius: 14.0,
-        child: Icon(
-          Icons.edit,
-          color: Colors.white,
-          size: 16.0,
-        ),
-      ),
-      onTap: () {
-        setState(() {
-          _status = false;
-        });
-      },
-    );
-  }
+  // Widget _getEditIcon() {
+  //   return GestureDetector(
+  //     child: const CircleAvatar(
+  //       backgroundColor: Colors.red,
+  //       radius: 14.0,
+  //       child: Icon(
+  //         Icons.edit,
+  //         color: Colors.white,
+  //         size: 16.0,
+  //       ),
+  //     ),
+  //     onTap: () {
+  //       setState(() {
+  //         _status = false;
+  //       });
+  //     },
+  //   );
+  // }
 }

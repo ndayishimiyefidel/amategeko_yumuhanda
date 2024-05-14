@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../screens/quizzes/exams.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:http/http.dart' as http;
 import '../screens/amasomo/prayer.dart';
 import 'package:uni_links/uni_links.dart';
-import '../screens/quizzes/new_quiz.dart';
+import '../screens/Login/login_screen.dart';
 import 'package:share_plus/share_plus.dart';
+import '../backend/apis/db_connection.dart';
 import '../screens/homepages/dashboard.dart';
 import '../screens/Signup/signup_screen.dart';
 import 'package:amategeko/utils/constants.dart';
@@ -27,11 +31,23 @@ class MainDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<MainDrawer> {
   late SharedPreferences preferences;
+  late String currentuserid;
+  late String phone;
+
+  void getCurrUserData() async {
+    preferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      currentuserid = preferences.getString("uid")!;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getCurrUserData();
     initUniLinks();
+    //static const deleteSingleUser = "$hostUser/deleteSingleUser.php";
   }
 
   Future<void> initUniLinks() async {
@@ -74,16 +90,16 @@ class _MainDrawerState extends State<MainDrawer> {
   }
 
   void redirectToPlayStore() {
-    // Replace "com.amategeko.amategeko" with your app package name on the Play Store
+    // Replace "com.amategeko.amategeko11" with your app package name on the Play Store
     String playStoreLink =
-        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
+        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko1";
     // Redirect to the Play Store
     launchUrl(Uri.parse(playStoreLink));
   }
 
   Future<bool> checkAppInstalled() async {
-    // Replace "com.amategeko.amategeko" with your app package name
-    const String appPackage = "com.amategeko.amategeko";
+    // Replace "com.amategeko.amategeko11" with your app package name
+    const String appPackage = "com.amategeko.amategeko1";
     // Check if the app is installed by attempting to launch it
     bool isInstalled = await canLaunchUrl(Uri.parse(appPackage));
     return isInstalled;
@@ -91,7 +107,7 @@ class _MainDrawerState extends State<MainDrawer> {
 
   void shareApp() {
     const String playStoreLink =
-        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko";
+        "https://play.google.com/store/apps/details?id=com.amategeko.amategeko1";
     const String appUrl = "https://amategeko-75e59.web.app/";
     String message;
 
@@ -155,7 +171,7 @@ class _MainDrawerState extends State<MainDrawer> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => NewQuiz(),
+                    builder: (BuildContext context) => const Exams(),
                   ),
                 );
               });
@@ -264,12 +280,10 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
           ),
           ListTile(
-            onTap: () => {
-              //String? currentuserid;
-            },
+            onTap: () => {},
             leading: IconButton(
               onPressed: () => {
-                //deleteUser(auth.currentUser!.uid),
+                deleteUser(currentuserid),
               },
               icon: const Icon(
                 Icons.delete,
@@ -294,17 +308,59 @@ class _MainDrawerState extends State<MainDrawer> {
     );
   }
 
-  // Future<void> deleteUser(String docId) async {
-  //   await auth.currentUser!.delete().then((value) => {
-  //         FirebaseFirestore.instance
-  //             .collection("Users")
-  //             .doc(docId)
-  //             .delete()
-  //             .then((value) => {
-  //                   UserStateMethods().logoutuser(context),
-  //                   // ignore: avoid_print
-  //                   print("User deleted"),
-  //                 })
-  //       });
-  // }
+  Future<void> deleteUser(String uid) async {
+    try {
+      final response = await http.post(
+        Uri.parse(API.deleteSingleUser),
+        body: {'uid': uid},
+      );
+
+      if (response.statusCode == 200) {
+        // User deleted successfully
+        final responseData = json.decode(response.body);
+        if (responseData['success']) {
+          // Show a success message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Account deleted successfully'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+          // Navigate to login or another appropriate screen
+          // Example:
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+        } else {
+          // Show an error message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('Failed to delete account: ${responseData['message']}'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        // Show an error message to the user if server responded with an error status
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete account: ${response.statusCode}'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the HTTP request
+      print('Error deleting user: $e');
+      // Show an error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An error occurred while deleting the account'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
 }

@@ -1,15 +1,15 @@
-import 'package:amategeko/enume/models/question_model.dart';
-import 'package:amategeko/screens/quizzes/result_screen.dart';
-import 'package:amategeko/widgets/play_quiz_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
-import 'package:screenshot_callback/screenshot_callback.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../ads/interestial_ad.dart';
-import '../../ads/reward_video_manager.dart';
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
+import '../../ads/interestial_ad.dart';
 import '../../widgets/count_down.dart';
 import '../homepages/noficationtab1.dart';
+import '../../ads/reward_video_manager.dart';
+import 'package:amategeko/widgets/play_quiz_widget.dart';
+import 'package:amategeko/enume/models/question_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amategeko/screens/quizzes/result_screen.dart';
+import 'package:screenshot_callback/screenshot_callback.dart';
+import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 
 class OpenQuiz extends StatefulWidget {
   final String quizId;
@@ -160,10 +160,10 @@ class _OpenQuizState extends State<OpenQuiz>
     }
   }
 
-  void _showInterstitialAd() {
-    // Show the interstitial ad when needed
-    adManager.showInterstitialAd();
-  }
+  // void _showInterstitialAd() {
+  //   // Show the interstitial ad when needed
+  //   adManager.showInterstitialAd();
+  // }
 
   @override
   void dispose() {

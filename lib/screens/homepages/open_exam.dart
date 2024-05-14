@@ -1,17 +1,16 @@
-import 'package:amategeko/components/amabwiriza.dart';
-import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../ads/interestial_ad.dart';
-import '../../ads/reward_video_manager.dart';
+import '../quizzes/exams.dart';
+import '../quizzes/examen_fr.dart';
 import '../../utils/constants.dart';
+import '../quizzes/exam_english.dart';
+import 'package:flutter/material.dart';
+import '../../ads/interestial_ad.dart';
+import '../../widgets/MainDrawer.dart';
 import '../../widgets/BouncingButton.dart';
 import '../../widgets/DashboardCards.dart';
-import '../../widgets/MainDrawer.dart';
-import '../quizzes/exam_english.dart';
-import '../quizzes/examen_fr.dart';
-import '../quizzes/exams.dart';
+import '../../ads/reward_video_manager.dart';
+import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OpenExamPage extends StatefulWidget {
   const OpenExamPage({super.key});
@@ -132,6 +131,7 @@ class _OpenExamPageState extends State<OpenExamPage>
               CustomButton(
                 text: "Amabwiriza",
                 onPressed: () {
+                  _showInterstitialAd();
                   Navigator.push(
                     context,
                     MaterialPageRoute(

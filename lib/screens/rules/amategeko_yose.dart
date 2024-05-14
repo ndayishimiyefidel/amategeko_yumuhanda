@@ -1,12 +1,11 @@
-import 'package:amategeko/components/amabwiriza.dart';
-import 'package:amategeko/screens/rules/readDocument.dart';
-import 'package:amategeko/screens/rules/uploadDocument.dart';
-import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-
 import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/MainDrawer.dart';
+import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
+import 'package:amategeko/screens/rules/readDocument.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 class AmategekoYose extends StatefulWidget {
   const AmategekoYose({Key? key}) : super(key: key);
 
@@ -78,17 +77,17 @@ class _AmategekoYoseState extends State<AmategekoYose> {
           ),
         ),
         actions: [
-      CustomButton(
-      text: "Amabwiriza",
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => AmabwirizaList(),
-          ),
-        );
-      },
-    )
+          CustomButton(
+            text: "Amabwiriza",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) => AmabwirizaList(),
+                ),
+              );
+            },
+          )
         ],
         centerTitle: true,
         backgroundColor: kPrimaryColor,
@@ -99,21 +98,21 @@ class _AmategekoYoseState extends State<AmategekoYose> {
           documentsList(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return const UploadDocuments(
-                  isNew: true,
-                );
-              },
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) {
+      //           return const UploadDocuments(
+      //             isNew: true,
+      //           );
+      //         },
+      //       ),
+      //     );
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }
