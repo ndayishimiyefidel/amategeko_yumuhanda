@@ -1,8 +1,7 @@
-import 'package:amategeko/utils/constants.dart';
+import '../utils/insttruction.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-
-import '../utils/insttruction.dart';
+import 'package:amategeko/utils/constants.dart';
 
 class AmabwirizaList extends StatelessWidget {
   void shareApp() {
@@ -59,11 +58,11 @@ class AmabwirizaList extends StatelessWidget {
               InstructionItem(
                 title: '4.KWISHYURA KUGIRA NGO IBIZAMINI BYOSE BIFUNGUKE',
                 description:
-                    '1. Nkuko nabisobanuye bwa mbere exam yambere ni ubuntu izindi 20 bisaba kwishyura 1500 RWF kuri 0788659575/0728877442 cg kuri MOMO PAY:329494 ibaruye kuri ALEXIS.\n 2.Iyo umaze kwishyura uhite ureba niba ufite connection (internet) ugahita ufungura exam ugakanda ahanditse saba code  ya application mwibara ryuburu ubundi ugakanda ahanditse saba code mwibara rya umuhondo ugahita usubira inyuma ugategereza iminota itanu ugatangira ukiga usanga byafungutse.',
+                    '1. Nkuko nabisobanuye bwa mbere exam yambere ni ubuntu izindi 20 bisaba kwishyura 1500 RWF kuri 0780494000/0729111458 cg kuri MOMO PAY:888085 ibaruye kuri Fidele.\n 2.Iyo umaze kwishyura uhite ureba niba ufite connection (internet) ugahita ufungura exam ugakanda ahanditse saba code  ya application mwibara ryuburu ubundi ugakanda ahanditse saba code mwibara rya umuhondo ugahita usubira inyuma ugategereza iminota itanu ugatangira ukiga usanga byafungutse.',
               ),
               InstructionItems(
                 title: '4. IBINDI BISABANURO BIRAMBUYE',
-                phoneNumbers: ['0788659575', '0728877442'],
+                phoneNumbers: ['0780494000', '0729111458'],
               ),
               SizedBox(
                 height: 10,

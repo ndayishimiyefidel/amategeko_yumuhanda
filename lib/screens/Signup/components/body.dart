@@ -1,26 +1,25 @@
-// ignore_for_file: use_build_context_synchronously
-
+import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
-import 'package:amategeko/backend/apis/db_connection.dart';
-import 'package:amategeko/enume/models/user_model.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../ads/interestial_ad.dart';
-import '../../../components/text_field_container.dart';
-import '../../../utils/constants.dart';
-import '../../../widgets/ProgressWidget.dart';
 import '../../HomeScreen.dart';
-import '../../Login/components/check_deviceid.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import '../../../utils/constants.dart';
 import '../../Login/login_screen.dart';
-import '../../Signup/components/background.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+import '../../../ads/interestial_ad.dart';
+import '../../../widgets/ProgressWidget.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../Signup/components/background.dart';
+import '../../Login/components/check_deviceid.dart';
+import '../../../components/text_field_container.dart';
+import 'package:amategeko/enume/models/user_model.dart';
+import 'package:amategeko/backend/apis/db_connection.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+// ignore_for_file: use_build_context_synchronously
 
 class SignUp extends StatefulWidget {
   final String? referralCode;
@@ -332,10 +331,10 @@ class _SignUpState extends State<SignUp> {
                             GestureDetector(
                               onTap: () async {
                                 await FlutterPhoneDirectCaller.callNumber(
-                                    "0788659575");
+                                    "0780494000");
                               },
                               child: const Text(
-                                "0788659575",
+                                "0780494000",
                                 style: TextStyle(
                                   color: kPrimaryColor,
                                   fontSize: 18,
@@ -345,10 +344,10 @@ class _SignUpState extends State<SignUp> {
                             GestureDetector(
                               onTap: () async {
                                 await FlutterPhoneDirectCaller.callNumber(
-                                    "0728877442");
+                                    "0729111458");
                               },
                               child: const Text(
-                                "0728877442",
+                                "0729111458",
                                 style: TextStyle(
                                   color: kPrimaryColor,
                                   fontSize: 18,
@@ -474,7 +473,7 @@ class _SignUpState extends State<SignUp> {
                 // ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 10),
-                  width: size.width * 0.3,
+                  width: size.width * 0.35,
                   height: size.height * 0.06,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),

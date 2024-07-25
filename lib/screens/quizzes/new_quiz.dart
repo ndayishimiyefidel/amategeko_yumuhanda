@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import '../../backend/apis/db_connection.dart';
-import '../../utils/constants.dart';
-import '../../utils/insttruction.dart';
-import '../../widgets/ProgressWidget.dart';
-import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
+import '../../utils/constants.dart';
+import '../../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import '../../utils/insttruction.dart';
+import 'package:http/http.dart' as http;
+import '../../widgets/ProgressWidget.dart';
+import '../../backend/apis/db_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class NewQuiz extends StatefulWidget {
   const NewQuiz({Key? key}) : super(key: key);
@@ -223,7 +223,7 @@ class _NewQuizState extends State<NewQuiz> {
                                     Column(
                                       children: [
                                         Text(
-                                          "1.Kugirango examen zifunguke ubanza kwishyura 1500 rwf kuri 0788659575/0728877442  cyangwa ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*329494*1500# kuri momo pay ibaruye kuri ALEXIS",
+                                          "1.Kugirango examen zifunguke ubanza kwishyura 1500 rwf kuri 0780494000/0729111458  cyangwa ukanze mu ibara ry'icyatsi cyangwa ukanze *182*8*1*888085*1500# kuri momo pay ibaruye kuri FIDELE",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -255,8 +255,8 @@ class _NewQuizState extends State<NewQuiz> {
                                       title:
                                           '4. Iyo wishyuye ukoresheje nimero itari muri application cg ukanze uhanditse saba code  utafunguye connection uhamagara kuri izi nimero tugufungurira: ',
                                       phoneNumbers: [
-                                        '0788659575',
-                                        '0728877442'
+                                        '0780494000',
+                                        '0729111458'
                                       ],
                                     ),
                                   ],
@@ -292,10 +292,10 @@ class _NewQuizState extends State<NewQuiz> {
                                     onPressed: () async {
                                       //direct phone call
                                       await FlutterPhoneDirectCaller.callNumber(
-                                          "*182*8*1*329494*1500#");
+                                          "*182*8*1*888085*1500#");
                                     },
                                     child: const Text(
-                                      "Kanda hano *182*8*1*329494*1500# wishyure",
+                                      "Kanda hano *182*8*1*888085*1500# wishyure",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -319,7 +319,7 @@ class _NewQuizState extends State<NewQuiz> {
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0780494000 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
@@ -390,7 +390,7 @@ class _NewQuizState extends State<NewQuiz> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
+                                      "*182*8*1*888085*1500#");
                                 },
                                 child: const Text(
                                   "Ishyura 1500 Rwf.",

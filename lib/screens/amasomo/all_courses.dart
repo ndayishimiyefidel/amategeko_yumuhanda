@@ -1,22 +1,21 @@
-import 'package:amategeko/components/amabwiriza.dart';
-import 'package:amategeko/screens/amasomo/course_contents.dart';
-import 'package:amategeko/utils/generate_code.dart';
-import 'package:amategeko/widgets/custom_widget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../backend/apis/db_connection.dart';
-import '../../utils/constants.dart';
-import '../../widgets/ProgressWidget.dart';
-import '../../widgets/fcmWidget.dart';
-import 'course_content.dart';
 import 'isomo_page.dart';
+import 'course_content.dart';
+import '../../utils/constants.dart';
+import '../../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
+import '../../widgets/ProgressWidget.dart';
+import '../../backend/apis/db_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:amategeko/utils/generate_code.dart';
+import 'package:amategeko/components/amabwiriza.dart';
+import 'package:amategeko/widgets/custom_widget.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:amategeko/screens/amasomo/course_contents.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class AllCourse extends StatefulWidget {
   const AllCourse({Key? key}) : super(key: key);
@@ -281,7 +280,7 @@ class _AllCourseState extends State<AllCourse> {
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0780494000 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
@@ -352,7 +351,7 @@ class _AllCourseState extends State<AllCourse> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
+                                      "*182*8*1*888085*1500#");
                                 },
                                 child: const Text(
                                   "Ishyura 1500 Rwf.",
@@ -646,7 +645,7 @@ class _CourseTileState extends State<CourseTile> {
                   builder: (context) {
                     return AlertDialog(
                       content: const Text(
-                          "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0788659575 bagufashe.Murakoze "),
+                          "Ntabwo wemerewe gufungura isomo, Hamagara iyi nimero 0780494000 bagufashe.Murakoze "),
                       actions: [
                         TextButton(
                             onPressed: () {

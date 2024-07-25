@@ -29,7 +29,7 @@ class _AmategekoYoseState extends State<AmategekoYose> {
           ),
           FileTile(
             assetPath: 'assets/files/alexisibyapa.pdf',
-            fileName: 'IBYAPA BY ALEXIS',
+            fileName: 'IBYAPA',
             fileSize: '753 KB',
           ),
 

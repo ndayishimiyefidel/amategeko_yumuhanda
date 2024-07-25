@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import '../../backend/apis/db_connection.dart';
-import '../../utils/constants.dart';
-import '../../utils/insttruction.dart';
-import '../../widgets/ProgressWidget.dart';
-import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
+import '../../utils/constants.dart';
+import '../../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import '../../utils/insttruction.dart';
+import 'package:http/http.dart' as http;
+import '../../widgets/ProgressWidget.dart';
+import '../../backend/apis/db_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class NewQuizEnglish extends StatefulWidget {
   const NewQuizEnglish({Key? key}) : super(key: key);
@@ -223,7 +223,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                     Column(
                                       children: [
                                         Text(
-                                          "1.For examen to open first pay 5000 Rwf at 0788659575/072887442 or click in green or click *182*8*1*329494*5000# on momo pay calculated on ALEXIS",
+                                          "1.For examen to open first pay 5000 Rwf at 0780494000/072887442 or click in green or click *182*8*1*888085*5000# on momo pay calculated on FIDELE",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -255,8 +255,8 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                       title:
                                           '4. When you pay using a number that is not in the application or click on the text and ask for the code without opening the connection by calling these numbers and opening them:',
                                       phoneNumbers: [
-                                        '0788659575',
-                                        '0728877442'
+                                        '0780494000',
+                                        '0729111458'
                                       ],
                                     ),
                                   ],
@@ -292,10 +292,10 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                     onPressed: () async {
                                       //direct phone call
                                       await FlutterPhoneDirectCaller.callNumber(
-                                          "*182*8*1*329494*5000#");
+                                          "*182*8*1*888085*5000#");
                                     },
                                     child: const Text(
-                                      "Click here *182*8*1*329494*5000# pay",
+                                      "Click here *182*8*1*888085*5000# pay",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -319,7 +319,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
     final sabaCodeUrl = API.sabaCode;
     final int exam = 1;
     String body =
-        "Well done, My name is ${senderName} and my phone number is I have already paid RWF 5000 for 0788659575 for testing.\n"
+        "Well done, My name is ${senderName} and my phone number is I have already paid RWF 5000 for 0780494000 for testing.\n"
         "“Now I was looking for an entry code. Thank you for abandoning me.";
     String notificationTitle = "Requesting Quiz Code";
 
@@ -390,7 +390,7 @@ class _NewQuizEnglishState extends State<NewQuizEnglish> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*5000#");
+                                      "*182*8*1*888085*5000#");
                                 },
                                 child: const Text(
                                   "Ishyura 5000 Rwf.",

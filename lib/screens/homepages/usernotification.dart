@@ -1,14 +1,14 @@
 import 'dart:convert';
+import '../../utils/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../../backend/apis/db_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../../components/notification_list.dart';
 import 'package:amategeko/widgets/fcmWidget.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../backend/apis/db_connection.dart';
-import '../../components/notification_list.dart';
-import '../../utils/constants.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class UserNotification extends StatefulWidget {
   const UserNotification({super.key});
@@ -129,7 +129,7 @@ class _UserNotificationState extends State<UserNotification> {
     final sabaCodeUrl = API.sabaCode;
     final int exam = 0;
     String body =
-        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0788659575 yo gukora ibizamini.\n"
+        "Mwiriwe neza,Amazina yanjye nitwa $senderName naho nimero ya telefoni ni  Namaze kwishyura amafaranga 1500 kuri 0780494000 yo gukora ibizamini.\n"
         "None nashakaga kode yo kwinjiramo. Murakoze ndatereje.";
     String notificationTitle = "Requesting Quiz Code";
 
@@ -198,7 +198,7 @@ class _UserNotificationState extends State<UserNotification> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*1500#");
+                                      "*182*8*1*888085*1500#");
                                 },
                                 child: const Text(
                                   "Ishyura 1500 Rwf.",

@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import '../../backend/apis/db_connection.dart';
-import '../../utils/constants.dart';
-import '../../utils/insttruction.dart';
-import '../../widgets/ProgressWidget.dart';
-import '../../widgets/fcmWidget.dart';
 import 'open_quiz.dart';
+import '../../utils/constants.dart';
+import '../../widgets/fcmWidget.dart';
+import 'package:flutter/material.dart';
+import '../../utils/insttruction.dart';
+import 'package:http/http.dart' as http;
+import '../../widgets/ProgressWidget.dart';
+import '../../backend/apis/db_connection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class NewQuizFrench extends StatefulWidget {
   const NewQuizFrench({Key? key}) : super(key: key);
@@ -223,7 +223,7 @@ class _NewQuizFrenchState extends State<NewQuizFrench> {
                                     Column(
                                       children: [
                                         Text(
-                                          "1.Pour ouvrir l'examen, veuillez d'abord payer 5000 RWF au 0788659575/072887442 ou cliquez sur le bouton vert ou composez 18281329494*5000# sur Momo Pay, calculé sur ALEXIS",
+                                          "1.Pour ouvrir l'examen, veuillez d'abord payer 5000 RWF au 0780494000/0729111458 ou cliquez sur le bouton vert ou composez *182*1*888085*5000# sur Momo Pay, calculé sur Fidele",
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.normal,
@@ -255,8 +255,8 @@ class _NewQuizFrenchState extends State<NewQuizFrench> {
                                       title:
                                           "4.Si vous effectuez le paiement avec un numéro qui n'est pas enregistré dans l'application, ou si vous cliquez sur le texte et demandez le code sans ouvrir la connexion en appelant ces numéros et en les ouvrant :",
                                       phoneNumbers: [
-                                        '0788659575',
-                                        '0728877442'
+                                        '0780494000',
+                                        '0729111458'
                                       ],
                                     ),
                                   ],
@@ -292,10 +292,10 @@ class _NewQuizFrenchState extends State<NewQuizFrench> {
                                     onPressed: () async {
                                       //direct phone call
                                       await FlutterPhoneDirectCaller.callNumber(
-                                          "*182*8*1*329494*5000#");
+                                          "*182*8*1*888085*5000#");
                                     },
                                     child: const Text(
-                                      "Cliquez ici *182*8*1*329494*5000# pour payer.",
+                                      "Cliquez ici *182*8*1*888085*5000# pour payer.",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 10,
@@ -319,7 +319,7 @@ class _NewQuizFrenchState extends State<NewQuizFrench> {
     final sabaCodeUrl = API.sabaCode;
     final int exam = 1;
     String body =
-        "Well done, My name is ${senderName} and my phone number is I have already paid RWF 5000 for 0788659575 for testing.\n"
+        "Well done, My name is ${senderName} and my phone number is I have already paid RWF 5000 for 0780494000 for testing.\n"
         "“Now I was looking for an entry code.y Thank you for abandoning me.";
     String notificationTitle = "Demande de code de quiz";
 
@@ -390,7 +390,7 @@ class _NewQuizFrenchState extends State<NewQuizFrench> {
                                 onPressed: () async {
                                   //direct phone call
                                   await FlutterPhoneDirectCaller.callNumber(
-                                      "*182*8*1*329494*5000#");
+                                      "*182*8*1*888085*5000#");
                                 },
                                 child: const Text(
                                   "Payer 5000 Rwf.",
