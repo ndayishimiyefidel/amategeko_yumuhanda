@@ -326,7 +326,7 @@ class _NewQuizState extends State<NewQuiz> {
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: {'userId': currentuserid, 'ex_type': exam.toString()},
+        body: {'userIds': currentuserid, 'ex_type': exam.toString()},
       );
 
       if (response.statusCode == 200) {
@@ -353,7 +353,7 @@ class _NewQuizState extends State<NewQuiz> {
             final res = await http.post(
               Uri.parse(sabaCodeUrl),
               body: {
-                'userId': currentuserid.toString(),
+                'userIds': currentuserid.toString(),
                 'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
                 "phone": phone.toString(),
                 "name": currentusername,

@@ -1,9 +1,15 @@
 class API {
+  static const appUpdateUrl =
+      'https://play.google.com/store/apps/details?id=com.amategeko.amategeko';
+
   // static const baseUrl = 'https://rwandatraffic.com/apis';
-  static const baseUrl = 'https://amategeko.hafiyacu.rw';
   // static const baseUrl = 'http://192.168.1.71/apis';
   //192.168.1.71
-  static const hostUser = "$baseUrl/user";
+  static const baseUrl = 'https://amategeko.hafiyacu.rw';
+  static const app_version_url =
+      'https://amategeko.hafiyacu.rw/app_version.json';
+
+  static const hostUser = "$baseUrl/endpoints";
   static const validate = "$hostUser/validate.php";
   //sign up
   static const signUp = "$hostUser/signup.php";

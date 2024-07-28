@@ -1,17 +1,15 @@
-// utils.dart
-
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 import '../backend/apis/db_connection.dart';
+// utils.dart
 
 class GenerateUser {
   static Future<void> generateCodeAndNotify(BuildContext context, String docId,
       String generatedCode, String name, String msg, int isOpen) async {
     final Map<String, dynamic> requestBody = {
       'docId': docId,
-      'generatedCode': generatedCode,
+      'generatedCodes': generatedCode,
       'isOpen': isOpen.toString(),
     };
     final url = API.generatecode;

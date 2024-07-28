@@ -7,7 +7,8 @@ import '../../Signup/signup_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
-  const Body({super.key});
+  final String minVersion;
+  const Body({super.key, required this.minVersion});
 
   @override
   _BodyState createState() => _BodyState();
@@ -52,10 +53,10 @@ class _BodyState extends State<Body> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(left: 15, right: 15),
               child: Text(
-                "MURAKAZA NEZA KURI APULIKASIYO Y'AMATEGEKO Y'UMUHANDA",
+                "MURAKAZA NEZA KURI APULIKASIYO Y'AMATEGEKO Y'UMUHANDA  VERSION",
                 style: TextStyle(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
@@ -81,7 +82,7 @@ class _BodyState extends State<Body> {
                   ),
                   Text(
                     "Niba uri mushya kuri iyi apulikasiyo kanda "
-                    "kuri buto ibanza yitwa iyandikishe,Naho niba usanzwe ufite konti kanda ahanditse injira",
+                    "kuri buto ibanza yitwa iyandikishe,Naho niba usanzwe ufite konti kanda ahanditse injira.",
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 18,

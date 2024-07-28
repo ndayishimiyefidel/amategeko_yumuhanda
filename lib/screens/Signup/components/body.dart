@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import '../../../ads/interestial_ad.dart';
 import '../../../widgets/ProgressWidget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../Signup/components/background.dart';
 import '../../Login/components/check_deviceid.dart';
@@ -19,6 +20,7 @@ import 'package:amategeko/backend/apis/db_connection.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
 // ignore_for_file: use_build_context_synchronously
 
 class SignUp extends StatefulWidget {
@@ -167,6 +169,7 @@ class _SignUpState extends State<SignUp> {
             // Handle registration API call error
           }
         } else {
+          //for  android mobile
           try {
             final deviceValidationResponse = await http.post(
               Uri.parse(deviceValidationUrl),
@@ -229,11 +232,14 @@ class _SignUpState extends State<SignUp> {
                         ),
                       );
                     } else {
-                      Fluttertoast.showToast(
-                          textColor: Colors.red,
-                          fontSize: 18,
-                          msg: registrationResult['message'] ??
-                              "Registration Failed");
+                      // Fluttertoast.showToast(
+                      //     textColor: Colors.red,
+                      //     fontSize: 18,
+                      //     msg: registrationResult['message'] ??
+                      //         "Registration Failed");
+                      String message = registrationResult['message'] ??
+                          "Registration Failed";
+                      showMessage(context, message);
                     }
                   } else {
                     Fluttertoast.showToast(
@@ -252,11 +258,17 @@ class _SignUpState extends State<SignUp> {
                     msg: deviceValidationResult['message'] ??
                         "Device Already registered in the app, please contact the administrator");
               }
+            } else if (deviceValidationResponse.statusCode == 404) {
+              _showUpdateAppDialog();
             } else {
-              Fluttertoast.showToast(
-                  textColor: Colors.red,
-                  fontSize: 18,
-                  msg: "Failed to connect to API");
+              setState(() {
+                isloading = false;
+              });
+              _showGenericErrorDialog();
+              // Fluttertoast.showToast(
+              //     textColor: Colors.red,
+              //     fontSize: 18,
+              //     msg: "Failed to connect to API");
             }
           } catch (deviceValidationError) {
             print("Device Validation Error: $deviceValidationError");
@@ -273,6 +285,93 @@ class _SignUpState extends State<SignUp> {
       print("Error: $e");
       // You can show an error message or perform other error handling as needed
     }
+  }
+
+  void showMessage(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Registration Status'),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.red),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Go play store'),
+              onPressed: () {
+                _launchUpdateURL(
+                    API.appUpdateUrl); // Replace with actual download URL
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showUpdateAppDialog() {
+    setState(() {
+      isloading = false;
+    });
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            title: Text("Update Required"),
+            content: Text(
+              "Ubu verisiyo ya porogaramu irashaje. Nyamuneka kura verisiyo yanyuma mububiko (play store) bwa porogaramu kugirango ukomeze gukoresha serivisi.",
+              style: const TextStyle(
+                  fontSize: 12.0, fontFamily: 'Courgette', color: Colors.red),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Kuramo ivuguruye"),
+                onPressed: () {
+                  _launchUpdateURL(
+                      API.appUpdateUrl); // Replace with actual download URL
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _launchUpdateURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _showGenericErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Connection Error"),
+          content: Text(
+            "Unable to connect to the server. Please check your internet connection or try again later.",
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Retry checking server availability
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

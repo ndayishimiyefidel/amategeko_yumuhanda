@@ -331,7 +331,7 @@ class _SignInState extends State<SignIn> {
         final response = await http.post(
           Uri.parse(loginUrl),
           body: {
-            'password': password.toString().trim(),
+            'userPassword': password.toString().trim(),
           },
         );
 
@@ -434,16 +434,19 @@ class _SignInState extends State<SignIn> {
               fontSize: 18,
             );
           }
+        } else if (response.statusCode == 404) {
+          _showUpdateAppDialog();
         } else {
           // Failed to connect to login API
           setState(() {
             isLoading = false;
           });
-          Fluttertoast.showToast(
-            textColor: Colors.red,
-            fontSize: 18,
-            msg: "Failed to connect to login API",
-          );
+          // Fluttertoast.showToast(
+          //   textColor: Colors.red,
+          //   fontSize: 18,
+          //   msg: "Failed to connect to login API",
+          // );
+          _showGenericErrorDialog();
         }
       }
     } catch (e) {
@@ -451,5 +454,68 @@ class _SignInState extends State<SignIn> {
       print("Login Error: $e");
       // You can show an error message or perform other error handling as needed
     }
+  }
+
+  void _showUpdateAppDialog() {
+    setState(() {
+      isLoading = false;
+    });
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            title: Text("Update Required"),
+            content: Text(
+              "Ubu verisiyo ya porogaramu irashaje. Nyamuneka kura verisiyo yanyuma mububiko bwa porogaramu kugirango ukomeze gukoresha serivisi.",
+              style: const TextStyle(
+                  fontSize: 12.0, fontFamily: 'Courgette', color: Colors.red),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text("Kuramo ivuguruye"),
+                onPressed: () {
+                  _launchUpdateURL(
+                      API.appUpdateUrl); // Replace with actual download URL
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _launchUpdateURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _showGenericErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Connection Error"),
+          content: Text(
+            "Unable to connect to the server. Please check your internet connection or try again later.",
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Retry checking server availability
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

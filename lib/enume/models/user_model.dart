@@ -27,7 +27,7 @@ class User {
     return User(
       uid: json['uid'],
       createdAt: json['createdAt'],
-      password: json['password'],
+      password: json['userPassword'],
       role: json['role'],
       phone: json['phone'],
       referralCode: json['referralCode'],
@@ -42,7 +42,7 @@ class User {
     return {
       'uid': uid,
       'createdAt': createdAt,
-      'password': password,
+      'userPassword': password,
       'role': role,
       'phone': phone,
       'referralCode': referralCode,
@@ -53,14 +53,15 @@ class User {
     };
   }
 }
+
 class IremboModel {
   String uid;
   String createdAt;
   String phone;
   String name;
   String address;
-  String identity,type;
-  String? code,category;
+  String identity, type;
+  String? code, category;
 
   IremboModel({
     required this.uid,
@@ -70,7 +71,8 @@ class IremboModel {
     required this.type,
     required this.address,
     required this.createdAt,
-  this.category, this.code,
+    this.category,
+    this.code,
   });
 
   factory IremboModel.fromJson(Map<String, dynamic> json) {
@@ -83,7 +85,7 @@ class IremboModel {
       identity: json['identity'],
       code: json['code'],
       category: json['category'],
-      type:json['type'],
+      type: json['type'],
     );
   }
 

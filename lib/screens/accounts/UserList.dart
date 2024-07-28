@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../backend/apis/db_connection.dart';
 import '../../components/chat_for_users_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -31,7 +31,7 @@ class _UserListState extends State<UserList> {
   int to = 10; // Initial range, fetch the first 10 records
 
   Future<void> fetchAllUsers() async {
-    final apiUrl = API.userWithCode + "?from=$from&to=$to";
+    final apiUrl = API.userWithCode + "?ifrom=$from&to=$to";
     isLoading = true;
 
     try {

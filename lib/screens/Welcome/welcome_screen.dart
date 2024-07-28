@@ -1,13 +1,16 @@
-import 'package:amategeko/screens/Welcome/components/body.dart';
 import 'package:flutter/material.dart';
+import 'package:amategeko/screens/Welcome/components/body.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+  final String min_version;
+  const WelcomeScreen({super.key, required this.min_version});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Body(),
+    return Scaffold(
+      body: Body(
+        minVersion: min_version,
+      ),
     );
   }
 }
