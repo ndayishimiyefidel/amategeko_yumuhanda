@@ -1,0 +1,73 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins-dependencies.lock
+.firebase/
+
+
+# Android build
+/android/app/build/
+/build/
+
+# APKs and bundles
+*.apk
+*.aab
+
+# iOS build
+/ios/Pods/
+/ios/Runner.xcworkspace/
+/ios/Flutter/Flutter.framework/
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/Flutter.podspec.lock
+/ios/Flutter/Flutter.podspec.lock
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated files
+*.lock
+
+# Exclude asset binaries and large files
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
+assets/*.pdf
+assets/*.exe
+assets/*.mp4
+assets/*.mov
+assets/*.avi
+assets/*.zip
+assets/*.tar.gz
+assets/*.7z
+assets/*.svg
+assets/*.ttf
+assets/*.otf
+
+# Exclude asset subfolders with images and binaries
+assets/examimages/
+assets/icons/
+assets/images/
+assets/files/*.pdf
+assets/files/*.json
+assets/fonts/
+
+# Firebase/Google services
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Misc
+*.log
+*.tmp
+
+# Uncomment below if you want to ignore all assets (not recommended if you need them in the app)
+# assets/

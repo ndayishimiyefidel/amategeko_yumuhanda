@@ -1,0 +1,255 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../../backend/apis/db_connection.dart';
+import '../../components/notification_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../utils/constants.dart';
+
+class NotificationTab2 extends StatefulWidget {
+  const NotificationTab2({super.key});
+
+  @override
+  State createState() => _NotificationTab2State();
+}
+
+class _NotificationTab2State extends State<NotificationTab2> {
+  List<Map<String, dynamic>> allUsersList = [];
+  String? currentuserid;
+  String? currentusername;
+  late String currentuserphoto;
+  String? userRole;
+  String? phoneNumber;
+  String? code;
+  late String quizTitle;
+  late SharedPreferences preferences;
+  int itemsPerPage = 10;
+  int currentPage = 0;
+  bool isLoading = false;
+
+  int from = 0;
+  int totalRows = 0;
+  int to = 10; // Initial range, fetch the first 10 records
+
+  Future<void> fetchAbadafiteCode() async {
+    final apiUrl = API.fetchAbadafiteCode + "?from=$from&to=$to";
+    isLoading = true;
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final String responseBody = response.body;
+
+        if (responseBody.isNotEmpty) {
+          final data = json.decode(responseBody);
+
+          if (data['success'] == true) {
+            if (!mounted) return;
+            setState(() {
+              if (from == 0) {
+                // If it's the first load, clear the list
+                allUsersList.clear();
+              }
+
+              // Append the new data to the existing list
+              allUsersList
+                  .addAll(List<Map<String, dynamic>>.from(data['data']));
+              if (!mounted) return;
+              setState(() {
+                isLoading = false;
+                totalRows = int.tryParse(data['total'])!.toInt();
+              });
+              print("notification list:$allUsersList");
+
+              // Update 'from' and 'to' for the next load
+              from = to;
+              to += 10; // Fetch the next 10 records
+            });
+          } else {
+            print("Failed to execute query");
+          }
+        } else {
+          print("Empty response body");
+        }
+      } else {
+        throw Exception(
+            'Failed to load data from the API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error occurs: $e");
+    }
+  }
+
+  getCurrUserId() async {
+    preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      currentuserid = preferences.getString("uid")!;
+      currentusername = preferences.getString("name")!;
+      userRole = preferences.getString("role")!;
+      phoneNumber = preferences.getString("phone")!;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrUserId();
+    fetchAbadafiteCode(); // Load the initial 10 records
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            kPrimaryColor.withValues(alpha: 0.05),
+            Colors.white,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: !isLoading
+          ? allUsersList.isEmpty
+              ? _buildEmptyState()
+              : _buildUserList()
+          : _buildLoadingState(),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.person_add_rounded,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            "No Users Without Code",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "No users without codes found in the system",
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 16,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "Loading users without codes...",
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserList() {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.only(top: 16),
+            itemCount: allUsersList.length,
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final data = allUsersList[index];
+              return UsersNotificationList(
+                name: data["name"] ?? '',
+                time: data["createdAt"],
+                userId: data["userId"] ?? '',
+                phone: data["phone"] ?? '',
+                code: data["code"] ?? '',
+                ex_type: data['ex_type'] ?? '',
+                endTime: data["endTime"] ?? "1684242113231",
+                docId: data['id'] ?? '',
+              );
+            },
+          ),
+        ),
+        if (to <= totalRows)
+          Container(
+            margin: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      fetchAbadafiteCode(); // Load more records
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              ),
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text(
+                      "Load More",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+            ),
+          ),
+      ],
+    );
+  }
+}

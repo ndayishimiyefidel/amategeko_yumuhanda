@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "rwanda_traffic_rules",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "rwanda_traffic_rules (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "rwanda_traffic_rules (release mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "e:/rwanda_traffic_rules_yumuhanda/lib/utils",
+      "program": "e:/rwanda_traffic_rules_yumuhanda/lib/utils/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

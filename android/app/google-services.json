@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "760178305900",
+    "project_id": "rwanda-traffic-rules-c7e18",
+    "storage_bucket": "rwanda-traffic-rules-c7e18.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760178305900:android:c31cb0fa5b71b0deca2149",
+        "android_client_info": {
+          "package_name": "com.rwanda.trafficrules"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuacBFYALZ0Ho2r2Vo7U8VqPty9scOzYw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
